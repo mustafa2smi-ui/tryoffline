@@ -1,0 +1,253 @@
+:root{
+  --bg:#2c3e50; --paper:#0D0D0D; --ink:#ecf0f1; --muted:#bdc3c7;
+  --accent:#f1c40f; --accent2:#f39c12; --danger:#e74c3c; --line:#46627f;
+  --shadow:rgba(0, 0, 0, 0.4);
+  --border:#f1c40f;
+  --dotted-line: #4a6580;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.wrap{
+  max-width:900px;
+  width: 100%;
+  margin: 20px auto;
+  padding:0 14px
+}
+
+.controls{
+  display:flex; align-items:center; gap:12px; margin-bottom:16px;
+}
+
+#meta{color:var(--muted); font-size:14px; font-weight:500;}
+
+.spacer{flex:1}
+
+.btn{
+  background: linear-gradient(to bottom, #f1c40f, #f39c12);
+  color:#2c3e50; border:1px solid #f39c12; padding:8px 16px; border-radius:4px;
+  cursor:pointer; font-weight:600; box-shadow:0 2px 6px var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: linear-gradient(to bottom, #f39c12, #e67e22);
+  box-shadow:0 4px 8px var(--shadow);
+}
+
+.btn:active{
+  transform:translateY(1px);
+  box-shadow:0 1px 3px var(--shadow);
+}
+
+/* A4 paper style with golden border and dark gray background */
+.paper{
+  background:var(--paper);
+  border-radius:6px;
+  border: 2px solid var(--border);
+  box-shadow:
+    0 12px 30px var(--shadow),
+    0 4px 10px rgba(0, 0, 0, 0.3);
+  overflow:hidden;
+  position: relative;
+  padding: 30px;
+}
+
+/* Subtle paper texture */
+.paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: 
+    linear-gradient(rgba(241, 196, 15, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(241, 196, 15, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* rows */
+#container{padding:4px 0}
+
+.row{
+  display:flex; align-items:center;
+  border-bottom:1px dotted var(--dotted-line);
+  padding:6px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.row:last-child{
+  border-bottom:1px dotted var(--dotted-line);
+}
+
+.sl{
+  width:40px; color:var(--accent); text-align:right;
+  margin-right:10px; font-weight:700; opacity:.95;
+  font-size: 15px;
+}
+
+.input{
+  flex:1; outline:none; white-space:pre-wrap; min-height:22px;
+  color: var(--ink);
+  font-family: inherit;
+  border: none;
+  padding: 3px 0;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.input:focus {
+  background: rgba(241, 196, 15, 0.1);
+  border-radius: 3px;
+  padding: 3px 6px;
+  margin: 0 -6px;
+}
+
+.result{
+  width:110px; text-align:right; color:var(--accent2);
+  font-weight:700; font-variant-numeric:tabular-nums;
+  font-size: 15px;
+}
+
+/* totals area */
+.totals{
+  border-top:2px solid var(--border);
+  padding:16px 0 10px;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+}
+
+.total{
+  text-align:right; font-weight:800; color:var(--accent);
+  font-variant-numeric:tabular-nums;
+  font-size: 1.15em;
+}
+
+.words{
+  margin-top:6px; color:var(--muted); font-size:14px; text-align:right;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Previous Balance box small + styled */
+.previous-balance {
+  display:inline-block;
+  text-align: right;
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  outline: none;
+  min-width: 80px;
+  max-width: 120px;
+}
+
+.previous-balance:empty::before{
+    content: "Previous Balance";
+    color: var(--muted);
+}
+
+/* Remark styling with underline */
+.remark{
+  text-align:center;
+  padding:10px 8px;
+  font-weight:600;
+  color:var(--accent);
+  border-bottom: 2px solid var(--border) !important;
+  outline:none;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  margin: 4px 0;
+}
+
+.remark:last-of-type{
+  border-top: 2px solid var(--border) !important;
+  border-bottom: none !important;
+  margin-top: 12px;
+}
+
+.remark:empty:before{
+  content:attr(data-placeholder);
+  color:var(--muted);
+  font-weight:400;
+}
+
+/* Prevent new lines in remark */
+.remark[contenteditable="true"] {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.remark[contenteditable="true"] br {
+  display: none;
+}
+
+.remark[contenteditable="true"] * {
+  display: inline;
+}
+
+/* Header with improved contrast */
+.header {
+  text-align: center;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.header h1 {
+  color: var(--accent);
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--muted);
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    padding: 0 10px;
+  }
+  
+  .paper {
+    padding: 20px 15px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
