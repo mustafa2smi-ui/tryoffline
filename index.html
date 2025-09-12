@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice Calculator PWA</title>
+  <meta name="theme-color" content="#2c3e50">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+</head>
+<body>
+  <div class="wrap">
+    <div class="controls">
+      <button id="clearBtn" class="btn" style="background:var(--danger); color:#fff;">Clear All</button>
+      <div class="spacer"></div>
+      <button id="saveBtn" class="btn">Save as Image</button>
+    </div>
+
+    <div id="paper" class="paper">
+      <div class="header">
+        <div id="meta" style="color:var(--ink); font-weight:bold; position:absolute; top:10px; left:10px;">
+          <span id="date"></span> <span id="time"></span>
+        </div>
+        <br>
+        <h1>INVOICE CALCULATOR</h1>
+        <p>Professional Billing Solution</p>
+      </div>
+      
+      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Customer Name"></div>
+      <div id="container"></div>
+      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Payment Method (Cash/Credit)"></div>
+      <div class="totals">
+        <div id="total" class="total">Total = 0</div>
+        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+        <lable> Previous Balance 
+          </lable>
+        <div class="previous-balance" contenteditable="true" 
+            data-placeholder="Previous Balance" 
+            maxlength="10"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+    
+    // Prevent default install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      console.log('PWA installation available');
+    });
+  </script>
+</body>
+</html>
