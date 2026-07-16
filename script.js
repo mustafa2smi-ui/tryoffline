@@ -230,20 +230,48 @@ document.head.appendChild(html2canvasScript);
   render();
 })();
   /* ---------- Quick Operator Insertion Logic ---------- */
+    /* ---------- Quick Operator & Auto-Scroll Logic ---------- */
   let activeInput = null;
 
-  // Track rakhenge ki user kis input box mein type kar raha tha
+  // Ek helper function jo input line ko visual area mein scroll karega
+  function scrollToActiveInput(element) {
+    if (!element) return;
+    
+    // Thoda sa delay (50ms) taaki keyboard ya naya element render ho chuka ho
+    setTimeout(() => {
+      element.scrollIntoView({
+        behavior: 'smooth', // Smooth animation ke saath scroll hoga
+        block: 'center'     // Element ko screen ke center/safe zone mein layega
+      });
+    }, 50);
+  }
+
+  // Track rakhenge aur focus hote hi scroll karenge
   container.addEventListener("focusin", function(e) {
     if(e.target.classList.contains("input")) {
       activeInput = e.target;
+      scrollToActiveInput(activeInput);
+    }
+  });
+
+  // Jab Enter markar naya row bane, tab naye input par auto-scroll trigger ho
+  container.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      // Humne `makeRow` ke andar enter logic banaya hai, wahan focus lagte hi upar wala focusin event auto-trigger ho jayega.
+      // Par double safety ke liye hum active input ko track karte rahenge.
+      setTimeout(() => {
+        const focused = document.activeElement;
+        if(focused && focused.classList.contains("input")) {
+          scrollToActiveInput(focused);
+        }
+      }, 60);
     }
   });
 
   document.querySelectorAll(".op-btn").forEach(btn => {
     btn.addEventListener("click", function(e) {
-      e.preventDefault(); // Default click behavior rokna taaki focus na toote
+      e.preventDefault(); 
       
-      // Agar koi active input box nahi hai, toh pehle/aakhri box ko select karein
       if (!activeInput && container.children.length > 0) {
         activeInput = container.lastChild.querySelector(".input");
       }
@@ -258,18 +286,18 @@ document.head.appendChild(html2canvasScript);
         const range = sel.getRangeAt(0);
         range.deleteContents();
         
-        // Text node insert karna jahan cursor hai
         const textNode = document.createTextNode(op);
         range.insertNode(textNode);
         
-        // Cursor ko character ke aage shift karna
         range.setStartAfter(textNode);
         range.setEndAfter(textNode);
         sel.removeAllRanges();
         sel.addRange(range);
         
-        // Live update calculation trigger karein
         render();
+        
+        // Operator add hone ke baad bhi screen focused item ko chupa na paye
+        scrollToActiveInput(activeInput);
       }
     });
   });
