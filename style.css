@@ -53,14 +53,14 @@ body{
   transform:translateY(1px);
   box-shadow:0 1px 3px var(--shadow);
 }
-/* Quick Operator Bar Layout */
+/* Quick Operator Bar Layout *
 .operator-bar {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
   justify-content: space-between;
 }
-
+*/
 .op-btn {
   flex: 1;
   background: #34495e; /* Dark theme contrast */
@@ -90,6 +90,69 @@ body{
   .op-btn {
     padding: 14px 0; /* Mobile par buttons bade aur clickable rahenge */
     font-size: 20px;
+  }
+}
+/* Quick Operator Bar Layout - Fixed/Sticky Upgrade */
+.operator-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  justify-content: space-between;
+  
+  /* Freeze logic start */
+  position: sticky;
+  top: 0; /* Desktop/Web par screen ke top par chipka rahega */
+  z-index: 100; /* Taaki invoice content iske peeche se guzre */
+  background: var(--bg); /* Scroll hote waqt peeche ka text na dikhe */
+  padding: 10px 0;
+}
+
+.op-btn {
+  flex: 1;
+  background: #34495e; 
+  color: var(--accent);
+  border: 1px solid var(--line);
+  padding: 12px 0; 
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--shadow);
+  transition: all 0.1s ease;
+  touch-action: manipulation; 
+}
+
+.op-btn:active {
+  background: var(--accent);
+  color: #2c3e50;
+  transform: translateY(1px);
+}
+
+/* Mobile responsive layout adjustment */
+@media (max-width: 600px) {
+  .operator-bar {
+    gap: 6px;
+    
+    /* Mobile par screen ke bilkul NICHE (Bottom) freeze karne ke liye */
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 14px; /* Phone screen ke edges se thoda gap */
+    background: #1a252f; /* Thoda aur dark background depth ke liye */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5); /* Niche se upar ki taraf shadow */
+    margin-bottom: 0;
+  }
+  
+  .op-btn {
+    padding: 16px 0; /* Mobile par buttons aur bade taaki touch miss na ho */
+    font-size: 22px;
+  }
+
+  /* Body ko niche thodi jagah deni hogi taaki total amount bar ke peeche na chupe */
+  body {
+    padding-bottom: 80px; 
   }
 }
 
