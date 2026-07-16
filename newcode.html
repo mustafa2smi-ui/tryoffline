@@ -3,565 +3,836 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Invoice Calculator PWA</title>
-  <meta name="theme-color" content="#2c3e50">
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.png" type="image/png">
+  <title>Notebook Invoice Calculator</title>
+  <meta name="theme-color" content="#1a252f">
+  
   <style>
-    :root{
-  --bg:#2c3e50; --paper:#0D0D0D; --ink:#ecf0f1; --muted:#bdc3c7;
-  --accent:#f1c40f; --accent2:#f39c12; --danger:#e74c3c; --line:#46627f;
-  --shadow:rgba(0, 0, 0, 0.4);
-  --border:#f1c40f;
-  --dotted-line: #4a6580;
-}
+    :root {
+      --bg: #1a252f;          /* Dark modern wrapper background */
+      --paper: #ffffff;       /* Real notebook white paper */
+      --ink: #0a2540;         /* Deep dark blue ink pen color */
+      --muted: #5b7a9c;       /* Muted blue for labels */
+      --accent: #d35400;      /* Dark orange accent */
+      --line: #b0c4de;        /* Light blue notebook rule line */
+      --shadow: rgba(0, 0, 0, 0.35);
+      --danger: #c0392b;
+      --green-patch: #e8f8f5; /* Light green strip background */
+      --green-text: #117a65;  /* Green text for item code */
+    }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-  display: flex; justify-content: center; align-items: center;
-  min-height: 100vh; padding: 20px 0;
-}
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 10px;
+    }
 
-.wrap{ max-width:900px; width: 100%; margin: 20px auto; padding:0 10px; }
-.controls{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-.spacer{ flex:1 }
+    .wrap {
+      max-width: 650px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      height: 96vh;
+    }
 
-/* Button Styles Upgrade */
-.btn{
-  background: linear-gradient(to bottom, #f1c40f, #f39c12);
-  color:#2c3e50; border:1px solid #f39c12; padding:10px 16px; border-radius:4px;
-  cursor:pointer; font-weight:600; box-shadow:0 2px 6px var(--shadow);
-  transition: all 0.2s ease;
-}
-.sq-btn {
-  padding: 10px 14px;
-  font-size: 18px;
-}
-.btn:hover { background: linear-gradient(to bottom, #f39c12, #e67e22); }
+    /* Fixed Controls & Header Top Section */
+    .header-fixed-container {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      padding-bottom: 8px;
+    }
 
-/* Entry Mode Panel Box */
-.entry-box {
-  background: #1a252f; border: 1px solid var(--line);
-  padding: 15px; border-radius: 6px; margin-bottom: 15px;
-}
-.entry-box h3 { margin-bottom: 10px; color: var(--accent); font-size: 16px; }
-.entry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.entry-box input {
-  background: #2c3e50; border: 1px solid var(--line); color: var(--ink);
-  padding: 8px; border-radius: 4px; outline: none; font-size: 14px;
-}
-.card-hidden { display: none !important; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
 
-/* Paper Component - Reduced Padding for Edge Alignment */
-.paper{
-  background:var(--paper); border-radius:6px; border: 2px solid var(--border);
-  box-shadow: 0 12px 30px var(--shadow); overflow:hidden; position: relative;
-  padding: 15px 8px; /* Daba kar space nikalne ke liye edge tight kiya */
-}
-#meta{ color:var(--muted); font-size:14px; font-weight:500; position:absolute; top:10px; left:10px; }
+    .spacer { flex: 1; }
 
-/* Row Management */
-.row { display:flex; align-items:center; border-bottom:1px dotted var(--dotted-line); padding:6px 0; position: relative; z-index: 2; }
-.sl { width:22px; color:var(--accent); text-align:left; font-weight:700; font-size: 14px; }
-.input-wrapper { flex: 1; position: relative; }
-.input {
-  width: 100%; outline:none; white-space:pre-wrap; min-height:22px; color: var(--ink);
-  border: none; padding: 3px 0; background: transparent; font-size: 15px; font-weight: 500;
-}
-.input:focus { background: rgba(241, 196, 15, 0.1); border-radius: 3px; }
-.result{ width:90px; text-align:right; color:var(--accent2); font-weight:700; font-size: 15px; }
+    /* Compact Square Buttons */
+    .btn {
+      background: linear-gradient(to bottom, #f1c40f, #f39c12);
+      color: #2c3e50;
+      border: 1px solid #f39c12;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.15s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-/* Autocomplete Suggestion Dropdown List */
-.suggest-box {
-  position: absolute; left: 0; top: 100%; width: 100%; background: #1e1e1e;
-  border: 1px solid var(--border); border-top: none; z-index: 999;
-  max-height: 150px; overflow-y: auto; border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-.suggest-item { padding: 8px; cursor: pointer; border-bottom: 1px solid #333; font-size: 14px; color: var(--ink); }
-.suggest-item:hover { background: var(--accent); color: #000; }
+    .sq-btn {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      font-size: 18px;
+    }
 
-/* Totals & Remarks */
-.totals{ border-top:2px solid var(--border); padding:16px 0 10px; margin-top: 8px; position: relative; z-index: 2; }
-.total{ text-align:right; font-weight:800; color:var(--accent); font-size: 1.25em; }
-.words{ margin-top:6px; color:var(--muted); font-size:13px; text-align:right; font-style: italic; }
-.previous-balance { display:inline-block; text-align: right; margin-top: 2px; font-size: 15px; color: var(--ink); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; outline: none; min-width: 100px; }
-.remark{ text-align:center; padding:10px 8px; font-weight:600; color:var(--accent); border-bottom: 2px solid var(--border) !important; outline:none; z-index: 2; font-size: 15px; margin: 4px 0; }
-.remark:last-of-type{ border-top: 2px solid var(--border) !important; border-bottom: none !important; margin-top: 12px; }
-.remark:empty:before{ content:attr(data-placeholder); color:var(--muted); font-weight:400; }
-.remark[contenteditable="true"] { white-space: nowrap; overflow: hidden; }
-.remark[contenteditable="true"] br { display: none; }
+    .mode-btn {
+      height: 38px;
+      padding: 0 12px;
+    }
 
-/* Sticky Operator Bar Styling */
-.operator-bar { display: flex; gap: 8px; justify-content: space-between; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 10px 0; margin-bottom: 16px; }
-.op-btn { flex: 1; background: #34495e; color: var(--accent); border: 1px solid var(--line); padding: 12px 0; border-radius: 6px; font-size: 18px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
-.op-btn:active { background: var(--accent); color: #2c3e50; }
+    .btn:hover {
+      background: linear-gradient(to bottom, #f39c12, #e67e22);
+    }
 
-@media (max-width: 600px) {
-  .operator-bar { position: fixed; top: auto; bottom: 0; left: 0; width: 100%; padding: 10px 14px; background: #1a252f; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5); margin-bottom: 0; gap: 6px; }
-  .op-btn { padding: 16px 0; font-size: 22px; }
-  body { padding-bottom: 80px; }
-  .entry-grid { grid-template-columns: 1fr; }
-}
+    .btn:active {
+      transform: translateY(1px);
+    }
 
+    /* Combo Box Styling */
+    .price-select {
+      background: #34495e;
+      color: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 8px;
+      height: 38px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Real Paper Notebook styling */
+    .paper {
+      background: var(--paper);
+      border-radius: 6px;
+      box-shadow: 0 8px 25px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto; /* Scrollable body */
+      position: relative;
+      border-left: 10px solid #e74c3c; /* Red notebook margin line on left */
+    }
+
+    /* Notebook Red Line margin background */
+    .paper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 30px;
+      bottom: 0;
+      width: 1px;
+      background: rgba(231, 76, 60, 0.4);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Header inside paper */
+    .paper-header {
+      padding: 15px 15px 5px 45px;
+      border-bottom: 2px solid var(--line);
+      text-align: center;
+      position: relative;
+    }
+
+    #meta {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .paper-header h1 {
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .paper-header p {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    /* Scrollable Row List Area */
+    .row-list {
+      padding: 10px 10px 10px 45px;
+      flex: 1;
+    }
+
+    /* Rows */
+    .row {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--line);
+      padding: 6px 0;
+    }
+
+    .row-main {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .sl {
+      width: 25px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .input {
+      width: 100%;
+      outline: none;
+      white-space: pre-wrap;
+      min-height: 20px;
+      color: var(--ink);
+      font-family: inherit;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .result {
+      width: 80px;
+      text-align: right;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* Code Strip Patch (Just below item text) */
+    .code-patch {
+      display: none; /* Only visible if code exists */
+      background: var(--green-patch);
+      color: var(--green-text);
+      font-size: 11px;
+      font-weight: 700;
+      font-style: italic;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-top: 3px;
+      align-self: flex-start;
+      margin-left: 25px;
+    }
+
+    .code-patch.visible {
+      display: inline-block;
+    }
+
+    /* Dropdown suggestions */
+    .suggest-box {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      z-index: 999;
+      max-height: 150px;
+      overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .suggest-item {
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .suggest-item:hover {
+      background: #ebebeb;
+    }
+
+    /* Paper Footer Totals Area */
+    .paper-footer {
+      padding: 10px 15px 10px 45px;
+      border-top: 2px solid var(--line);
+      background: #fafafa;
+    }
+
+    .totals {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-lbl {
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .total-val {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .words {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      text-align: right;
+    }
+
+    .previous-balance-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .previous-balance {
+      text-align: right;
+      font-size: 14px;
+      color: var(--ink);
+      border: 1px dashed var(--line);
+      padding: 2px 6px;
+      border-radius: 4px;
+      outline: none;
+      min-width: 80px;
+      font-weight: bold;
+    }
+
+    /* Mode Indicators & Status Banner */
+    .mode-banner {
+      background: #1abc9c;
+      color: white;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .mode-banner.entry {
+      background: #3498db;
+    }
+
+    /* Floating / Sticky Operators Bar */
+    .operator-bar {
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
+      margin-top: 8px;
+      background: var(--bg);
+      padding: 5px 0;
+    }
+
+    .op-btn {
+      flex: 1;
+      background: #34495e;
+      color: #fff;
+      border: 1px solid var(--line);
+      padding: 10px 0;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .op-btn:active {
+      background: var(--line);
+      color: #000;
+    }
+
+    @media (max-width: 600px) {
+      .operator-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 8px 10px;
+        background: #111b24;
+        box-shadow: 0 -3px 10px rgba(0,0,0,0.5);
+        margin-top: 0;
+        z-index: 200;
+      }
+      .op-btn {
+        padding: 12px 0;
+        font-size: 18px;
+      }
+      .wrap {
+        height: 88vh;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="controls">
-      <button id="modeBtn" class="btn mode-btn">📋 Bill Mode</button>
-      <div class="spacer"></div>
-      <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
-      <button id="saveBtn" class="btn sq-btn" title="Save as Image">💾</button>
-    </div>
 
-    <div id="entryContainer" class="entry-box card-hidden">
-      <h3>📥 Add Item to Database</h3>
-      <div class="entry-grid">
-        <input type="text" id="itemCode" placeholder="Item Code (e.g., 101)">
-        <input type="text" id="itemName" placeholder="Item Name">
-        <input type="number" id="itemWholesale" placeholder="Wholesale Price">
-        <input type="number" id="itemRetail" placeholder="Retail Price">
-      </div>
-      <div style="margin-top: 10px; display: flex; gap: 10px;">
-        <button id="addItemBtn" class="btn" style="flex:1;">Save Item</button>
-        <select id="priceModeSelect" class="btn" style="background: #34495e; color: #fff;">
-          <option value="retail">Use Retail Price</option>
-          <option value="wholesale">Use Wholesale Price</option>
+  <div class="wrap">
+    
+    <div class="header-fixed-container">
+      <div class="controls">
+        <button id="modeBtn" class="btn mode-btn">📋 Bill Mode</button>
+        <select id="priceModeSelect" class="price-select">
+          <option value="retail">Retail Price</option>
+          <option value="wholesale">Wholesale Price</option>
         </select>
+        <div class="spacer"></div>
+        <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+        <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
       </div>
     </div>
 
     <div id="paper" class="paper">
-      <div class="header">
+      
+      <div id="modeStatus" class="mode-banner">Billing Active</div>
+
+      <div class="paper-header">
         <div id="meta">
-          <span id="date"></span> <span id="time"></span>
+          <span id="date"></span>
+          <span id="time"></span>
         </div>
-        <br>
-        <h1>INVOICE CALCULATOR</h1>
-        <p>Professional Billing Solution</p>
+        <h1>DAILY LEDGER</h1>
+        <p>Simple & Smart Ledger Solutions</p>
       </div>
-      
-      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Customer Name"></div>
-      
-      <div id="container"></div>
-      
-      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Payment Method (Cash/Credit)"></div>
-      <div class="totals">
-        <div id="total" class="total">Total = 0</div>
-        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
-        <label style="color:var(--muted); font-size:14px; display:block; text-align:right; margin-top:8px;">Previous Balance</label>
-        <div style="text-align: right;">
-          <div class="previous-balance" contenteditable="true" data-placeholder="0" maxlength="10"></div>
+
+      <div class="row-list" id="container"></div>
+
+      <div class="paper-footer">
+        <div class="totals">
+          <div class="total-row">
+            <span class="total-lbl">Total:</span>
+            <span id="total" class="total-val">0.00</span>
+          </div>
+          <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+          
+          <div class="previous-balance-container">
+            <span style="font-size:12px; font-weight:bold; color:var(--muted);">Prev Bal:</span>
+            <div class="previous-balance" contenteditable="true" data-placeholder="0" id="prevBalBox"></div>
+          </div>
         </div>
       </div>
+
     </div>
+
+    <div class="operator-bar">
+      <button class="op-btn" data-op="+">+</button>
+      <button class="op-btn" data-op="-">-</button>
+      <button class="op-btn" data-op="*">×</button>
+      <button class="op-btn" data-op="/">÷</button>
+      <button class="op-btn" data-op="(">(</button>
+      <button class="op-btn" data-op=")">)</button>
+    </div>
+
   </div>
 
-  <div class="operator-bar">
-    <button class="op-btn" data-op="+">+</button>
-    <button class="op-btn" data-op="-">-</button>
-    <button class="op-btn" data-op="*">×</button>
-    <button class="op-btn" data-op="/">÷</button>
-    <button class="op-btn" data-op="(">(</button>
-    <button class="op-btn" data-op=")">)</button>
-  </div>
-<script> 
-  const html2canvasScript = document.createElement('script');
-html2canvasScript.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-document.head.appendChild(html2canvasScript);
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-(function(){
-  const container = document.getElementById("container");
-  const totalBox  = document.getElementById("total");
-  const totalWordsBox = document.getElementById("totalWords");
-  const dateEl = document.getElementById("date");
-  const timeEl = document.getElementById("time");
-  const saveBtn = document.getElementById("saveBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const modeBtn = document.getElementById("modeBtn");
-  const entryContainer = document.getElementById("entryContainer");
-  const addItemBtn = document.getElementById("addItemBtn");
-  const priceModeSelect = document.getElementById("priceModeSelect");
-  const previousBalanceEl = document.querySelector(".previous-balance");
+  <script>
+    (function(){
+      const container = document.getElementById("container");
+      const totalBox  = document.getElementById("total");
+      const totalWordsBox = document.getElementById("totalWords");
+      const dateEl = document.getElementById("date");
+      const timeEl = document.getElementById("time");
+      const saveBtn = document.getElementById("saveBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const modeBtn = document.getElementById("modeBtn");
+      const modeStatus = document.getElementById("modeStatus");
+      const priceModeSelect = document.getElementById("priceModeSelect");
+      const prevBalBox = document.getElementById("prevBalBox");
 
-  // LocalStorage Database Setup
-  let itemDatabase = JSON.parse(localStorage.getItem("invoice_db")) || [];
+      // App Mode State: 'bill' or 'entry'
+      let currentMode = 'bill'; 
 
-  /* ---------- Utils ---------- */
-  function setCaretToEnd(el){
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
+      // Offline Database
+      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db")) || [
+        { code: "101", name: "Aata", price: 40 },
+        { code: "102", name: "Shakkar", price: 45 },
+        { code: "103", name: "Chawal", price: 60 }
+      ];
 
-  function nowDateTimeTick(){
-    const now = new Date();
-    dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
-    timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
-  }
-  setInterval(nowDateTimeTick, 1000);
-  nowDateTimeTick();
+      function setCaretToEnd(el){
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
 
-  function evalExpr(expr){
-    try{
-      const js=expr.replace(/\^/g,"**");
-      const val=Function('"use strict";return('+js+')')();
-      if(typeof val==="number" && isFinite(val))
-        return Number.isInteger(val)?val:parseFloat(val.toFixed(2));
-    }catch(e){}
-    return 0;
-  }
+      function nowDateTimeTick(){
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
+        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+      }
+      setInterval(nowDateTimeTick, 1000);
+      nowDateTimeTick();
 
-  function numberToWordsIndian(num){
-    num = Math.floor(Math.abs(num));
-    if (num === 0) return "Zero";
-    const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
-    const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
-    function twoDigits(n){ if(n<20) return ones[n]; return tens[Math.floor(n/10)] + (n%10?" " + ones[n%10]:""); }
-    function threeDigits(n){ const h=Math.floor(n/100), r=n%100; return (h?ones[h]+" Hundred":"") + (h&&r?" ":"") + (r?twoDigits(r):""); }
-    let words = "";
-    const crore = Math.floor(num/10000000); num%=10000000;
-    const lakh  = Math.floor(num/100000);   num%=100000;
-    const thou  = Math.floor(num/1000);     num%=1000;
-    if(crore) words += threeDigits(crore) + " Crore";
-    if(lakh)  words += (words?" ":"") + twoDigits(lakh) + " Lakh";
-    if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
-    if(num)   words += (words?" ":"") + threeDigits(num);
-    return words.trim();
-  }
+      function evalExpr(expr){
+        try{
+          const js = expr.replace(/\^/g,"**");
+          const val = Function('"use strict";return('+js+')')();
+          if(typeof val === "number" && isFinite(val))
+            return Number.isInteger(val)?val:parseFloat(val.toFixed(2));
+        }catch(e){}
+        return 0;
+      }
 
-  function totalInWords(amt){
-    const rupees = Math.floor(amt);
-    const paise = Math.round((amt - rupees) * 100);
-    let s = numberToWordsIndian(rupees) + " Rupees";
-    if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
-    return s + " Only";
-  }
+      function numberToWordsIndian(num){
+        num = Math.floor(Math.abs(num));
+        if (num === 0) return "Zero";
+        const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+        const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+        function twoDigits(n){ if(n<20) return ones[n]; return tens[Math.floor(n/10)] + (n%10?" " + ones[n%10]:""); }
+        function threeDigits(n){ const h=Math.floor(n/100), r=n%100; return (h?ones[h]+" Hundred":"") + (h&&r?" ":"") + (r?twoDigits(r):""); }
+        let words = "";
+        const crore = Math.floor(num/10000000); num%=10000000;
+        const lakh  = Math.floor(num/100000);   num%=100000;
+        const thou  = Math.floor(num/1000);     num%=1000;
+        if(crore) words += threeDigits(crore) + " Crore";
+        if(lakh)  words += (words?" ":"") + twoDigits(lakh) + " Lakh";
+        if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
+        if(num)   words += (words?" ":"") + threeDigits(num);
+        return words.trim();
+      }
 
-  // Auto-Save New Items from Invoice String Parsing
-  function autoSaveFromText(text) {
-    // Expected Pattern: ItemName [Code] 50*2 ya ItemName [Code] 100
-    const match = text.match(/^(.+?)\s*\[(.*?)]\s*([0-9.\s()+\-*/^]+)$/);
-    if(match) {
-      const name = match[1].trim();
-      const code = match[2].trim();
-      const expr = match[3].trim();
-      const price = evalExpr(expr);
+      function totalInWords(amt){
+        const rupees = Math.floor(amt);
+        const paise = Math.round((amt - rupees) * 100);
+        let s = numberToWordsIndian(rupees) + " Rupees";
+        if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
+        return s + " Only";
+      }
 
-      if(name && code && price > 0) {
-        const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
-        if(!exists) {
-          itemDatabase.push({ code, name, wholesale: price, retail: price });
-          localStorage.setItem("invoice_db", JSON.stringify(itemDatabase));
+      // Automatically learns new items typed directly on lines
+      function parseAndSaveNewItem(text) {
+        // Formats expected: "ItemName 50" or "ItemName [Code] 50"
+        const cleanText = text.trim();
+        const patternWithCode = /^([a-zA-Z\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/;
+        const simplePattern = /^([a-zA-Z\s]+)\s*([0-9.]+)$/;
+
+        let name = "", code = "", price = 0;
+
+        if(patternWithCode.test(cleanText)) {
+          const match = cleanText.match(patternWithCode);
+          name = match[1].trim();
+          code = match[2].trim();
+          price = parseFloat(match[3]);
+        } else if(simplePattern.test(cleanText)) {
+          const match = cleanText.match(simplePattern);
+          name = match[1].trim();
+          price = parseFloat(match[2]);
+          code = (itemDatabase.length + 101).toString(); // Auto generate code
         }
-      }
-    }
-  }
 
-  /* ---------- Row factory with Autocomplete Suggestion ---------- */
-  function makeRow(i, text=""){
-    const row = document.createElement("div");
-    row.className = "row";
-
-    const sl = document.createElement("div");
-    sl.className = "sl";
-    sl.textContent = i+1;
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "input-wrapper";
-
-    const input = document.createElement("div");
-    input.className = "input";
-    input.contentEditable = true;
-    input.textContent = text;
-
-    wrapper.appendChild(input);
-
-    const result = document.createElement("div");
-    result.className = "result";
-/*
-    // Handle Suggestions
-    input.addEventListener("input", function() {
-      render();
-      const val = input.textContent.trim().toLowerCase();
-      // Purani Suggestion box hatayein
-      const oldBox = wrapper.querySelector(".suggest-box");
-      if(oldBox) oldBox.remove();
-
-      if(!val) return;
-
-      const matches = itemDatabase.filter(item => 
-        item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
-      );
-
-      if(matches.length > 0) {
-        const suggestBox = document.createElement("div");
-        suggestBox.className = "suggest-box";
-        
-        matches.forEach(match => {
-          const itemDiv = document.createElement("div");
-          itemDiv.className = "suggest-item";
-          const pMode = priceModeSelect.value;
-          const price = pMode === 'wholesale' ? match.wholesale : match.retail;
-          itemDiv.textContent = `${match.name} [${match.code}] - ₹${price}`;
-          
-          itemDiv.addEventListener("click", function(e) {
-            e.preventDefault();
-            input.textContent = `${match.name} [${match.code}] ${price}`;
-            suggestBox.remove();
-            render();
-            setCaretToEnd(input);
-          });
-          suggestBox.appendChild(itemDiv);
-        });
-        wrapper.appendChild(suggestBox);
-      }
-    });
-*/
-        // Handle Suggestions with Full Touch Support
-    input.addEventListener("input", function() {
-      render();
-      const val = input.textContent.trim().toLowerCase();
-      // Purani Suggestion box hatayein
-      const oldBox = wrapper.querySelector(".suggest-box");
-      if(oldBox) oldBox.remove();
-
-      if(!val) return;
-
-      const matches = itemDatabase.filter(item => 
-        item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
-      );
-
-      if(matches.length > 0) {
-        const suggestBox = document.createElement("div");
-        suggestBox.className = "suggest-box";
-        
-        matches.forEach(match => {
-          const itemDiv = document.createElement("div");
-          itemDiv.className = "suggest-item";
-          const pMode = priceModeSelect.value;
-          const price = pMode === 'wholesale' ? match.wholesale : match.retail;
-          itemDiv.textContent = `${match.name} [${match.code}] - ₹${price}`;
-          
-          // Mobile Touch aur Desktop Click dono ko handle karne ke liye pro handler
-          const selectItem = (e) => {
-            e.preventDefault(); // Blur hone se rokega taaki touch register ho sake
-            e.stopPropagation();
-            
-            input.textContent = `${match.name} [${match.code}] ${price}`;
-            suggestBox.remove();
-            
-            render();
-            setCaretToEnd(input);
-            activeInput = input; // Input focus track active rakhein
-          };
-
-          // Desktop users ke liye
-          itemDiv.addEventListener("mousedown", selectItem);
-          // Mobile users ke liye instant touch response
-          itemDiv.addEventListener("touchstart", selectItem);
-          
-          suggestBox.appendChild(itemDiv);
-        });
-        wrapper.appendChild(suggestBox);
-      }
-    });
-
-    // Remove suggestions on blur/focus out
-    input.addEventListener("blur", function() {
-      setTimeout(() => {
-        const box = wrapper.querySelector(".suggest-box");
-        if(box) box.remove();
-        autoSaveFromText(input.textContent); // Auto-save trigger dynamically
-      }, 400);
-    });
-
-    input.addEventListener("keydown", function(e){
-      if(e.key === "Enter"){
-        e.preventDefault();
-        if(input.textContent.trim() !== ""){
-          container.appendChild(makeRow(container.children.length));
-          updateSL();
-          render();
-          container.lastChild.querySelector(".input").focus();
-        }
-      }
-      if(e.key === "Backspace" && input.textContent.trim() === ""){
-        if(container.children.length > 1){
-          e.preventDefault();
-          const prev = row.previousElementSibling || row.nextElementSibling;
-          row.remove();
-          updateSL();
-          render();
-          if(prev){
-            const target = prev.querySelector(".input");
-            target.focus();
-            setCaretToEnd(target);
+        if(name && price > 0) {
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if(!exists) {
+            itemDatabase.push({ code, name, price });
+            localStorage.setItem("ledger_db", JSON.stringify(itemDatabase));
           }
         }
       }
-    });
 
-    row.appendChild(sl);
-    row.appendChild(wrapper);
-    row.appendChild(result);
-    return row;
-  }
+      /* ---------- Row Factory with Embedded Code Patch ---------- */
+      function makeRow(i, text=""){
+        const row = document.createElement("div");
+        row.className = "row";
 
-  function updateSL(){
-    [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
-  }
+        const rowMain = document.createElement("div");
+        rowMain.className = "row-main";
 
-  function render(){
-    let grand = 0;
-    const previousBalance = parseFloat(previousBalanceEl.textContent) || 0;
-    grand += previousBalance;
+        const sl = document.createElement("div");
+        sl.className = "sl";
+        sl.textContent = i+1;
 
-    [...container.children].forEach(row=>{
-      const text = row.querySelector(".input").textContent;
-      const resBox = row.querySelector(".result");
-      let val=0;
-      const m=text.match(/([0-9.\s()+\-*/^]+)$/);
-      if(m){
-        const expr=m[1].trim();
-        if(expr && /[0-9]/.test(expr)) val=evalExpr(expr);
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        const input = document.createElement("div");
+        input.className = "input";
+        input.contentEditable = true;
+        input.textContent = text;
+
+        wrapper.appendChild(input);
+
+        const result = document.createElement("div");
+        result.className = "result";
+
+        rowMain.appendChild(sl);
+        rowMain.appendChild(wrapper);
+        rowMain.appendChild(result);
+
+        // Code display patch under item
+        const codePatch = document.createElement("div");
+        codePatch.className = "code-patch";
+        
+        row.appendChild(rowMain);
+        row.appendChild(codePatch);
+
+        // Suggestions Event Handler with proper touch logic
+        input.addEventListener("input", function() {
+          render();
+          const val = input.textContent.trim().toLowerCase();
+          const oldBox = wrapper.querySelector(".suggest-box");
+          if(oldBox) oldBox.remove();
+
+          if(!val) return;
+
+          const matches = itemDatabase.filter(item => 
+            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+          );
+
+          if(matches.length > 0) {
+            const suggestBox = document.createElement("div");
+            suggestBox.className = "suggest-box";
+            
+            matches.forEach(match => {
+              const itemDiv = document.createElement("div");
+              itemDiv.className = "suggest-item";
+              itemDiv.textContent = `${match.name} [${match.code}] - ₹${match.price}`;
+              
+              const selectItem = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                input.textContent = `${match.name} ${match.price}`;
+                suggestBox.remove();
+                
+                render();
+                setCaretToEnd(input);
+                activeInput = input;
+              };
+
+              itemDiv.addEventListener("mousedown", selectItem);
+              itemDiv.addEventListener("touchstart", selectItem);
+              suggestBox.appendChild(itemDiv);
+            });
+            wrapper.appendChild(suggestBox);
+          }
+        });
+
+        // Save on blur & clean up suggestions
+        input.addEventListener("blur", function() {
+          setTimeout(() => {
+            const box = wrapper.querySelector(".suggest-box");
+            if(box) box.remove();
+            
+            // Auto save item configuration
+            parseAndSaveNewItem(input.textContent);
+            render();
+          }, 300);
+        });
+
+        // Key bindings
+        input.addEventListener("keydown", function(e){
+          if(e.key === "Enter"){
+            e.preventDefault();
+            if(input.textContent.trim() !== ""){
+              container.appendChild(makeRow(container.children.length));
+              updateSL();
+              render();
+              container.lastChild.querySelector(".input").focus();
+            }
+          }
+          if(e.key === "Backspace" && input.textContent.trim() === ""){
+            if(container.children.length > 1){
+              e.preventDefault();
+              const prev = row.previousElementSibling || row.nextElementSibling;
+              row.remove();
+              updateSL();
+              render();
+              if(prev){
+                const target = prev.querySelector(".input");
+                target.focus();
+                setCaretToEnd(target);
+              }
+            }
+          }
+        });
+
+        return row;
       }
-      resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-      grand += val;
-    });
 
-    totalBox.textContent = "Total = " + grand.toLocaleString('en-IN');
-    totalWordsBox.textContent = "In Words: " + totalInWords(grand);
-  }
+      function updateSL(){
+        [...container.children].forEach((row,i)=>{ 
+          row.querySelector(".sl").textContent = i+1; 
+        });
+      }
 
-  // Entry Mode vs Bill Mode View Switcher
-  modeBtn.addEventListener("click", function() {
-    if(entryContainer.classList.contains("card-hidden")) {
-      entryContainer.classList.remove("card-hidden");
-      modeBtn.textContent = "📝 Entry Mode";
-    } else {
-      entryContainer.classList.add("card-hidden");
-      modeBtn.textContent = "📋 Bill Mode";
-    }
-  });
+      function render(){
+        let grand = 0;
+        const previousBalance = parseFloat(prevBalBox.textContent) || 0;
+        
+        if (currentMode === 'bill') {
+          grand += previousBalance;
+        }
 
-  // Explicit Item Entry Database addition
-  addItemBtn.addEventListener("click", function() {
-    const code = document.getElementById("itemCode").value.trim();
-    const name = document.getElementById("itemName").value.trim();
-    const wholesale = parseFloat(document.getElementById("itemWholesale").value) || 0;
-    const retail = parseFloat(document.getElementById("itemRetail").value) || 0;
+        [...container.children].forEach(row => {
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.textContent.trim();
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
+          let val = 0;
 
-    if(code && name && (wholesale || retail)) {
-      itemDatabase.push({ code, name, wholesale, retail });
-      localStorage.setItem("invoice_db", JSON.stringify(itemDatabase));
-      alert(`Item "${name}" database me save ho gaya!`);
-      document.getElementById("itemCode").value = "";
-      document.getElementById("itemName").value = "";
-      document.getElementById("itemWholesale").value = "";
-      document.getElementById("itemRetail").value = "";
-    } else {
-      alert("Kripya Code, Name aur koi ek Price jaroor bharein!");
-    }
-  });
+          // Process and identify Item code under input
+          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
+            // Check in Database by Name to display existing Code
+            const wordTokens = text.split(/\s+/);
+            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
+          }
 
-  /* ---------- Operator Bar & Scroll Core Sync ---------- */
-  let activeInput = null;
-  function scrollToActiveInput(element) {
-    if (!element) return;
-    setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
-  }
+          if (currentMode === 'bill') {
+            // Compute expressions only in billing mode
+            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            // Hide calculations in Entry Mode
+            resBox.style.display = "none";
+          }
+        });
 
-  container.addEventListener("focusin", function(e) {
-    if(e.target.classList.contains("input")) {
-      activeInput = e.target;
-      scrollToActiveInput(activeInput);
-    }
-  });
+        if (currentMode === 'bill') {
+          totalBox.textContent = grand.toLocaleString('en-IN');
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "block";
+        } else {
+          totalBox.textContent = "---- (Entry Active)";
+          totalWordsBox.style.display = "none";
+        }
+      }
 
-  document.querySelectorAll(".op-btn").forEach(btn => {
-    btn.addEventListener("click", function(e) {
-      e.preventDefault();
-      if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
-      if (activeInput) {
-        activeInput.focus();
-        const op = btn.getAttribute("data-op");
-        const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-        const range = sel.getRangeAt(0);
-        range.deleteContents();
-        const textNode = document.createTextNode(op);
-        range.insertNode(textNode);
-        range.setStartAfter(textNode);
-        range.setEndAfter(textNode);
-        sel.removeAllRanges();
-        sel.addRange(range);
+      /* ---------- Mode Toggle Logic ---------- */
+      modeBtn.addEventListener("click", function() {
+        if(currentMode === 'bill') {
+          currentMode = 'entry';
+          modeBtn.textContent = "✍️ Entry Mode";
+          modeStatus.textContent = "Database Entry Active";
+          modeStatus.classList.add("entry");
+        } else {
+          currentMode = 'bill';
+          modeBtn.textContent = "📋 Bill Mode";
+          modeStatus.textContent = "Billing Active";
+          modeStatus.classList.remove("entry");
+        }
         render();
-        scrollToActiveInput(activeInput);
-      }
-    });
-  });
-
-  // Save Image Layout Action
-  async function saveAsImage(){
-    const paper = document.getElementById("paper");
-    await new Promise(r=>requestAnimationFrame(r));
-    if (typeof html2canvas === 'undefined') { alert('html2canvas tool loading, please wait...'); return; }
-    const canvas = await html2canvas(paper, {backgroundColor:null, scale:2});
-    const link = document.createElement('a');
-    const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-    link.download = `invoice-${stamp}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }
-  
-  saveBtn.addEventListener("click", saveAsImage);
-
-  clearBtn.addEventListener("click", function(){
-    container.innerHTML="";
-    container.appendChild(makeRow(0));
-    previousBalanceEl.textContent="";
-    render();
-  });
-
-  previousBalanceEl.addEventListener("input", function(){
-    let val = previousBalanceEl.textContent.replace(/\D/g, "");
-    if(val.length > 10) val = val.slice(0,10);
-    if(previousBalanceEl.textContent !== val){ previousBalanceEl.textContent = val; setCaretToEnd(previousBalanceEl); }
-    render();
-  });
-
-  // Remarks validation structure
-  document.querySelectorAll('.remark').forEach(remark => {
-    remark.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); });
-    remark.addEventListener('paste', e => {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-      document.execCommand('insertText', false, text.replace(/[\r\n]+/g, ' '));
-    });
-  });
-
-  container.appendChild(makeRow(0));
-  render();
-})();
-      
-</script>
-  <script src="script.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
       });
-    }
-    window.addEventListener('beforeinstallprompt', (e) => e.preventDefault());
+
+      /* ---------- Operators Mobile Integration ---------- */
+      let activeInput = null;
+      function scrollToActiveInput(element) {
+        if (!element) return;
+        setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+      }
+
+      container.addEventListener("focusin", function(e) {
+        if(e.target.classList.contains("input")) {
+          activeInput = e.target;
+          scrollToActiveInput(activeInput);
+        }
+      });
+
+      document.querySelectorAll(".op-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
+          if (activeInput) {
+            activeInput.focus();
+            const op = btn.getAttribute("data-op");
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode(op);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            render();
+            scrollToActiveInput(activeInput);
+          }
+        });
+      });
+
+      // Export Image Trigger
+      async function saveAsImage(){
+        const paper = document.getElementById("paper");
+        await new Promise(r=>requestAnimationFrame(r));
+        if (typeof html2canvas === 'undefined') { alert('html2canvas loading... please try again in a moment'); return; }
+        const canvas = await html2canvas(paper, {backgroundColor:null, scale:2});
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+        link.download = `ledger-${stamp}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+      
+      saveBtn.addEventListener("click", saveAsImage);
+
+      clearBtn.addEventListener("click", function(){
+        container.innerHTML = "";
+        container.appendChild(makeRow(0));
+        prevBalBox.textContent = "";
+        render();
+      });
+
+      prevBalBox.addEventListener("input", function(){
+        let val = prevBalBox.textContent.replace(/\D/g, "");
+        if(val.length > 10) val = val.slice(0,10);
+        if(prevBalBox.textContent !== val){ prevBalBox.textContent = val; setCaretToEnd(prevBalBox); }
+        render();
+      });
+
+      // Initiate default row
+      container.appendChild(makeRow(0));
+      render();
+    })();
   </script>
 </body>
 </html>
