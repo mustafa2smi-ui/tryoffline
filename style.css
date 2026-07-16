@@ -53,6 +53,45 @@ body{
   transform:translateY(1px);
   box-shadow:0 1px 3px var(--shadow);
 }
+/* Quick Operator Bar Layout */
+.operator-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  justify-content: space-between;
+}
+
+.op-btn {
+  flex: 1;
+  background: #34495e; /* Dark theme contrast */
+  color: var(--accent);
+  border: 1px solid var(--line);
+  padding: 12px 0; /* Mobile dynamic thumb spacing */
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--shadow);
+  transition: all 0.1s ease;
+  touch-action: manipulation; /* Mobile click delay remove karne ke liye */
+}
+
+.op-btn:active {
+  background: var(--accent);
+  color: #2c3e50;
+  transform: translateY(1px);
+}
+
+/* Mobile responsive layout adjustment */
+@media (max-width: 600px) {
+  .operator-bar {
+    gap: 6px;
+  }
+  .op-btn {
+    padding: 14px 0; /* Mobile par buttons bade aur clickable rahenge */
+    font-size: 20px;
+  }
+}
 
 /* A4 paper style with golden border and dark gray background */
 .paper{
