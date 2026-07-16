@@ -287,7 +287,7 @@ document.head.appendChild(html2canvasScript);
 
     const result = document.createElement("div");
     result.className = "result";
-
+/*
     // Handle Suggestions
     input.addEventListener("input", function() {
       render();
@@ -320,6 +320,55 @@ document.head.appendChild(html2canvasScript);
             render();
             setCaretToEnd(input);
           });
+          suggestBox.appendChild(itemDiv);
+        });
+        wrapper.appendChild(suggestBox);
+      }
+    });
+*/
+        // Handle Suggestions with Full Touch Support
+    input.addEventListener("input", function() {
+      render();
+      const val = input.textContent.trim().toLowerCase();
+      // Purani Suggestion box hatayein
+      const oldBox = wrapper.querySelector(".suggest-box");
+      if(oldBox) oldBox.remove();
+
+      if(!val) return;
+
+      const matches = itemDatabase.filter(item => 
+        item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+      );
+
+      if(matches.length > 0) {
+        const suggestBox = document.createElement("div");
+        suggestBox.className = "suggest-box";
+        
+        matches.forEach(match => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "suggest-item";
+          const pMode = priceModeSelect.value;
+          const price = pMode === 'wholesale' ? match.wholesale : match.retail;
+          itemDiv.textContent = `${match.name} [${match.code}] - ₹${price}`;
+          
+          // Mobile Touch aur Desktop Click dono ko handle karne ke liye pro handler
+          const selectItem = (e) => {
+            e.preventDefault(); // Blur hone se rokega taaki touch register ho sake
+            e.stopPropagation();
+            
+            input.textContent = `${match.name} [${match.code}] ${price}`;
+            suggestBox.remove();
+            
+            render();
+            setCaretToEnd(input);
+            activeInput = input; // Input focus track active rakhein
+          };
+
+          // Desktop users ke liye
+          itemDiv.addEventListener("mousedown", selectItem);
+          // Mobile users ke liye instant touch response
+          itemDiv.addEventListener("touchstart", selectItem);
+          
           suggestBox.appendChild(itemDiv);
         });
         wrapper.appendChild(suggestBox);
