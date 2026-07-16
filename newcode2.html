@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Notebook Invoice PWA</title>
+  <title>Notebook Bill</title>
   <meta name="theme-color" content="#1a252f">
   
   <style>
@@ -17,7 +17,8 @@
       --shadow: rgba(0, 0, 0, 0.3);
       --danger: #c0392b;
       --green-patch: #e8f8f5; 
-      --green-text: #117a65;  
+      --green-text: #117a65;
+      --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); /* Green to Pink Gradient */
     }
 
     * {
@@ -26,7 +27,6 @@
       padding: 0;
     }
 
-    /* Fixed Body Layout for keyboard adjust */
     body {
       margin: 0;
       background: var(--bg);
@@ -36,11 +36,11 @@
       justify-content: center;
       align-items: stretch;
       height: 100vh;
-      overflow: hidden; /* No outer scroll */
+      height: 100dvh; /* Dynamic viewport for mobile keyboard adjustment */
+      overflow: hidden; 
       padding: 5px;
     }
 
-    /* Outer Wrapper */
     .wrap {
       max-width: 600px;
       width: 100%;
@@ -50,25 +50,74 @@
       height: 100%;
     }
 
-    /* 1. SCROLLABLE PAPER AREA */
-    .paper {
-      background: var(--paper);
+    /* Green & Pink Two Color Brand Header Bar */
+    .brand-header {
+      background: var(--gradient-head);
+      padding: 10px;
+      text-align: center;
       border-radius: 8px 8px 0 0;
-      box-shadow: 0 4px 15px var(--shadow);
-      display: flex;
-      flex-direction: column;
-      flex: 1; /* Squeezes when keyboard appears */
-      overflow-y: auto; 
-      position: relative;
-      border-left: 6px solid #e74c3c; /* Red notebook margin line on left edge */
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
-    /* Red Margin Line Alignment (Tighter to left) */
+    .brand-header h2 {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Entry Mode Database Form Panel */
+    .db-entry-panel {
+      background: #1a252f;
+      border: 1px solid var(--line);
+      padding: 10px;
+      display: none; /* Hidden by default in Bill mode */
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .db-entry-panel h4 {
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .db-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .db-input {
+      background: #2c3e50;
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .db-input::placeholder { color: #95a5a6; }
+
+    /* SCROLLABLE PAPER AREA */
+    .paper {
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      flex: 1; 
+      overflow-y: auto; 
+      position: relative;
+      border-left: 6px solid #e74c3c;
+    }
+
     .paper::before {
       content: "";
       position: absolute;
       top: 0;
-      left: 18px; /* Brought closer to margin */
+      left: 18px; 
       bottom: 0;
       width: 1px;
       background: rgba(231, 76, 60, 0.35);
@@ -76,7 +125,6 @@
       z-index: 10;
     }
 
-    /* Header (Simple & Tiny) */
     .paper-header {
       padding: 10px 10px 5px 24px;
       border-bottom: 2px solid var(--line);
@@ -94,18 +142,15 @@
 
     .paper-header h1 {
       color: var(--ink);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
-      letter-spacing: 1px;
     }
 
-    /* Scrollable Row List Area */
     .row-list {
-      padding: 5px 5px 20px 24px; /* Serial number lines align right with margin */
+      padding: 5px 5px 20px 24px;
       flex: 1;
     }
 
-    /* Rows styling */
     .row {
       display: flex;
       flex-direction: column;
@@ -119,13 +164,11 @@
       width: 100%;
     }
 
-    /* Serial number pushed to left of Red Line */
     .sl {
       width: 15px;
       color: var(--muted);
       font-weight: 700;
       font-size: 12px;
-      text-align: left;
     }
 
     .input-wrapper {
@@ -155,7 +198,6 @@
       font-size: 15px;
     }
 
-    /* Code Strip green patch */
     .code-patch {
       display: none;
       background: var(--green-patch);
@@ -170,11 +212,9 @@
       margin-left: 18px;
     }
 
-    .code-patch.visible {
-      display: inline-block;
-    }
+    .code-patch.visible { display: inline-block; }
 
-    /* Autocomplete Suggestions Box */
+    /* Suggestions Box */
     .suggest-box {
       position: absolute;
       left: 0;
@@ -198,11 +238,9 @@
       font-weight: 600;
     }
 
-    .suggest-item:active {
-      background: var(--line);
-    }
+    .suggest-item:active { background: var(--line); }
 
-    /* 2. FIXED BOTTOM CONTAINER (CalcNote Style) */
+    /* FIXED BOTTOM CONTAINER (CalcNote Style Layout) */
     .bottom-dashboard {
       background: #111b24;
       border-radius: 0 0 8px 8px;
@@ -214,7 +252,6 @@
       z-index: 1000;
     }
 
-    /* Total Board inside bottom bar */
     .total-board {
       background: #1a252f;
       padding: 6px 10px;
@@ -228,131 +265,44 @@
       align-items: center;
     }
 
-    .total-lbl {
-      font-weight: bold;
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
+    .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
+    .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px; }
 
-    .total-val {
-      font-weight: 800;
-      font-size: 20px;
-      color: var(--accent);
-    }
-
-    .words {
-      font-size: 11px;
-      color: var(--muted);
-      font-style: italic;
-      text-align: right;
-      margin-top: 2px;
-    }
-
-    /* Bottom Control Action Buttons Row */
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .controls { display: flex; align-items: center; gap: 6px; }
 
     .btn {
       background: linear-gradient(to bottom, #f1c40f, #f39c12);
-      color: #2c3e50;
-      border: 1px solid #f39c12;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 700;
-      box-shadow: 0 2px 4px var(--shadow);
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px;
+      cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.15s ease; display: flex; align-items: center; justify-content: center;
     }
 
-    .sq-btn {
-      width: 38px;
-      height: 38px;
-      font-size: 18px;
-    }
-
-    .mode-btn {
-      height: 38px;
-      padding: 0 10px;
-      font-size: 13px;
-      flex: 1;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
+    .sq-btn { width: 38px; height: 38px; font-size: 18px; }
+    .mode-btn { height: 38px; padding: 0 10px; font-size: 13px; flex: 1; }
     .price-select {
-      background: #34495e;
-      color: #fff;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 0 6px;
-      height: 38px;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-      font-size: 13px;
+      background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px;
+      padding: 0 6px; height: 38px; font-weight: 600; outline: none; cursor: pointer; font-size: 13px;
     }
 
-    /* Banner status inside dashboard */
     .mode-banner {
-      background: #1abc9c;
-      color: white;
-      text-align: center;
-      font-size: 10px;
-      font-weight: bold;
-      padding: 2px 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-radius: 3px;
+      background: #1abc9c; color: white; text-align: center; font-size: 10px;
+      font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px;
     }
+    .mode-banner.entry { background: #3498db; }
 
-    .mode-banner.entry {
-      background: #3498db;
-    }
-
-    /* Floating / Sticky Operators Bar */
-    .operator-bar {
-      display: flex;
-      gap: 5px;
-      justify-content: space-between;
-    }
-
+    .operator-bar { display: flex; gap: 5px; justify-content: space-between; }
     .op-btn {
-      flex: 1;
-      background: #34495e;
-      color: #fff;
-      border: 1px solid var(--line);
-      padding: 12px 0;
-      border-radius: 4px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      touch-action: manipulation;
+      flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line);
+      padding: 12px 0; border-radius: 4px; font-size: 16px; font-weight: 700; cursor: pointer; touch-action: manipulation;
     }
+    .op-btn:active { background: var(--line); color: #000; }
 
-    .op-btn:active {
-      background: var(--line);
-      color: #000;
-    }
-
-    /* Mobile keyboard tweaks */
     @media (max-width: 600px) {
-      body {
-        padding: 0;
-      }
-      .paper {
-        border-radius: 0;
-      }
-      .bottom-dashboard {
-        border-radius: 0;
-        padding-bottom: env(safe-area-inset-bottom, 8px); /* Safe area support for iOS/Android */
-      }
+      body { padding: 0; }
+      .brand-header { border-radius: 0; }
+      .paper { border-radius: 0; }
+      .bottom-dashboard { border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 8px); }
     }
   </style>
 </head>
@@ -360,22 +310,33 @@
 
   <div class="wrap">
     
+    <div class="brand-header">
+      <h2>Notebook Bill</h2>
+    </div>
+
+    <div id="dbEntryPanel" class="db-entry-panel">
+      <h4>📥 Add Product to Ledger Database</h4>
+      <div class="db-grid">
+        <input type="text" id="dbCode" class="db-input" placeholder="Product Code (e.g. 101)">
+        <input type="text" id="dbName" class="db-input" placeholder="Product Name">
+        <input type="number" id="dbRetail" class="db-input" placeholder="Retail Rate (₹)">
+        <input type="number" id="dbWholesale" class="db-input" placeholder="Wholesale Rate (₹)">
+      </div>
+      <button id="dbSaveBtn" class="btn" style="padding: 6px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff;">Save to Database</button>
+    </div>
+
     <div id="paper" class="paper">
-      
       <div class="paper-header">
         <div id="meta">
           <span id="date"></span>
           <span id="time"></span>
         </div>
-        <h1>DAILY LEDGER</h1>
+        <h1>DAILY LEDGER SHEET</h1>
       </div>
-
       <div class="row-list" id="container"></div>
-
     </div>
 
-    <div class="bottom-dashboard">
-      
+    <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
       <div class="total-board">
@@ -406,7 +367,6 @@
         <button class="op-btn" data-op="(">(</button>
         <button class="op-btn" data-op=")">)</button>
       </div>
-
     </div>
 
   </div>
@@ -425,16 +385,25 @@
       const modeBtn = document.getElementById("modeBtn");
       const modeStatus = document.getElementById("modeStatus");
       const priceModeSelect = document.getElementById("priceModeSelect");
+      const dbEntryPanel = document.getElementById("dbEntryPanel");
+      const dbSaveBtn = document.getElementById("dbSaveBtn");
 
       let currentMode = 'bill'; 
       let activeInput = null;
 
-      // Offline Database storage
-      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db")) || [
-        { code: "101", name: "Aata", price: 40 },
-        { code: "102", name: "Shakkar", price: 45 },
-        { code: "103", name: "Chawal", price: 60 }
+      // Local Database Store (Holds code, name, retail, and wholesale prices)
+      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
+        { code: "101", name: "Aata", retail: 40, wholesale: 38 },
+        { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
+        { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
       ];
+
+      // Pro Level: Mobile Viewport Height Sync Logic to bring dashboard over keyboard
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          document.body.style.height = window.visualViewport.height + 'px';
+        });
+      }
 
       function setCaretToEnd(el){
         const range = document.createRange();
@@ -489,39 +458,36 @@
         return s + " Only";
       }
 
-      // Automatically learns and stores new items (Format: Item [Code] Price OR Item Price)
-      function parseAndSaveNewItem(text) {
-        const cleanText = text.trim();
-        // Regex 1: Name [Code] Price
-        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
-        // Regex 2: Name Price
-        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
+      // Explicit Database save logic
+      dbSaveBtn.addEventListener("click", function() {
+        const code = document.getElementById("dbCode").value.trim();
+        const name = document.getElementById("dbName").value.trim();
+        const retail = parseFloat(document.getElementById("dbRetail").value) || 0;
+        const wholesale = parseFloat(document.getElementById("dbWholesale").value) || 0;
 
-        let name = "", code = "", price = 0;
-
-        if(patternWithCode.test(cleanText)) {
-          const match = cleanText.match(patternWithCode);
-          name = match[1].trim();
-          code = match[2].trim();
-          price = parseFloat(match[3]);
-        } else if(simplePattern.test(cleanText)) {
-          const match = cleanText.match(simplePattern);
-          name = match[1].trim();
-          price = parseFloat(match[2]);
-          // Generate custom unique code
-          code = (itemDatabase.length + 101).toString();
-        }
-
-        if(name && price > 0) {
-          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
-          if(!exists) {
-            itemDatabase.push({ code, name, price });
-            localStorage.setItem("ledger_db", JSON.stringify(itemDatabase));
+        if (code && name && (retail || wholesale)) {
+          const existsIdx = itemDatabase.findIndex(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
+          if (existsIdx > -1) {
+            itemDatabase[existsIdx] = { code, name, retail, wholesale };
+          } else {
+            itemDatabase.push({ code, name, retail, wholesale });
           }
+          localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          alert(`"${name}" Database me save ho gaya!`);
+          document.getElementById("dbCode").value = "";
+          document.getElementById("dbName").value = "";
+          document.getElementById("dbRetail").value = "";
+          document.getElementById("dbWholesale").value = "";
+          render();
+        } else {
+          alert("Kripya product Code, Name aur kam se kam ek Rate zaroor enter karein!");
         }
-      }
+      });
 
-      /* ---------- Row Factory with Embedded Code Patch ---------- */
+      // Price Mode dropdown trigger re-render
+      priceModeSelect.addEventListener("change", render);
+
+      /* ---------- Row Factory Engine ---------- */
       function makeRow(i, text=""){
         const row = document.createElement("div");
         row.className = "row";
@@ -556,7 +522,7 @@
         row.appendChild(rowMain);
         row.appendChild(codePatch);
 
-        // Instant Touch and Search Action
+        // Auto Suggest Dropdown Logic (Synchronized with Retail/Wholesale choice)
         input.addEventListener("input", function() {
           render();
           const val = input.textContent.trim().toLowerCase();
@@ -565,7 +531,6 @@
 
           if(!val) return;
 
-          // Match Code or Name
           const matches = itemDatabase.filter(item => 
             item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
           );
@@ -577,14 +542,19 @@
             matches.forEach(match => {
               const itemDiv = document.createElement("div");
               itemDiv.className = "suggest-item";
-              itemDiv.textContent = `${match.name} [${match.code}] - ₹${match.price}`;
               
-              // Touch handler prevents blur event execution entirely
+              // Read current dropdown configuration mode
+              const pMode = priceModeSelect.value;
+              const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
+              
+              itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
+              
               const selectItem = (e) => {
                 e.preventDefault(); 
                 e.stopPropagation();
                 
-                input.textContent = `${match.name} ${match.price}`;
+                // Directly inputting item name and proper filtered price into active notebook sheet row
+                input.textContent = `${match.name} ${activePrice}`;
                 suggestBox.remove();
                 
                 render();
@@ -592,28 +562,22 @@
                 activeInput = input;
               };
 
-              // Binding on both events for 100% instant response
               itemDiv.addEventListener("mousedown", selectItem);
               itemDiv.addEventListener("touchstart", selectItem);
-              
               suggestBox.appendChild(itemDiv);
             });
             wrapper.appendChild(suggestBox);
           }
         });
 
-        // Close on blur
         input.addEventListener("blur", function() {
           setTimeout(() => {
             const box = wrapper.querySelector(".suggest-box");
             if(box) box.remove();
-            
-            parseAndSaveNewItem(input.textContent);
             render();
           }, 250);
         });
 
-        // Key Controls
         input.addEventListener("keydown", function(e){
           if(e.key === "Enter"){
             e.preventDefault();
@@ -648,13 +612,12 @@
       }
 
       function updateSL(){
-        [...container.children].forEach((row,i)=>{ 
-          row.querySelector(".sl").textContent = i+1; 
-        });
+        [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
       }
 
       function render(){
         let grand = 0;
+        const pMode = priceModeSelect.value;
 
         [...container.children].forEach(row => {
           const inputEl = row.querySelector(".input");
@@ -664,7 +627,7 @@
           
           let val = 0;
 
-          // Auto render code strip
+          // Sync Code patch logic
           const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
           if (codeMatch) {
             patchBox.textContent = `Code: ${codeMatch[1]}`;
@@ -704,28 +667,27 @@
         }
       }
 
-      /* ---------- Toggle Switch Layout Mode ---------- */
+      /* ---------- Mode Toggle System Upgrade ---------- */
       modeBtn.addEventListener("click", function() {
         if(currentMode === 'bill') {
           currentMode = 'entry';
           modeBtn.textContent = "✍️ Entry Mode";
           modeStatus.textContent = "Database Entry Active";
           modeStatus.classList.add("entry");
+          dbEntryPanel.style.display = "flex"; // Show panel box inside entry setup
         } else {
           currentMode = 'bill';
           modeBtn.textContent = "📋 Bill Mode";
           modeStatus.textContent = "Billing Active";
           modeStatus.classList.remove("entry");
+          dbEntryPanel.style.display = "none"; // Hide panel box entirely in billing setup
         }
         render();
       });
 
-      /* ---------- Sticky Auto Scroll Core Layout ---------- */
       function scrollToActiveInput(element) {
         if (!element) return;
-        setTimeout(() => { 
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
-        }, 80);
+        setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
       }
 
       container.addEventListener("focusin", function(e) {
@@ -735,7 +697,7 @@
         }
       });
 
-      // Quick Operator insertion binding
+      // Quick Operator Setup
       document.querySelectorAll(".op-btn").forEach(btn => {
         btn.addEventListener("click", function(e) {
           e.preventDefault();
@@ -759,11 +721,11 @@
         });
       });
 
-      // Export Invoice canvas image structure
+      // Image Render
       async function saveAsImage(){
         const paper = document.getElementById("paper");
         await new Promise(r=>requestAnimationFrame(r));
-        if (typeof html2canvas === 'undefined') { alert('Tools load ho raha hai, thodi der baad dobara click karein!'); return; }
+        if (typeof html2canvas === 'undefined') { alert('Tools background load ho raha hai, do second baad click karein.'); return; }
         const canvas = await html2canvas(paper, {backgroundColor: "#ffffff", scale:2});
         const link = document.createElement('a');
         const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
@@ -780,7 +742,6 @@
         render();
       });
 
-      // Initialize
       container.appendChild(makeRow(0));
       render();
     })();
