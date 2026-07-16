@@ -18,7 +18,7 @@
       --danger: #c0392b;
       --green-patch: #e8f8f5; 
       --green-text: #117a65;
-      --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); /* Green to Pink Gradient */
+      --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); 
     }
 
     * {
@@ -36,7 +36,7 @@
       justify-content: center;
       align-items: stretch;
       height: 100vh;
-      height: 100dvh; /* Dynamic viewport for mobile keyboard adjustment */
+      height: 100dvh; 
       overflow: hidden; 
       padding: 5px;
     }
@@ -71,8 +71,8 @@
     .db-entry-panel {
       background: #1a252f;
       border: 1px solid var(--line);
-      padding: 10px;
-      display: none; /* Hidden by default in Bill mode */
+      padding: 8px;
+      display: none; 
       flex-direction: column;
       gap: 8px;
       margin-bottom: 5px;
@@ -94,7 +94,7 @@
       background: #2c3e50;
       border: 1px solid var(--line);
       color: #fff;
-      padding: 8px;
+      padding: 6px;
       border-radius: 4px;
       font-size: 13px;
       outline: none;
@@ -125,25 +125,27 @@
       z-index: 10;
     }
 
+    /* Redesigned Paper Header (Title Shshifted below Date/Time) */
     .paper-header {
-      padding: 10px 10px 5px 24px;
+      padding: 8px 10px 5px 24px;
       border-bottom: 2px solid var(--line);
       text-align: center;
     }
 
     #meta {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: bold;
       color: var(--muted);
       display: flex;
       justify-content: space-between;
-      margin-bottom: 2px;
+      margin-bottom: 5px;
     }
 
     .paper-header h1 {
       color: var(--ink);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 800;
+      letter-spacing: 1px;
     }
 
     .row-list {
@@ -240,6 +242,57 @@
 
     .suggest-item:active { background: var(--line); }
 
+    /* Alphabetical Database List View inside Entry Mode */
+    .db-list-container {
+      display: none; /* Only visible in Entry Mode */
+      padding: 10px 10px 10px 24px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .db-list-header {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 4px;
+      margin-bottom: 5px;
+    }
+
+    .db-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .db-item-details {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .db-item-details span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: normal;
+      margin-left: 5px;
+    }
+
+    .db-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .db-action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 5px;
+    }
+
     /* FIXED BOTTOM CONTAINER (CalcNote Style Layout) */
     .bottom-dashboard {
       background: #111b24;
@@ -315,7 +368,7 @@
     </div>
 
     <div id="dbEntryPanel" class="db-entry-panel">
-      <h4>📥 Add Product to Ledger Database</h4>
+      <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
       <div class="db-grid">
         <input type="text" id="dbCode" class="db-input" placeholder="Product Code (e.g. 101)">
         <input type="text" id="dbName" class="db-input" placeholder="Product Name">
@@ -333,7 +386,13 @@
         </div>
         <h1>DAILY LEDGER SHEET</h1>
       </div>
+
       <div class="row-list" id="container"></div>
+
+      <div class="db-list-container" id="dbListContainer">
+        <div class="db-list-header">All Saved Products (Alphabetical)</div>
+        <div id="dbItemsList"></div>
+      </div>
     </div>
 
     <div class="bottom-dashboard" id="bottomDashboard">
@@ -387,18 +446,21 @@
       const priceModeSelect = document.getElementById("priceModeSelect");
       const dbEntryPanel = document.getElementById("dbEntryPanel");
       const dbSaveBtn = document.getElementById("dbSaveBtn");
+      const dbListContainer = document.getElementById("dbListContainer");
+      const dbItemsList = document.getElementById("dbItemsList");
+      const panelTitle = document.getElementById("panelTitle");
 
       let currentMode = 'bill'; 
       let activeInput = null;
+      let editingItemCode = null; // Track if we are editing an item
 
-      // Local Database Store (Holds code, name, retail, and wholesale prices)
+      // Local Database Store
       let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
         { code: "101", name: "Aata", retail: 40, wholesale: 38 },
         { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
         { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
       ];
 
-      // Pro Level: Mobile Viewport Height Sync Logic to bring dashboard over keyboard
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
           document.body.style.height = window.visualViewport.height + 'px';
@@ -458,7 +520,71 @@
         return s + " Only";
       }
 
-      // Explicit Database save logic
+      // Render Alphabetical Database List in Entry Mode
+      function renderDatabaseList() {
+        dbItemsList.innerHTML = "";
+        
+        // Alphabetical Sort
+        const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if(sortedDatabase.length === 0) {
+          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>No items saved in database yet.</div>";
+          return;
+        }
+
+        sortedDatabase.forEach(item => {
+          const itemRow = document.createElement("div");
+          itemRow.className = "db-item-row";
+
+          const details = document.createElement("div");
+          details.className = "db-item-details";
+          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | R: ₹${item.retail} | W: ₹${item.wholesale}</span>`;
+
+          const actions = document.createElement("div");
+          actions.className = "db-item-actions";
+
+          // Edit Button
+          const editBtn = document.createElement("button");
+          editBtn.className = "db-action-btn";
+          editBtn.innerHTML = "✏️";
+          editBtn.title = "Edit Item";
+          editBtn.addEventListener("click", () => {
+            document.getElementById("dbCode").value = item.code;
+            document.getElementById("dbName").value = item.name;
+            document.getElementById("dbRetail").value = item.retail;
+            document.getElementById("dbWholesale").value = item.wholesale;
+            
+            editingItemCode = item.code; // Track code for matching index later
+            panelTitle.textContent = "✏️ Edit Product in Ledger Database";
+            dbSaveBtn.textContent = "Update Product";
+            dbSaveBtn.style.background = "#e67e22";
+            dbSaveBtn.style.borderColor = "#d35400";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+
+          // Delete Button
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "db-action-btn";
+          deleteBtn.innerHTML = "❌";
+          deleteBtn.title = "Delete Item";
+          deleteBtn.addEventListener("click", () => {
+            if(confirm(`Kya aap "${item.name}" ko database se delete karna chahte hain?`)) {
+              itemDatabase = itemDatabase.filter(i => i.code !== item.code);
+              localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+              renderDatabaseList();
+              render();
+            }
+          });
+
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+          itemRow.appendChild(details);
+          itemRow.appendChild(actions);
+          dbItemsList.appendChild(itemRow);
+        });
+      }
+
+      // Explicit Database save and update logic
       dbSaveBtn.addEventListener("click", function() {
         const code = document.getElementById("dbCode").value.trim();
         const name = document.getElementById("dbName").value.trim();
@@ -466,25 +592,39 @@
         const wholesale = parseFloat(document.getElementById("dbWholesale").value) || 0;
 
         if (code && name && (retail || wholesale)) {
-          const existsIdx = itemDatabase.findIndex(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
-          if (existsIdx > -1) {
-            itemDatabase[existsIdx] = { code, name, retail, wholesale };
+          if (editingItemCode) {
+            // Update Existing Product
+            const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
+            if (idx > -1) {
+              itemDatabase[idx] = { code, name, retail, wholesale };
+            }
+            editingItemCode = null;
+            panelTitle.textContent = "📥 Add Product to Ledger Database";
+            dbSaveBtn.textContent = "Save to Database";
+            dbSaveBtn.style.background = "#3498db";
+            dbSaveBtn.style.borderColor = "#2980b9";
           } else {
+            // Add New Product (Check for existing first)
+            const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+              alert("Is code ya name se product pehle se hi saved hai!");
+              return;
+            }
             itemDatabase.push({ code, name, retail, wholesale });
           }
+
           localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
-          alert(`"${name}" Database me save ho gaya!`);
           document.getElementById("dbCode").value = "";
           document.getElementById("dbName").value = "";
           document.getElementById("dbRetail").value = "";
           document.getElementById("dbWholesale").value = "";
+          renderDatabaseList();
           render();
         } else {
           alert("Kripya product Code, Name aur kam se kam ek Rate zaroor enter karein!");
         }
       });
 
-      // Price Mode dropdown trigger re-render
       priceModeSelect.addEventListener("change", render);
 
       /* ---------- Row Factory Engine ---------- */
@@ -522,7 +662,7 @@
         row.appendChild(rowMain);
         row.appendChild(codePatch);
 
-        // Auto Suggest Dropdown Logic (Synchronized with Retail/Wholesale choice)
+        // Auto Suggest Dropdown Logic
         input.addEventListener("input", function() {
           render();
           const val = input.textContent.trim().toLowerCase();
@@ -543,7 +683,6 @@
               const itemDiv = document.createElement("div");
               itemDiv.className = "suggest-item";
               
-              // Read current dropdown configuration mode
               const pMode = priceModeSelect.value;
               const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
               
@@ -553,7 +692,6 @@
                 e.preventDefault(); 
                 e.stopPropagation();
                 
-                // Directly inputting item name and proper filtered price into active notebook sheet row
                 input.textContent = `${match.name} ${activePrice}`;
                 suggestBox.remove();
                 
@@ -617,7 +755,6 @@
 
       function render(){
         let grand = 0;
-        const pMode = priceModeSelect.value;
 
         [...container.children].forEach(row => {
           const inputEl = row.querySelector(".input");
@@ -627,7 +764,6 @@
           
           let val = 0;
 
-          // Sync Code patch logic
           const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
           if (codeMatch) {
             patchBox.textContent = `Code: ${codeMatch[1]}`;
@@ -667,20 +803,32 @@
         }
       }
 
-      /* ---------- Mode Toggle System Upgrade ---------- */
+      /* ---------- Mode Toggle System ---------- */
       modeBtn.addEventListener("click", function() {
         if(currentMode === 'bill') {
           currentMode = 'entry';
           modeBtn.textContent = "✍️ Entry Mode";
           modeStatus.textContent = "Database Entry Active";
           modeStatus.classList.add("entry");
-          dbEntryPanel.style.display = "flex"; // Show panel box inside entry setup
+          dbEntryPanel.style.display = "flex"; 
+          container.style.display = "none";     // Hide billing rows
+          dbListContainer.style.display = "flex"; // Show alphabetically sorted DB list
+          renderDatabaseList();
         } else {
           currentMode = 'bill';
           modeBtn.textContent = "📋 Bill Mode";
           modeStatus.textContent = "Billing Active";
           modeStatus.classList.remove("entry");
-          dbEntryPanel.style.display = "none"; // Hide panel box entirely in billing setup
+          dbEntryPanel.style.display = "none"; 
+          container.style.display = "block";     // Show billing rows
+          dbListContainer.style.display = "none"; // Hide DB list
+          
+          // Clear any editing state
+          editingItemCode = null;
+          panelTitle.textContent = "📥 Add Product to Ledger Database";
+          dbSaveBtn.textContent = "Save to Database";
+          dbSaveBtn.style.background = "#3498db";
+          dbSaveBtn.style.borderColor = "#2980b9";
         }
         render();
       });
