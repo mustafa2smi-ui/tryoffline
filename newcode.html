@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoice Calculator PWA</title>
+  <meta name="theme-color" content="#2c3e50">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" type="image/png">
+</head>
+<body>
+  <div class="wrap">
+    <div class="controls">
+      <button id="modeBtn" class="btn mode-btn">📋 Bill Mode</button>
+      <div class="spacer"></div>
+      <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+      <button id="saveBtn" class="btn sq-btn" title="Save as Image">💾</button>
+    </div>
+
+    <div id="entryContainer" class="entry-box card-hidden">
+      <h3>📥 Add Item to Database</h3>
+      <div class="entry-grid">
+        <input type="text" id="itemCode" placeholder="Item Code (e.g., 101)">
+        <input type="text" id="itemName" placeholder="Item Name">
+        <input type="number" id="itemWholesale" placeholder="Wholesale Price">
+        <input type="number" id="itemRetail" placeholder="Retail Price">
+      </div>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button id="addItemBtn" class="btn" style="flex:1;">Save Item</button>
+        <select id="priceModeSelect" class="btn" style="background: #34495e; color: #fff;">
+          <option value="retail">Use Retail Price</option>
+          <option value="wholesale">Use Wholesale Price</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="paper" class="paper">
+      <div class="header">
+        <div id="meta">
+          <span id="date"></span> <span id="time"></span>
+        </div>
+        <br>
+        <h1>INVOICE CALCULATOR</h1>
+        <p>Professional Billing Solution</p>
+      </div>
+      
+      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Customer Name"></div>
+      
+      <div id="container"></div>
+      
+      <div class="remark" contenteditable="true" maxlength="20" data-placeholder="Payment Method (Cash/Credit)"></div>
+      <div class="totals">
+        <div id="total" class="total">Total = 0</div>
+        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+        <label style="color:var(--muted); font-size:14px; display:block; text-align:right; margin-top:8px;">Previous Balance</label>
+        <div style="text-align: right;">
+          <div class="previous-balance" contenteditable="true" data-placeholder="0" maxlength="10"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="operator-bar">
+    <button class="op-btn" data-op="+">+</button>
+    <button class="op-btn" data-op="-">-</button>
+    <button class="op-btn" data-op="*">×</button>
+    <button class="op-btn" data-op="/">÷</button>
+    <button class="op-btn" data-op="(">(</button>
+    <button class="op-btn" data-op=")">)</button>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+      });
+    }
+    window.addEventListener('beforeinstallprompt', (e) => e.preventDefault());
+  </script>
+</body>
+</html>
