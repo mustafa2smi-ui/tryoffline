@@ -229,3 +229,47 @@ document.head.appendChild(html2canvasScript);
   container.appendChild(makeRow(0));
   render();
 })();
+  /* ---------- Quick Operator Insertion Logic ---------- */
+  let activeInput = null;
+
+  // Track rakhenge ki user kis input box mein type kar raha tha
+  container.addEventListener("focusin", function(e) {
+    if(e.target.classList.contains("input")) {
+      activeInput = e.target;
+    }
+  });
+
+  document.querySelectorAll(".op-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault(); // Default click behavior rokna taaki focus na toote
+      
+      // Agar koi active input box nahi hai, toh pehle/aakhri box ko select karein
+      if (!activeInput && container.children.length > 0) {
+        activeInput = container.lastChild.querySelector(".input");
+      }
+
+      if (activeInput) {
+        activeInput.focus();
+        
+        const op = btn.getAttribute("data-op");
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        
+        // Text node insert karna jahan cursor hai
+        const textNode = document.createTextNode(op);
+        range.insertNode(textNode);
+        
+        // Cursor ko character ke aage shift karna
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        
+        // Live update calculation trigger karein
+        render();
+      }
+    });
+  });
