@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Notebook Invoice PWA</title>
+  <meta name="theme-color" content="#1a252f">
+  
+  <style>
+    :root {
+      --bg: #1a252f;          
+      --paper: #ffffff;       
+      --ink: #0a2540;         
+      --muted: #5b7a9c;       
+      --accent: #d35400;      
+      --line: #b0c4de;        
+      --shadow: rgba(0, 0, 0, 0.3);
+      --danger: #c0392b;
+      --green-patch: #e8f8f5; 
+      --green-text: #117a65;  
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Fixed Body Layout for keyboard adjust */
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      height: 100vh;
+      overflow: hidden; /* No outer scroll */
+      padding: 5px;
+    }
+
+    /* Outer Wrapper */
+    .wrap {
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* 1. SCROLLABLE PAPER AREA */
+    .paper {
+      background: var(--paper);
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 4px 15px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      flex: 1; /* Squeezes when keyboard appears */
+      overflow-y: auto; 
+      position: relative;
+      border-left: 6px solid #e74c3c; /* Red notebook margin line on left edge */
+    }
+
+    /* Red Margin Line Alignment (Tighter to left) */
+    .paper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 18px; /* Brought closer to margin */
+      bottom: 0;
+      width: 1px;
+      background: rgba(231, 76, 60, 0.35);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Header (Simple & Tiny) */
+    .paper-header {
+      padding: 10px 10px 5px 24px;
+      border-bottom: 2px solid var(--line);
+      text-align: center;
+    }
+
+    #meta {
+      font-size: 10px;
+      font-weight: bold;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .paper-header h1 {
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* Scrollable Row List Area */
+    .row-list {
+      padding: 5px 5px 20px 24px; /* Serial number lines align right with margin */
+      flex: 1;
+    }
+
+    /* Rows styling */
+    .row {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--line);
+      padding: 4px 0;
+    }
+
+    .row-main {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Serial number pushed to left of Red Line */
+    .sl {
+      width: 15px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      padding-left: 5px;
+    }
+
+    .input {
+      width: 100%;
+      outline: none;
+      white-space: pre-wrap;
+      min-height: 20px;
+      color: var(--ink);
+      font-family: inherit;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .result {
+      width: 75px;
+      text-align: right;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* Code Strip green patch */
+    .code-patch {
+      display: none;
+      background: var(--green-patch);
+      color: var(--green-text);
+      font-size: 10px;
+      font-weight: 700;
+      font-style: italic;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-top: 2px;
+      align-self: flex-start;
+      margin-left: 18px;
+    }
+
+    .code-patch.visible {
+      display: inline-block;
+    }
+
+    /* Autocomplete Suggestions Box */
+    .suggest-box {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      background: #ffffff;
+      border: 2px solid var(--line);
+      z-index: 9999;
+      max-height: 140px;
+      overflow-y: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      border-radius: 4px;
+    }
+
+    .suggest-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .suggest-item:active {
+      background: var(--line);
+    }
+
+    /* 2. FIXED BOTTOM CONTAINER (CalcNote Style) */
+    .bottom-dashboard {
+      background: #111b24;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1000;
+    }
+
+    /* Total Board inside bottom bar */
+    .total-board {
+      background: #1a252f;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-lbl {
+      font-weight: bold;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .total-val {
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .words {
+      font-size: 11px;
+      color: var(--muted);
+      font-style: italic;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    /* Bottom Control Action Buttons Row */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      background: linear-gradient(to bottom, #f1c40f, #f39c12);
+      color: #2c3e50;
+      border: 1px solid #f39c12;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sq-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+    }
+
+    .mode-btn {
+      height: 38px;
+      padding: 0 10px;
+      font-size: 13px;
+      flex: 1;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .price-select {
+      background: #34495e;
+      color: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 6px;
+      height: 38px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Banner status inside dashboard */
+    .mode-banner {
+      background: #1abc9c;
+      color: white;
+      text-align: center;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 3px;
+    }
+
+    .mode-banner.entry {
+      background: #3498db;
+    }
+
+    /* Floating / Sticky Operators Bar */
+    .operator-bar {
+      display: flex;
+      gap: 5px;
+      justify-content: space-between;
+    }
+
+    .op-btn {
+      flex: 1;
+      background: #34495e;
+      color: #fff;
+      border: 1px solid var(--line);
+      padding: 12px 0;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .op-btn:active {
+      background: var(--line);
+      color: #000;
+    }
+
+    /* Mobile keyboard tweaks */
+    @media (max-width: 600px) {
+      body {
+        padding: 0;
+      }
+      .paper {
+        border-radius: 0;
+      }
+      .bottom-dashboard {
+        border-radius: 0;
+        padding-bottom: env(safe-area-inset-bottom, 8px); /* Safe area support for iOS/Android */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    
+    <div id="paper" class="paper">
+      
+      <div class="paper-header">
+        <div id="meta">
+          <span id="date"></span>
+          <span id="time"></span>
+        </div>
+        <h1>DAILY LEDGER</h1>
+      </div>
+
+      <div class="row-list" id="container"></div>
+
+    </div>
+
+    <div class="bottom-dashboard">
+      
+      <div id="modeStatus" class="mode-banner">Billing Active</div>
+
+      <div class="total-board">
+        <div class="total-row">
+          <span class="total-lbl">Total Amount:</span>
+          <span id="total" class="total-val">₹0.00</span>
+        </div>
+        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+      </div>
+
+      <div class="controls">
+        <button id="modeBtn" class="btn mode-btn">📋 Bill Mode</button>
+        
+        <select id="priceModeSelect" class="price-select">
+          <option value="retail">Retail Rate</option>
+          <option value="wholesale">Wholesale Rate</option>
+        </select>
+        
+        <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+        <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
+      </div>
+
+      <div class="operator-bar">
+        <button class="op-btn" data-op="+">+</button>
+        <button class="op-btn" data-op="-">-</button>
+        <button class="op-btn" data-op="*">×</button>
+        <button class="op-btn" data-op="/">÷</button>
+        <button class="op-btn" data-op="(">(</button>
+        <button class="op-btn" data-op=")">)</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    (function(){
+      const container = document.getElementById("container");
+      const totalBox  = document.getElementById("total");
+      const totalWordsBox = document.getElementById("totalWords");
+      const dateEl = document.getElementById("date");
+      const timeEl = document.getElementById("time");
+      const saveBtn = document.getElementById("saveBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const modeBtn = document.getElementById("modeBtn");
+      const modeStatus = document.getElementById("modeStatus");
+      const priceModeSelect = document.getElementById("priceModeSelect");
+
+      let currentMode = 'bill'; 
+      let activeInput = null;
+
+      // Offline Database storage
+      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db")) || [
+        { code: "101", name: "Aata", price: 40 },
+        { code: "102", name: "Shakkar", price: 45 },
+        { code: "103", name: "Chawal", price: 60 }
+      ];
+
+      function setCaretToEnd(el){
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      function nowDateTimeTick(){
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
+        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+      }
+      setInterval(nowDateTimeTick, 1000);
+      nowDateTimeTick();
+
+      function evalExpr(expr){
+        try{
+          const js = expr.replace(/\^/g,"**");
+          const val = Function('"use strict";return('+js+')')();
+          if(typeof val === "number" && isFinite(val))
+            return Number.isInteger(val)?val:parseFloat(val.toFixed(2));
+        }catch(e){}
+        return 0;
+      }
+
+      function numberToWordsIndian(num){
+        num = Math.floor(Math.abs(num));
+        if (num === 0) return "Zero";
+        const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+        const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+        function twoDigits(n){ if(n<20) return ones[n]; return tens[Math.floor(n/10)] + (n%10?" " + ones[n%10]:""); }
+        function threeDigits(n){ const h=Math.floor(n/100), r=n%100; return (h?ones[h]+" Hundred":"") + (h&&r?" ":"") + (r?twoDigits(r):""); }
+        let words = "";
+        const crore = Math.floor(num/10000000); num%=10000000;
+        const lakh  = Math.floor(num/100000);   num%=100000;
+        const thou  = Math.floor(num/1000);     num%=1000;
+        if(crore) words += threeDigits(crore) + " Crore";
+        if(lakh)  words += (words?" ":"") + twoDigits(lakh) + " Lakh";
+        if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
+        if(num)   words += (words?" ":"") + threeDigits(num);
+        return words.trim();
+      }
+
+      function totalInWords(amt){
+        const rupees = Math.floor(amt);
+        const paise = Math.round((amt - rupees) * 100);
+        let s = numberToWordsIndian(rupees) + " Rupees";
+        if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
+        return s + " Only";
+      }
+
+      // Automatically learns and stores new items (Format: Item [Code] Price OR Item Price)
+      function parseAndSaveNewItem(text) {
+        const cleanText = text.trim();
+        // Regex 1: Name [Code] Price
+        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
+        // Regex 2: Name Price
+        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
+
+        let name = "", code = "", price = 0;
+
+        if(patternWithCode.test(cleanText)) {
+          const match = cleanText.match(patternWithCode);
+          name = match[1].trim();
+          code = match[2].trim();
+          price = parseFloat(match[3]);
+        } else if(simplePattern.test(cleanText)) {
+          const match = cleanText.match(simplePattern);
+          name = match[1].trim();
+          price = parseFloat(match[2]);
+          // Generate custom unique code
+          code = (itemDatabase.length + 101).toString();
+        }
+
+        if(name && price > 0) {
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if(!exists) {
+            itemDatabase.push({ code, name, price });
+            localStorage.setItem("ledger_db", JSON.stringify(itemDatabase));
+          }
+        }
+      }
+
+      /* ---------- Row Factory with Embedded Code Patch ---------- */
+      function makeRow(i, text=""){
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const rowMain = document.createElement("div");
+        rowMain.className = "row-main";
+
+        const sl = document.createElement("div");
+        sl.className = "sl";
+        sl.textContent = i+1;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        const input = document.createElement("div");
+        input.className = "input";
+        input.contentEditable = true;
+        input.textContent = text;
+
+        wrapper.appendChild(input);
+
+        const result = document.createElement("div");
+        result.className = "result";
+
+        rowMain.appendChild(sl);
+        rowMain.appendChild(wrapper);
+        rowMain.appendChild(result);
+
+        const codePatch = document.createElement("div");
+        codePatch.className = "code-patch";
+        
+        row.appendChild(rowMain);
+        row.appendChild(codePatch);
+
+        // Instant Touch and Search Action
+        input.addEventListener("input", function() {
+          render();
+          const val = input.textContent.trim().toLowerCase();
+          const oldBox = wrapper.querySelector(".suggest-box");
+          if(oldBox) oldBox.remove();
+
+          if(!val) return;
+
+          // Match Code or Name
+          const matches = itemDatabase.filter(item => 
+            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+          );
+
+          if(matches.length > 0) {
+            const suggestBox = document.createElement("div");
+            suggestBox.className = "suggest-box";
+            
+            matches.forEach(match => {
+              const itemDiv = document.createElement("div");
+              itemDiv.className = "suggest-item";
+              itemDiv.textContent = `${match.name} [${match.code}] - ₹${match.price}`;
+              
+              // Touch handler prevents blur event execution entirely
+              const selectItem = (e) => {
+                e.preventDefault(); 
+                e.stopPropagation();
+                
+                input.textContent = `${match.name} ${match.price}`;
+                suggestBox.remove();
+                
+                render();
+                setCaretToEnd(input);
+                activeInput = input;
+              };
+
+              // Binding on both events for 100% instant response
+              itemDiv.addEventListener("mousedown", selectItem);
+              itemDiv.addEventListener("touchstart", selectItem);
+              
+              suggestBox.appendChild(itemDiv);
+            });
+            wrapper.appendChild(suggestBox);
+          }
+        });
+
+        // Close on blur
+        input.addEventListener("blur", function() {
+          setTimeout(() => {
+            const box = wrapper.querySelector(".suggest-box");
+            if(box) box.remove();
+            
+            parseAndSaveNewItem(input.textContent);
+            render();
+          }, 250);
+        });
+
+        // Key Controls
+        input.addEventListener("keydown", function(e){
+          if(e.key === "Enter"){
+            e.preventDefault();
+            if(input.textContent.trim() !== ""){
+              container.appendChild(makeRow(container.children.length));
+              updateSL();
+              render();
+              
+              const lastInput = container.lastChild.querySelector(".input");
+              lastInput.focus();
+              scrollToActiveInput(lastInput);
+            }
+          }
+          if(e.key === "Backspace" && input.textContent.trim() === ""){
+            if(container.children.length > 1){
+              e.preventDefault();
+              const prev = row.previousElementSibling || row.nextElementSibling;
+              row.remove();
+              updateSL();
+              render();
+              if(prev){
+                const target = prev.querySelector(".input");
+                target.focus();
+                setCaretToEnd(target);
+                scrollToActiveInput(target);
+              }
+            }
+          }
+        });
+
+        return row;
+      }
+
+      function updateSL(){
+        [...container.children].forEach((row,i)=>{ 
+          row.querySelector(".sl").textContent = i+1; 
+        });
+      }
+
+      function render(){
+        let grand = 0;
+
+        [...container.children].forEach(row => {
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.textContent.trim();
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
+          let val = 0;
+
+          // Auto render code strip
+          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
+            const wordTokens = text.split(/\s+/);
+            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
+          }
+
+          if (currentMode === 'bill') {
+            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            resBox.style.display = "none";
+          }
+        });
+
+        if (currentMode === 'bill') {
+          totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "block";
+        } else {
+          totalBox.textContent = "---- (Entry Active)";
+          totalWordsBox.style.display = "none";
+        }
+      }
+
+      /* ---------- Toggle Switch Layout Mode ---------- */
+      modeBtn.addEventListener("click", function() {
+        if(currentMode === 'bill') {
+          currentMode = 'entry';
+          modeBtn.textContent = "✍️ Entry Mode";
+          modeStatus.textContent = "Database Entry Active";
+          modeStatus.classList.add("entry");
+        } else {
+          currentMode = 'bill';
+          modeBtn.textContent = "📋 Bill Mode";
+          modeStatus.textContent = "Billing Active";
+          modeStatus.classList.remove("entry");
+        }
+        render();
+      });
+
+      /* ---------- Sticky Auto Scroll Core Layout ---------- */
+      function scrollToActiveInput(element) {
+        if (!element) return;
+        setTimeout(() => { 
+          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); 
+        }, 80);
+      }
+
+      container.addEventListener("focusin", function(e) {
+        if(e.target.classList.contains("input")) {
+          activeInput = e.target;
+          scrollToActiveInput(activeInput);
+        }
+      });
+
+      // Quick Operator insertion binding
+      document.querySelectorAll(".op-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
+          if (activeInput) {
+            activeInput.focus();
+            const op = btn.getAttribute("data-op");
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode(op);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            render();
+            scrollToActiveInput(activeInput);
+          }
+        });
+      });
+
+      // Export Invoice canvas image structure
+      async function saveAsImage(){
+        const paper = document.getElementById("paper");
+        await new Promise(r=>requestAnimationFrame(r));
+        if (typeof html2canvas === 'undefined') { alert('Tools load ho raha hai, thodi der baad dobara click karein!'); return; }
+        const canvas = await html2canvas(paper, {backgroundColor: "#ffffff", scale:2});
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+        link.download = `notebook-invoice-${stamp}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+      
+      saveBtn.addEventListener("click", saveAsImage);
+
+      clearBtn.addEventListener("click", function(){
+        container.innerHTML = "";
+        container.appendChild(makeRow(0));
+        render();
+      });
+
+      // Initialize
+      container.appendChild(makeRow(0));
+      render();
+    })();
+  </script>
+</body>
+</html>
