@@ -362,10 +362,15 @@
 <body>
 
   <div class="wrap">
-    
+    <!--
     <div class="brand-header">
       <h2>Notebook Bill</h2>
     </div>
+    -->
+<!-- BRAND HEADER: Isme shop name ka transparent input box add kiya hai -->
+<div class="brand-header">
+  <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.5); color: #fff; font-size: 20px; font-weight: 800; text-align: center; width: 80%; outline: none; letter-spacing: 1.5px;" placeholder="Write Your Shop Name" value="Notebook Bill">
+</div>
 
     <div id="dbEntryPanel" class="db-entry-panel">
       <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
@@ -377,7 +382,7 @@
       </div>
       <button id="dbSaveBtn" class="btn" style="padding: 6px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff;">Save to Database</button>
     </div>
-
+<!--
     <div id="paper" class="paper">
       <div class="paper-header">
         <div id="meta">
@@ -386,7 +391,22 @@
         </div>
         <h1>DAILY LEDGER SHEET</h1>
       </div>
-
+-->
+    <!-- PAPER HEADER: Isme DAILY LEDGER SHEET ke theek niche Customer Name ka editable field add kiya hai -->
+<div id="paper" class="paper">
+  <div class="paper-header">
+    <div id="meta">
+      <span id="date"></span>
+      <span id="time"></span>
+    </div>
+    <h1>DAILY LEDGER SHEET</h1>
+    <!-- Customer Name field -->
+    <div style="margin-top: 5px; font-size: 14px; font-weight: 600; color: var(--muted); display: flex; justify-content: center; gap: 5px;">
+      <span>Cust Name:</span>
+      <div contenteditable="true" style="border-bottom: 1px solid var(--line); min-width: 120px; outline: none; text-align: left; color: var(--ink);" placeholder="Enter Name"></div>
+    </div>
+  </div>
+  
       <div class="row-list" id="container"></div>
 
       <div class="db-list-container" id="dbListContainer">
@@ -416,6 +436,9 @@
         
         <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
         <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
+      <!-- Controls row ke andar 💾 wale button ke theek niche daalein -->
+<button id="shareBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Share Link">📤</button>
+
       </div>
 
       <div class="operator-bar">
@@ -644,7 +667,11 @@
 
         const input = document.createElement("div");
         input.className = "input";
-        input.contentEditable = true;
+        
+        // makeRow function ke andar input element creation ke niche paste karein:
+input.contentEditable = true;
+input.setAttribute("enterkeyhint", "next"); // Mobile keyboard par 'Next/Enter' icon lane ke liye
+input.setAttribute("autocorrect", "on");    // Mic/Voice typing capability open karne ke liye
         input.textContent = text;
 
         wrapper.appendChild(input);
@@ -868,6 +895,25 @@
           }
         });
       });
+// Script ke end mein paste karein:
+const shareBtn = document.getElementById("shareBtn");
+shareBtn.addEventListener("click", async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: document.getElementById("shopNameInput").value || 'Notebook Bill',
+        text: 'Mera digital bahi-khata ledger check karein.',
+        url: window.location.href // Sirf current website ka clean URL share karega
+      });
+    } catch (err) {
+      console.log("Share cancel ya fail hua: ", err);
+    }
+  } else {
+    // Agar browser native share support na kare (jaise purane desktop chrome)
+    navigator.clipboard.writeText(window.location.href);
+    alert("URL clipboard me copy ho gaya hai! Aap manually share kar sakte hain.");
+  }
+});
 
       // Image Render
       async function saveAsImage(){
