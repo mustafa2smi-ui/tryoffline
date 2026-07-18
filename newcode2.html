@@ -333,7 +333,7 @@
       padding: 10px 0; border-radius: 4px; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation;
     }
     .op-btn:active { background: var(--line); color: #000; }
-
+/*
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
@@ -343,10 +343,32 @@
         position: fixed; bottom: 0; left: 0; width: 100%;
         padding-bottom: env(safe-area-inset-bottom, 8px);
       }
-      /* Dashboard space padding inside mobile paper layout */
+      /* Dashboard space padding inside mobile paper layout *
       .row-list { padding-bottom: 140px; }
       .db-list-container { padding-bottom: 140px; }
     }
+    */
+      /* Puraane @media (max-width: 600px) block ko isse replace karein */
+  @media (max-width: 600px) {
+    body { padding: 0; }
+    .brand-header { border-radius: 0; }
+    .paper { border-radius: 0; }
+    
+    /* Strict Floating Fixed layout for CalcNote action board */
+    .bottom-dashboard {
+      border-radius: 0; 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%;
+      padding-bottom: env(safe-area-inset-bottom, 6px);
+    }
+    
+    /* Paper ke rows ko bottom panel ke size ke barabar space dena */
+    .row-list { padding-bottom: 150px; }
+    .db-list-container { padding-bottom: 150px; }
+  }
+
   </style>
 </head>
 <body>
