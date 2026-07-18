@@ -195,18 +195,7 @@
       </div>
 
       <div class="row-list" id="container"></div>
-<!-- index.html me row-list container ke theek niche ise paste karein -->
-<div class="row-list" id="container"></div>
 
-<!-- 📜 Naya: Only for Paper Capture Total Line -->
-<div id="paperTotalZone" style="padding: 15px 10px 5px 0; border-top: 2px solid var(--line); margin-top: 15px; display: flex; flex-direction: column; gap: 4px;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <span style="font-weight: bold; font-size: 14px; color: var(--muted);">Grand Total:</span>
-    <span id="paperTotalVal" style="font-weight: 800; font-size: 18px; color: var(--accent);">₹0.00</span>
-  </div>
-  <div id="paperTotalWords" style="font-size: 12px; color: var(--muted); font-style: italic; text-align: right;">In Words: Zero Rupees Only</div>
-</div>
-<div class="db-list-container" id="dbListContainer">
 
       <!-- FIX #1: Hidden total overlay that appears only during image capture -->
       <div class="total-overlay-for-image" id="totalOverlayForImage"></div>
@@ -580,8 +569,62 @@
       function updateSL(){
         [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
       }
-/*
+
       function render(){
+        let grand = 0;
+
+        [...container.children].forEach(row => {
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.textContent.trim();
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
+          let val = 0;
+
+          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
+            const wordTokens = text.split(/\s+*/);
+            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
+          }
+
+          if (currentMode === 'bill') {
+            const m = text.match(/([0-9.\s()+\-/^]+)$/);
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            resBox.style.display = "none";
+          }
+        });
+
+        if (currentMode === 'bill') {
+          totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "block";
+          
+          // FIX #1: Update the hidden overlay for image capture
+          totalOverlayForImage.textContent = "Total: ₹" + grand.toLocaleString('en-IN') + " | " + totalInWords(grand);
+        } else {
+          totalBox.textContent = "----";
+          totalWordsBox.style.display = "none";
+          totalOverlayForImage.textContent = "";
+        }
+      }
+/*
+            function render(){
         let grand = 0;
 
         [...container.children].forEach(row => {
@@ -621,60 +664,6 @@
           }
         });
 
-        if (currentMode === 'bill') {
-          totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
-          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
-          totalWordsBox.style.display = "block";
-          
-          // FIX #1: Update the hidden overlay for image capture
-          totalOverlayForImage.textContent = "Total: ₹" + grand.toLocaleString('en-IN') + " | " + totalInWords(grand);
-        } else {
-          totalBox.textContent = "----";
-          totalWordsBox.style.display = "none";
-          totalOverlayForImage.textContent = "";
-        }
-      }
-*/
-            function render(){
-        let grand = 0;
-
-        [...container.children].forEach(row => {
-          const inputEl = row.querySelector(".input");
-          const text = inputEl.textContent.trim();
-          const resBox = row.querySelector(".result");
-          const patchBox = row.querySelector(".code-patch");
-          
-          let val = 0;
-
-          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
-          if (codeMatch) {
-            patchBox.textContent = `Code: ${codeMatch[1]}`;
-            patchBox.classList.add("visible");
-          } else {
-            const wordTokens = text.split(/\s+/);
-            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
-            if (foundItem) {
-              patchBox.textContent = `Code: ${foundItem.code}`;
-              patchBox.classList.add("visible");
-            } else {
-              patchBox.classList.remove("visible");
-            }
-          }
-
-          if (currentMode === 'bill') {
-            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
-            if(m){
-              const expr = m[1].trim();
-              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
-            }
-            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-            grand += val;
-            resBox.style.display = "block";
-          } else {
-            resBox.style.display = "none";
-          }
-        });
-
         // 🌟 Dono jagah ke text aur words ko dynamic sync karna
         const formattedTotal = "₹" + grand.toLocaleString('en-IN');
         const formattedWords = "In Words: " + totalInWords(grand);
@@ -695,7 +684,7 @@
           document.getElementById("paperTotalZone").style.display = "none";
         }
       }
-
+*/
       function toggleViewMode(mode) {
         currentMode = mode;
         if(mode === 'entry') {
