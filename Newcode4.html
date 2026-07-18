@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Notebook Bill</title>
+  <meta name="theme-color" content="#1a252f">
+  
+  <style>
+    :root {
+      --bg: #1a252f;          
+      --paper: #ffffff;       
+      --ink: #0a2540;         
+      --muted: #5b7a9c;       
+      --accent: #d35400;      
+      --line: #b0c4de;        
+      --shadow: rgba(0, 0, 0, 0.3);
+      --danger: #c0392b;
+      --green-patch: #e8f8f5; 
+      --green-text: #117a65;
+      --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); 
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Strict Flexbox frame to prevent any gray space gaps */
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      display: flex; justify-content: center; align-items: stretch;
+      height: 100vh; height: 100dvh; overflow: hidden; padding: 0;
+    }
+
+    .wrap {
+      max-width: 600px; width: 100%; margin: 0 auto;
+      display: flex; flex-direction: column; height: 100%;
+    }
+
+    .brand-header { background: var(--gradient-head); padding: 10px; box-shadow: 0 2px 8px var(--shadow); z-index: 10; }
+    .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
+
+    .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; }
+    .db-entry-panel h4 { color: #fff; font-size: 13px; margin-bottom: 2px; }
+    .db-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; width: 100%; }
+    .db-input { background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; outline: none; width: 100%; }
+    .db-input::placeholder { color: #95a5a6; }
+
+    /* Pure scrollable component sheet setup */
+    .paper {
+      background: var(--paper); display: flex; flex-direction: column;
+      flex: 1; overflow-y: auto; position: relative; border-left: 6px solid #e74c3c;
+    }
+    .paper::before { content: ""; position: absolute; top: 0; left: 18px; bottom: 0; width: 1px; background: rgba(231, 76, 60, 0.35); pointer-events: none; z-index: 10; }
+    
+    .paper-header { padding: 8px 10px 5px 24px; border-bottom: 2px solid var(--line); text-align: center; }
+    #meta { font-size: 11px; font-weight: bold; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .paper-header h1 { color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+
+    .row-list { padding: 5px 5px 20px 24px; flex: 1; }
+    .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 4px 0; }
+    .row-main { display: flex; align-items: center; width: 100%; }
+    .sl { width: 15px; color: var(--muted); font-weight: 700; font-size: 12px; }
+    .input-wrapper { flex: 1; position: relative; padding-left: 5px; }
+    
+    .input {
+      width: 100%; border: none; outline: none; background: transparent;
+      color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 3px 0;
+    }
+
+    .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }
+    .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 1px 4px; border-radius: 3px; margin-top: 2px; align-self: flex-start; margin-left: 18px; }
+    .code-patch.visible { display: inline-block; }
+
+    /* Flipped upward suggestions list */
+    .suggest-box { position: absolute; left: 0; bottom: 100%; width: 100%; background: #ffffff; border: 2px solid var(--line); z-index: 99999; max-height: 140px; overflow-y: auto; box-shadow: 0 -4px 15px rgba(0,0,0,0.25); border-radius: 4px; margin-bottom: 4px; }
+    .suggest-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: var(--ink); font-weight: 600; }
+    .suggest-item:active { background: var(--line); }
+
+    .db-list-container { display: none; padding: 10px 10px 10px 24px; flex-direction: column; gap: 8px; }
+    .db-list-header { font-size: 12px; font-weight: bold; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 5px; }
+    .db-item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+    .db-item-details { font-size: 14px; color: var(--ink); font-weight: 600; }
+    .db-item-details span { color: var(--muted); font-size: 11px; font-weight: normal; margin-left: 5px; }
+    .db-item-actions { display: flex; gap: 8px; }
+    .db-action-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 5px; }
+
+    /* Position Relative Layout to strictly prevent floating screen vibration gaps */
+    .bottom-dashboard {
+      background: #111b24; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+      padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000;
+      position: relative; width: 100%; padding-bottom: env(safe-area-inset-bottom, 8px);
+    }
+    
+    .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
+    .total-row { display: flex; justify-content: space-between; align-items: center; }
+    .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
+    .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
+    .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px; }
+
+    .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
+    .sq-btn { width: 42px; height: 42px; font-size: 18px; }
+    .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; height: 30px; font-weight: 600; outline: none; cursor: pointer; font-size: 12px; }
+
+    .mode-banner { background: #1abc9c; color: white; text-align: center; font-size: 10px; font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; }
+    .mode-banner.entry { background: #3498db; }
+
+    .operator-bar { display: flex; gap: 4px; justify-content: space-between; }
+    .op-btn { flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line); padding: 10px 0; border-radius: 4px; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+    .op-btn:active { background: var(--line); color: #000; }
+
+    .bill-history-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
+    .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    
+    <!-- TOP APP BAR -->
+    <div class="brand-header">
+      <div class="controls">
+        <div style="display: flex; gap: 4px;">
+          <button id="entryModeBtn" class="mode-toggle-btn" style="background:#3498db; color:#fff;">🖋️ E</button>
+          <button id="billModeBtn" class="mode-toggle-btn" style="background:#1abc9c; color:#fff;">💵 B</button>
+        </div>
+        
+        <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.5); color: #fff; font-size: 16px; font-weight: 800; text-align: center; width: 45%; outline: none;" placeholder="Shop Name" value="Notebook Bill">
+        
+        <select id="priceModeSelect" class="price-select">
+          <option value="wholesale" selected>Wholesale</option>
+          <option value="retail">Retail</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ENTRY FLOW MANAGER -->
+    <div id="dbEntryPanel" class="db-entry-panel">
+      <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
+      <div class="db-grid">
+        <input type="text" id="dbCode" class="db-input" placeholder="Code (e.g. 101)">
+        <input type="text" id="dbName" class="db-input" placeholder="Product Name">
+        <input type="number" id="dbRetail" class="db-input" placeholder="Retail Rate (₹)">
+        <input type="number" id="dbWholesale" class="db-input" placeholder="Wholesale Rate (₹)">
+      </div>
+      <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
+    </div>
+
+    <!-- REAL WHITE SCROLL SHEET -->
+    <div id="paper" class="paper">
+      <div class="paper-header">
+        <div id="meta">
+          <span id="date"></span>
+          <span id="time"></span>
+        </div>
+        <h1>DAILY LEDGER SHEET</h1>
+        
+        <div id="custBlock" style="margin-top: 5px; font-size: 13px; font-weight: 600; color: var(--muted); display: flex; justify-content: center; gap: 5px;">
+          <span>Cust Name:</span>
+          <div contenteditable="true" id="custNameInput" style="border-bottom: 1px solid var(--line); min-width: 140px; outline: none; text-align: left; color: var(--ink);" placeholder="Enter Name"></div>
+        </div>
+      </div>
+
+      <div class="row-list" id="container"></div>
+
+      <div class="db-list-container" id="dbListContainer">
+        <div class="db-list-header">All Saved Products (Alphabetical)</div>
+        <div id="dbItemsList" style="margin-bottom: 20px;"></div>
+        
+        <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
+        <div id="dbBillsHistoryList"></div>
+      </div>
+    </div>
+
+    <!-- DYNAMIC DASHBOARD ZONE -->
+    <div class="bottom-dashboard" id="bottomDashboard">
+      <div id="modeStatus" class="mode-banner">Billing Active</div>
+
+      <div class="total-board">
+        <div class="total-row">
+          <span class="total-lbl">Total Amount:</span>
+          <span id="total" class="total-val">₹0.00</span>
+        </div>
+        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+      </div>
+
+      <div class="controls" style="margin-top: 2px;">
+        <div class="operator-bar" style="flex: 1;">
+          <button class="op-btn" data-op="+">+</button>
+          <button class="op-btn" data-op="-">-</button>
+          <button class="op-btn" data-op="*">×</button>
+          <button class="op-btn" data-op="/">÷</button>
+        </div>
+
+        <div style="display: flex; gap: 4px;">
+          <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+          <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
+          <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
+          <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
+          <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    (function(){
+      const container = document.getElementById("container");
+      const totalBox  = document.getElementById("total");
+      const totalWordsBox = document.getElementById("totalWords");
+      const dateEl = document.getElementById("date");
+      const timeEl = document.getElementById("time");
+      const saveBtn = document.getElementById("saveBtn");
+      const localSaveBtn = document.getElementById("localSaveBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const shareBtn = document.getElementById("shareBtn");
+      const entryModeBtn = document.getElementById("entryModeBtn");
+      const billModeBtn = document.getElementById("billModeBtn");
+      const modeStatus = document.getElementById("modeStatus");
+      const priceModeSelect = document.getElementById("priceModeSelect");
+      const dbEntryPanel = document.getElementById("dbEntryPanel");
+      const dbSaveBtn = document.getElementById("dbSaveBtn");
+      const dbListContainer = document.getElementById("dbListContainer");
+      const dbItemsList = document.getElementById("dbItemsList");
+      const panelTitle = document.getElementById("panelTitle");
+      const bottomDashboard = document.getElementById("bottomDashboard");
+      const custBlock = document.getElementById("custBlock");
+      const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
+      const csvBtn = document.getElementById("csvBtn");
+
+      let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
+      let currentMode = 'bill'; 
+      let activeInput = null;
+      let editingItemCode = null; 
+
+      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
+        { code: "101", name: "Aata", retail: 40, wholesale: 38 },
+        { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
+        { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
+      ];
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          document.body.style.height = window.visualViewport.height + 'px';
+        });
+      }
+
+      function setCaretToEnd(el){
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      function nowDateTimeTick(){
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
+        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+      }
+      setInterval(nowDateTimeTick, 1000);
+      nowDateTimeTick();
+
+      function evalExpr(expr){
+        try{
+          const js = expr.replace(/\^/g,"**");
+          const val = Function('"use strict";return('+js+')')();
+          if(typeof val === "number" && isFinite(val))
+            return Number.isInteger(val)?val:parseFloat(val.toFixed(2));
+        }catch(e){}
+        return 0;
+      }
+
+      function numberToWordsIndian(num){
+        num = Math.floor(Math.abs(num));
+        if (num === 0) return "Zero";
+        const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+        const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+        function twoDigits(n){ if(n<20) return ones[n]; return tens[Math.floor(n/10)] + (n%10?" " + ones[n%10]:""); }
+        function threeDigits(n){ const h=Math.floor(n/100), r=n%100; return (h?ones[h]+" Hundred":"") + (h&&r?" ":"") + (r?twoDigits(r):""); }
+        let words = "";
+        const crore = Math.floor(num/10000000); num%=10000000;
+        const lakh  = Math.floor(num/100000);   num%=100000;
+        const thou  = Math.floor(num/1000);     num%=1000;
+        if(crore) words += threeDigits(crore) + " Crore";
+        if(lakh)  words += (words?" ":"") + twoDigits(lakh) + " Lakh";
+        if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
+        if(num)   words += (words?" ":"") + threeDigits(num);
+        return words.trim();
+      }
+
+      function totalInWords(amt){
+        const rupees = Math.floor(amt);
+        const paise = Math.round((amt - rupees) * 100);
+        let s = numberToWordsIndian(rupees) + " Rupees";
+        if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
+        return s + " Only";
+      }
+
+      function parseAndSaveNewItem(text) {
+        const cleanText = text.trim();
+        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
+        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
+
+        let name = "", code = "", price = 0;
+
+        if(patternWithCode.test(cleanText)) {
+          const match = cleanText.match(patternWithCode);
+          name = match[1].trim(); code = match[2].trim(); price = parseFloat(match[3]);
+        } else if(simplePattern.test(cleanText)) {
+          const match = cleanText.match(simplePattern);
+          name = match[1].trim(); price = parseFloat(match[2]);
+          code = (itemDatabase.length + 101).toString();
+        }
+
+        if(name && price > 0) {
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if(!exists) {
+            itemDatabase.push({ code, name, retail: price, wholesale: price });
+            localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          }
+        }
+      }
+
+      function renderDatabaseList() {
+        dbItemsList.innerHTML = "";
+        const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if(sortedDatabase.length === 0) {
+          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>";
+          return;
+        }
+
+        sortedDatabase.forEach(item => {
+          const itemRow = document.createElement("div");
+          itemRow.className = "db-item-row";
+
+          const details = document.createElement("div");
+          details.className = "db-item-details";
+          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Retail: ₹${item.retail} | Whol: ₹${item.wholesale}</span>`;
+
+          const actions = document.createElement("div");
+          actions.className = "db-item-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+          editBtn.addEventListener("click", () => {
+            document.getElementById("dbCode").value = item.code;
+            document.getElementById("dbName").value = item.name;
+            document.getElementById("dbRetail").value = item.retail;
+            document.getElementById("dbWholesale").value = item.wholesale;
+            
+            editingItemCode = item.code; 
+            panelTitle.textContent = "✏️ Edit Product in Ledger Database";
+            dbSaveBtn.textContent = "Update Product";
+            dbSaveBtn.style.background = "#e67e22";
+            dbSaveBtn.style.borderColor = "#d35400";
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+          deleteBtn.addEventListener("click", () => {
+            if(confirm(`Delete "${item.name}"?`)) {
+              itemDatabase = itemDatabase.filter(i => i.code !== item.code);
+              localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+              renderDatabaseList();
+              render();
+            }
+          });
+
+          actions.appendChild(editBtn); actions.appendChild(deleteBtn);
+          itemRow.appendChild(details); itemRow.appendChild(actions);
+          dbItemsList.appendChild(itemRow);
+        });
+      }
+
+      dbSaveBtn.addEventListener("click", function() {
+        const code = document.getElementById("dbCode").value.trim();
+        const name = document.getElementById("dbName").value.trim();
+        const retail = parseFloat(document.getElementById("dbRetail").value) || 0;
+        const wholesale = parseFloat(document.getElementById("dbWholesale").value) || 0;
+
+        if (code && name && (retail || wholesale)) {
+          if (editingItemCode) {
+            const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
+            if (idx > -1) itemDatabase[idx] = { code, name, retail, wholesale };
+            editingItemCode = null;
+            panelTitle.textContent = "📥 Add Product to Ledger Database";
+            dbSaveBtn.textContent = "Save to Database";
+            dbSaveBtn.style.background = "#3498db";
+            dbSaveBtn.style.borderColor = "#2980b9";
+          } else {
+            const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
+            if (exists) { alert("Product matches an existing entry!"); return; }
+            itemDatabase.push({ code, name, retail, wholesale });
+          }
+          localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          document.getElementById("dbCode").value = "";
+          document.getElementById("dbName").value = "";
+          document.getElementById("dbRetail").value = "";
+          document.getElementById("dbWholesale").value = "";
+          renderDatabaseList();
+          render();
+        } else {
+          alert("Fill all required fields code, name & pricing!");
+        }
+      });
+
+      priceModeSelect.addEventListener("change", render);
+
+      /* ---------- Row Factory Engine ---------- */
+      function makeRow(i, text=""){
+        const row = document.createElement("div");
+        row.className = "row";
+        const rowMain = document.createElement("div");
+        rowMain.className = "row-main";
+
+        const sl = document.createElement("div");
+        sl.className = "sl"; sl.textContent = i+1;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        const input = document.createElement("div");
+        input.className = "input";
+        
+        input.contentEditable = true;
+        input.setAttribute("enterkeyhint", "next");
+        input.setAttribute("autocorrect", "on");
+        input.setAttribute("autocomplete", "on"); 
+        input.setAttribute("spellcheck", "false");
+        input.textContent = text;
+
+        wrapper.appendChild(input);
+        const result = document.createElement("div");
+        result.className = "result";
+
+        rowMain.appendChild(sl); rowMain.appendChild(wrapper); rowMain.appendChild(result);
+
+        const codePatch = document.createElement("div");
+        codePatch.className = "code-patch";
+        
+        row.appendChild(rowMain); row.appendChild(codePatch);
+
+        input.addEventListener("input", function() {
+          render();
+          const val = input.textContent.trim().toLowerCase();
+          const oldBox = wrapper.querySelector(".suggest-box");
+          if(oldBox) oldBox.remove();
+          if(!val) return;
+
+          const matches = itemDatabase.filter(item => 
+            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+          );
+
+          if(matches.length > 0) {
+            const suggestBox = document.createElement("div");
+            suggestBox.className = "suggest-box";
+            
+            matches.forEach(match => {
+              const itemDiv = document.createElement("div");
+              itemDiv.className = "suggest-item";
+              const pMode = priceModeSelect.value;
+              const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
+              itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
+              
+              const selectItem = (e) => {
+                e.preventDefault(); e.stopPropagation();
+                input.textContent = `${match.name} ${activePrice}`;
+                suggestBox.remove();
+                render();
+                setCaretToEnd(input);
+                activeInput = input;
+              };
+
+              itemDiv.addEventListener("mousedown", selectItem);
+              itemDiv.addEventListener("touchstart", selectItem);
+              suggestBox.appendChild(itemDiv);
+            });
+            wrapper.appendChild(suggestBox);
+          }
+        });
+
+        input.addEventListener("blur", function() {
+          setTimeout(() => {
+            const box = wrapper.querySelector(".suggest-box");
+            if(box) box.remove();
+            
+            const currentText = input.textContent.trim();
+            if (currentText) { parseAndSaveNewItem(currentText); }
+            render();
+          }, 350); 
+        });
+
+        input.addEventListener("keydown", function(e){
+          if(e.key === "Enter"){
+            e.preventDefault();
+            if(input.textContent.trim() !== ""){
+              container.appendChild(makeRow(container.children.length));
+              updateSL();
+              render();
+              const lastInput = container.lastChild.querySelector(".input");
+              lastInput.focus();
+              scrollToActiveInput(lastInput);
+            }
+          }
+          if(e.key === "Backspace" && input.textContent.trim() === ""){
+            if(container.children.length > 1){
+              e.preventDefault();
+              const prev = row.previousElementSibling || row.nextElementSibling;
+              row.remove();
+              updateSL();
+              render();
+              if(prev){
+                const target = prev.querySelector(".input");
+                target.focus();
+                setCaretToEnd(target);
+                scrollToActiveInput(target);
+              }
+            }
+          }
+        });
+
+        return row;
+      }
+
+      function updateSL(){
+        [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
+      }
+
+      function render(){
+        let grand = 0;
+
+        [...container.children].forEach(row => {
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.textContent.trim();
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
+          let val = 0;
+
+          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
+            const wordTokens = text.split(/\s+/);
+            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
+          }
+
+          if (currentMode === 'bill') {
+            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            resBox.style.display = "none";
+          }
+        });
+
+        if (currentMode === 'bill') {
+          totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "none"; 
+        } else {
+          totalBox.textContent = "----";
+          totalWordsBox.style.display = "none";
+        }
+      }
+
+      function toggleViewMode(mode) {
+        currentMode = mode;
+        if(mode === 'entry') {
+          modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
+          dbEntryPanel.style.display = "flex"; container.style.display = "none";     
+          custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
+          renderDatabaseList(); renderBillsHistoryList(); 
+        } else {
+          modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
+          dbEntryPanel.style.display = "none"; container.style.display = "block";     
+          custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
+          editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
+          dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+        }
+        render();
+      }
+
+      entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
+      billModeBtn.addEventListener("click", () => toggleViewMode('bill'));
+
+      function scrollToActiveInput(element) {
+        if (!element) return;
+        setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+      }
+
+      container.addEventListener("focusin", function(e) {
+        if(e.target.classList.contains("input")) {
+          activeInput = e.target;
+          scrollToActiveInput(activeInput);
+        }
+      });
+
+      document.querySelectorAll(".op-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
+          if (activeInput) {
+            activeInput.focus();
+            const op = btn.getAttribute("data-op");
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode(op);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            render();
+            scrollToActiveInput(activeInput);
+          }
+        });
+      });
+
+      /* ---------- FIXED HIGH QUALITY SNAPSHOT ENGINE ---------- */
+      async function saveAsImage(){
+        const paper = document.getElementById("paper");
+        
+        // Safety lock: Render full calculations before taking screenshot
+        const originalMode = currentMode;
+        currentMode = 'bill';
+        render();
+        
+        // Force calculation boxes visible inside hidden layouts
+        const allResults = paper.querySelectorAll(".result");
+        allResults.forEach(r => r.style.display = "block");
+
+        await new Promise(r => requestAnimationFrame(r));
+        if (typeof html2canvas === 'undefined') { alert('Tools asset loading error, try again.'); return; }
+        
+        // Full frame clone height calculations targeting hidden overflows
+        const canvas = await html2canvas(paper, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          windowWidth: paper.scrollWidth,
+          windowHeight: paper.scrollHeight,
+          height: paper.scrollHeight,
+          y: paper.getBoundingClientRect().top + window.pageYOffset
+        });
+        
+        // Restore active configuration context back
+        currentMode = originalMode;
+        render();
+
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+        link.download = `notebook-invoice-${stamp}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+      saveBtn.addEventListener("click", saveAsImage);
+
+      localSaveBtn.addEventListener("click", function() {
+        const customerName = document.getElementById("custNameInput").textContent.trim();
+        if(!customerName) { alert("Data save karne ke liye 'Cust Name' zaroor entered karein!"); return; }
+
+        const dateObj = new Date();
+        const yearStamp = dateObj.getFullYear();
+        const sequentialId = (savedBillsHistory.length + 101).toString();
+        const generatedBillCode = `NB-${yearStamp}-${sequentialId}`;
+
+        let rowItems = [];
+        [...container.children].forEach(row => {
+          const itemValue = row.querySelector(".input").textContent.trim();
+          if(itemValue) rowItems.push(itemValue);
+        });
+
+        savedBillsHistory.push({
+          billCode: generatedBillCode,
+          custName: customerName,
+          date: dateEl.textContent,
+          time: timeEl.textContent,
+          items: rowItems,
+          total: totalBox.textContent
+        });
+
+        localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
+        alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
+      });
+
+      shareBtn.addEventListener("click", async () => {
+        let itemsListText = "";
+        const lines = [...container.children].slice(0, 20);
+        lines.forEach((row, index) => {
+          const itemText = row.querySelector(".input").textContent.trim();
+          const itemTotal = row.querySelector(".result").textContent.trim();
+          if(itemText) { itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`; }
+        });
+        if([...container.children].length > 20) { itemsListText += "...and more products listed.\n"; }
+
+        const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
+        const customerName = document.getElementById("custNameInput").textContent.trim() || 'N/A';
+        const payloadMessage = `*${shopTitle}*\nCust: ${customerName}\n---------------------\n${itemsListText}---------------------\n*Total bill: ${totalBox.textContent}*\n\n`;
+
+        if (navigator.share) {
+          try { await navigator.share({ title: shopTitle, text: payloadMessage, url: window.location.href }); } catch (err) { console.log(err); }
+        } else {
+          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`); alert("Bill ki details copy ho gayi hain!");
+        }
+      });
+
+      csvBtn.addEventListener("click", function() {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Serial No,Item Description,Amount (INR)\n";
+        [...container.children].forEach((row, idx) => {
+          const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
+          const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
+          if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
+        });
+        csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri); link.setAttribute("download", `ledger_report.csv`);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      });
+
+      function renderBillsHistoryList() {
+        dbBillsHistoryList.innerHTML = "";
+        if(savedBillsHistory.length === 0) {
+          dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>"; return;
+        }
+        [...savedBillsHistory].reverse().forEach((bill, revIdx) => {
+          const actualIdx = savedBillsHistory.length - 1 - revIdx;
+          const bRow = document.createElement("div"); bRow.className = "bill-history-row";
+          const details = document.createElement("div"); details.className = "bill-meta-details";
+          details.innerHTML = `${bill.custName || 'Unknown Cust'} <span>Code: ${bill.billCode} | Total: ${bill.total}</span>`;
+          const actions = document.createElement("div"); actions.className = "db-item-actions";
+
+          const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+          editBtn.addEventListener("click", () => {
+            document.getElementById("custNameInput").textContent = bill.custName;
+            container.innerHTML = "";
+            bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
+            toggleViewMode('bill'); render();
+          });
+
+          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+          deleteBtn.addEventListener("click", () => {
+            if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
+              savedBillsHistory.splice(actualIdx, 1);
+              localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); renderBillsHistoryList();
+            }
+          });
+          actions.appendChild(editBtn); actions.appendChild(deleteBtn); bRow.appendChild(details); bRow.appendChild(actions); dbBillsHistoryList.appendChild(bRow);
+        });
+      }
+
+      clearBtn.addEventListener("click", function(){
+        container.innerHTML = ""; document.getElementById("custNameInput").textContent = ""; container.appendChild(makeRow(0)); render();
+      });
+
+      container.appendChild(makeRow(0));
+      render();
+    })();
+  </script>
+</body>
+</html>
