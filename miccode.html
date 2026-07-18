@@ -391,6 +391,17 @@
       .paper { border-radius: 0; }
       .bottom-dashboard { border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 8px); }
     }
+    /* Bills history viewer styles */
+.bill-history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
+.bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
+
   </style>
 </head>
 <body>
@@ -442,16 +453,26 @@
         </div>
       </div>
 
-      <!-- Billing layout rows -->
+      <!-- Billing layout rows --
       <div class="row-list" id="container"></div>
 
-      <!-- Alphabetical View container for database entries -->
+      <!-- Alphabetical View container for database entries --
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
         <div id="dbItemsList"></div>
       </div>
     </div>
-
+-->
+      <div class="row-list" id="container"></div>
+    <!-- index.html me is block ko purane dbListContainer se replace karein -->
+<div class="db-list-container" id="dbListContainer">
+  <div class="db-list-header">All Saved Products (Alphabetical)</div>
+  <div id="dbItemsList" style="margin-bottom: 20px;"></div>
+  
+  <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
+  <div id="dbBillsHistoryList"></div>
+</div>
+    </div>
     <!-- COMPACT BOTTOM CONTROL PANEL -->
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
@@ -472,12 +493,7 @@
           <button class="op-btn" data-op="*">×</button>
           <button class="op-btn" data-op="/">÷</button>
         </div>
-        <!-- Dashboard controls div ke andar ise paste karein -->
-<div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-  <input type="text" id="billNoInput" style="flex: 1; background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 6px; border-radius: 4px; font-size: 13px; outline: none;" placeholder="Bill No / Name (e.g. Bill-01)">
-  <button id="dbBillSaveBtn" class="btn" style="font-size: 12px; padding: 0 8px; background: #2ecc71; border-color: #27ae60; color:#fff;">Save Bill</button>
-  <button id="loadBillBtn" class="btn" style="font-size: 12px; padding: 0 8px; background: #3498db; border-color: #2980b9; color:#fff;">Load List</button>
-</div>
+
 
         <div style="display: flex; gap: 4px;">
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
@@ -516,7 +532,12 @@
       const panelTitle = document.getElementById("panelTitle");
       const bottomDashboard = document.getElementById("bottomDashboard");
       const custBlock = document.getElementById("custBlock");
+const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
+const csvBtn = document.getElementById("csvBtn");
 
+// Local Database initialization for active invoices
+let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
+      
       let currentMode = 'bill'; 
       let activeInput = null;
       let editingItemCode = null; 
@@ -887,6 +908,10 @@ input.addEventListener("blur", function() {
           dbListContainer.style.display = "flex"; 
           bottomDashboard.style.display = "none"; // Hides fixed layout completely to stop vibrations
           renderDatabaseList();
+          // toggleViewMode inside entry status block append:
+renderDatabaseList();
+renderBillsHistoryList(); // Fire history viewer rendering automatically
+
         } else {
           modeStatus.textContent = "Billing Active";
           modeStatus.classList.remove("entry");
@@ -1005,7 +1030,7 @@ input.addEventListener("blur", function() {
       container.appendChild(makeRow(0));
       render();
     })();
-    
+    /*
 // Local Storage Bills Database
 let savedBills = JSON.parse(localStorage.getItem("notebook_saved_bills")) || {};
 
@@ -1069,36 +1094,83 @@ loadBillBtn.addEventListener("click", function() {
     alert("Galat Bill Name!");
   }
 });
+    */
 // CSV Generation and Download Logic
-const csvBtn = document.getElementById("csvBtn");
 csvBtn.addEventListener("click", function() {
   let csvContent = "data:text/csv;charset=utf-8,";
-  
-  // Headers configuration
   csvContent += "Serial No,Item Description,Amount (INR)\n";
-  
   [...container.children].forEach((row, idx) => {
-    const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " "); // Comma remove taaki CSV skip na ho
+    const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
     const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
-    
-    if(itemText) {
-      csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
-    }
+    if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
   });
-  
-  // Total Row injection
   csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
-  
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
-  const stamp = new Date().toISOString().slice(0,10);
-  
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `ledger_report_${stamp}.csv`);
+  link.setAttribute("download", `ledger_report.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 });
+
+function renderBillsHistoryList() {
+  dbBillsHistoryList.innerHTML = "";
+  
+  if(savedBillsHistory.length === 0) {
+    dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
+    return;
+  }
+
+  // Latest bill top par dikhane ke liye reverse indexing map
+  [...savedBillsHistory].reverse().forEach((bill, revIdx) => {
+    const actualIdx = savedBillsHistory.length - 1 - revIdx;
+    
+    const bRow = document.createElement("div");
+    bRow.className = "bill-history-row";
+
+    const details = document.createElement("div");
+    details.className = "bill-meta-details";
+    details.innerHTML = `${bill.custName || 'Unknown Cust'} <span>Code: ${bill.billCode} | Total: ${bill.total}</span>`;
+
+    const actions = document.createElement("div");
+    actions.className = "db-item-actions";
+
+    // Edit ✏️ Button logic: Sets contents back to active paper session
+    const editBtn = document.createElement("button");
+    editBtn.className = "db-action-btn";
+    editBtn.innerHTML = "✏️";
+    editBtn.addEventListener("click", () => {
+      document.getElementById("custNameInput").textContent = bill.custName;
+      
+      container.innerHTML = "";
+      bill.items.forEach((itemText, rIdx) => {
+        container.appendChild(makeRow(rIdx, itemText));
+      });
+      
+      toggleViewMode('bill'); // Switch back to sheet instantly
+      render();
+    });
+
+    // Delete ❌ Button logic with explicit confirmation parameters
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "db-action-btn";
+    deleteBtn.innerHTML = "❌";
+    deleteBtn.addEventListener("click", () => {
+      if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
+        savedBillsHistory.splice(actualIdx, 1);
+        localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
+        renderBillsHistoryList();
+      }
+    });
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+    bRow.appendChild(details);
+    bRow.appendChild(actions);
+    dbBillsHistoryList.appendChild(bRow);
+  });
+}
 
   </script>
 </body>
