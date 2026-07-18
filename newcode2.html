@@ -348,13 +348,13 @@
       .db-list-container { padding-bottom: 140px; }
     }
     */
-      /* Puraane @media (max-width: 600px) block ko isse replace karein */
+      /* Puraane @media (max-width: 600px) block ko isse replace karein *
   @media (max-width: 600px) {
     body { padding: 0; }
     .brand-header { border-radius: 0; }
     .paper { border-radius: 0; }
     
-    /* Strict Floating Fixed layout for CalcNote action board */
+    /* Strict Floating Fixed layout for CalcNote action board *
     .bottom-dashboard {
       border-radius: 0; 
       position: fixed; 
@@ -366,9 +366,15 @@
     
     /* Paper ke rows ko bottom panel ke size ke barabar space dena *
     .row-list { padding-bottom: 150px; }
-    .db-list-container { padding-bottom: 150px; }*/
+    .db-list-container { padding-bottom: 150px; }*
   }
-
+    */
+    @media (max-width: 600px) {
+      body { padding: 0; }
+      .brand-header { border-radius: 0; }
+      .paper { border-radius: 0; }
+      .bottom-dashboard { border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 8px); }
+    }
   </style>
 </head>
 <body>
