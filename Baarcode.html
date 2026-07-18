@@ -109,7 +109,6 @@
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
 
-    /* Floating Camera Overlay View Frame Setup */
     .scanner-wrapper-zone {
       display: none; flex-direction: column; align-items: center; justify-content: center;
       background: #000000; border: 2px solid var(--line); border-radius: 6px;
@@ -135,13 +134,12 @@
 
   <div class="wrap">
     
-    <!-- OPTIMIZED MASTER TOP BAR WITH INTEGRATED CAMERA CONTROLS -->
+    <!-- HEADER BAR -->
     <div class="brand-header">
       <div class="controls">
         <div style="display: flex; gap: 4px; align-items: center;">
           <button id="entryModeBtn" class="mode-toggle-btn" style="background:#3498db; color:#fff;">🖋️ E</button>
           <button id="billModeBtn" class="mode-toggle-btn" style="background:#1abc9c; color:#fff;">💵 B</button>
-          <!-- 📷 COMPACT HIGH SPEED BARCODE TRIGGER LINK -->
           <button id="btnCamToggle" class="mode-toggle-btn" style="background:#e67e22; border-color:#d35400; color:#fff;">📷 Cam</button>
         </div>
         
@@ -162,7 +160,7 @@
       </div>
     </div>
 
-    <!-- REGISTER PRODUCT DATABASE ROW LAYER -->
+    <!-- DATABASE ENTRY PANEL -->
     <div id="dbEntryPanel" class="db-entry-panel">
       <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
       <div class="db-grid">
@@ -174,7 +172,7 @@
       <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
     </div>
 
-    <!-- DYNAMIC SCROLL SHEET PANELS -->
+    <!-- NOTEBOOK SHEET -->
     <div id="paper" class="paper">
       <div class="paper-header">
         <div id="meta">
@@ -189,7 +187,7 @@
         </div>
       </div>
 
-      <!-- 🎥 FLOATING CAMERA BARCODE LIVE SCANNING CONTAINER HOOK -->
+      <!-- CAMERA SCANNING CONTAINER -->
       <div class="scanner-wrapper-zone" id="scannerWrapperZone">
         <div id="reader"></div>
         <button id="btnResumeCamUI" class="btn" style="display:none; width:100%; padding:6px; font-size:12px; background:#2ecc71; border-color:#27ae60; color:#fff; margin-top:5px;">Scan Again 🔄</button>
@@ -206,7 +204,7 @@
       </div>
     </div>
 
-    <!-- CALCNOTE ACTION INTERFACE CONSOLE -->
+    <!-- BOTTOM CONTROL PANEL -->
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
@@ -580,7 +578,7 @@
         });
       });
 
-      // Browser Storage Local Database commit
+      // Save Data to Storage
       localSaveBtn.addEventListener("click", function() {
         const customerName = document.getElementById("custNameInput").textContent.trim();
         if(!customerName) { alert("Data save karne ke liye 'Cust Name' zaroor entered karein!"); return; }
@@ -602,7 +600,7 @@
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
       });
 
-      // WhatsApp / Native Share API Engine
+      // Share API Engine
       shareBtn.addEventListener("click", async () => {
         let itemsListText = ""; const lines = [...container.children].slice(0, 20);
         lines.forEach((row, index) => {
@@ -622,7 +620,7 @@
         }
       });
 
-      // Excel Compatible CSV Exporter
+      // CSV Exporter
       csvBtn.addEventListener("click", function() {
         let csvContent = "data:text/csv;charset=utf-8,"; csvContent += "Serial No,Item Description,Amount (INR)\n";
         [...container.children].forEach((row, idx) => {
@@ -636,7 +634,7 @@
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
       });
 
-      /* ---------- 🔥 ADVANCED PRINTER ACCESS GATEWAY ---------- */
+      /* ---------- PRINTER ACCESS ---------- */
       async function autoTranslateText(text) {
         if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
         const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
@@ -711,7 +709,7 @@
       }
       printBtn.addEventListener("click", printBill);
 
-      /* ---------- 📷 HIGH SPEED NATIVE BARCODE SCANNER LOGIC ENGINE ---------- */
+      /* ---------- 📷 BARCODE SCANNER LOGIC ---------- */
       function toggleCameraUI() {
         if (scannerWrapperZone.style.display === 'flex' || isScannerRunning) {
           stopHardwareCamera();
@@ -723,6 +721,10 @@
       btnCamToggle.addEventListener("click", toggleCameraUI);
 
       function startHardwareCamera() {
+        if (typeof Html5Qrcode === 'undefined') {
+          alert("Scanner Asset Load ho raha hai, ek second baad click karein.");
+          return;
+        }
         if(isScannerRunning) return;
         btnResumeCamUI.style.display = "none";
         isProcessingScan = false;
@@ -753,14 +755,12 @@
       }
 
       function executeScannedCodeMatch(code) {
-        // Find barcode match inside browser core local memory database
         let match = itemDatabase.find(i => i.code.toString().trim() === code);
         
         if (match) {
           const pMode = priceModeSelect.value;
           const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
           
-          // Inject scanned item data parameters back into last row safely
           if (!activeInput && container.children.length > 0) {
             activeInput = container.lastChild.querySelector(".input");
           }
@@ -772,7 +772,6 @@
             activeInput = container.lastChild.querySelector(".input");
           }
           
-          // Instantly trigger next automatic input row creation chain
           container.appendChild(makeRow(container.children.length));
           updateSL();
           render();
@@ -835,7 +834,7 @@
             toggleViewMode('bill'); render();
           });
 
-          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+          const deleteBtn = document.createElement("button"); deleteBtn.className = "deleteBtn"; deleteBtn.innerHTML = "❌";
           deleteBtn.addEventListener("click", () => {
             if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
               savedBillsHistory.splice(actualIdx, 1);
