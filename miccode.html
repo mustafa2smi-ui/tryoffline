@@ -385,12 +385,34 @@
     .db-list-container { padding-bottom: 150px; }*
   }
     */
+    /*
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
       .paper { border-radius: 0; }
       .bottom-dashboard { border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 8px); }
     }
+    */
+    @media (max-width: 600px) {
+  body { padding: 0; }
+  .brand-header { border-radius: 0; }
+  .paper { border-radius: 0; }
+  
+  /* Gray space aur vibration hatane ke liye absolute position cleanup */
+  .bottom-dashboard {
+    border-radius: 0; 
+    position: relative; /* Fixed hata kar position relative kiya */
+    bottom: auto; 
+    left: auto; 
+    width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 6px);
+  }
+  
+  /* Dynamic spacer settings taaki rows dashboard se na dabien */
+  .row-list { padding-bottom: 20px; }
+  .db-list-container { padding-bottom: 20px; }
+}
+
     /* Bills history viewer styles */
 .bill-history-row {
   display: flex;
@@ -971,7 +993,30 @@
           }
         });
       });
-
+// JavaScript ke andar saveAsImage ko is naye rule se badlein
+async function saveAsImage(){
+  const paper = document.getElementById("paper");
+  
+  // Image me text cutoff na ho isliye screen ko ek frame refresh time dete hain
+  await new Promise(r=>requestAnimationFrame(r));
+  if (typeof html2canvas === 'undefined') { alert('Tools asset loading error, try again.'); return; }
+  
+  // Canvas configuration upgrade to strictly include calculation results
+  const canvas = await html2canvas(paper, {
+    backgroundColor: "#ffffff",
+    scale: 2,
+    logging: false,
+    useCORS: true,
+    scrollY: -window.scrollY // Fixes viewport scrolling cutoffs
+  });
+  
+  const link = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  link.download = `notebook-invoice-${stamp}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+/*
       // Pure Image Canvas exporter (Only downloads PNG)
       async function saveAsImage(){
         const paper = document.getElementById("paper");
@@ -985,7 +1030,7 @@
         link.click();
       }
       saveBtn.addEventListener("click", saveAsImage);
-
+*/
       // Dedicated Browser Data Storage Save Logic
       localSaveBtn.addEventListener("click", function() {
         const customerName = document.getElementById("custNameInput").textContent.trim();
