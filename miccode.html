@@ -464,54 +464,53 @@
     </div>
 -->
       <div class="row-list" id="container"></div>
-    <!-- index.html me is block ko purane dbListContainer se replace karein -->
-<div class="db-list-container" id="dbListContainer">
-  <div class="db-list-header">All Saved Products (Alphabetical)</div>
-  <div id="dbItemsList" style="margin-bottom: 20px;"></div>
-  
-  <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
-  <div id="dbBillsHistoryList"></div>
-</div>
-    </div>
-    <!-- COMPACT BOTTOM CONTROL PANEL -->
-    <div class="bottom-dashboard" id="bottomDashboard">
-      <div id="modeStatus" class="mode-banner">Billing Active</div>
 
-      <div class="total-board">
-        <div class="total-row">
-          <span class="total-lbl">Total Amount:</span>
-          <span id="total" class="total-val">₹0.00</span>
-        </div>
-        <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+    <!-- CLEAN NOTEBOOK DATA HISTORY VIEWER -->
+    <div class="db-list-container" id="dbListContainer">
+      <div class="db-list-header">All Saved Products (Alphabetical)</div>
+      <div id="dbItemsList" style="margin-bottom: 20px;"></div>
+      
+      <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
+      <div id="dbBillsHistoryList"></div>
+    </div>
+  </div>
+
+  <!-- COMPACT BOTTOM CONTROL PANEL -->
+  <div class="bottom-dashboard" id="bottomDashboard">
+    <div id="modeStatus" class="mode-banner">Billing Active</div>
+
+    <div class="total-board">
+      <div class="total-row">
+        <span class="total-lbl">Total Amount:</span>
+        <span id="total" class="total-val">₹0.00</span>
+      </div>
+      <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+    </div>
+
+    <!-- Combined Row: Operators + Action Utilities -->
+    <div class="controls" style="margin-top: 2px;">
+      <div class="operator-bar" style="flex: 1;">
+        <button class="op-btn" data-op="+">+</button>
+        <button class="op-btn" data-op="-">-</button>
+        <button class="op-btn" data-op="*">×</button>
+        <button class="op-btn" data-op="/">÷</button>
       </div>
 
-      <!-- Combined Row: Operators + Action Utilities -->
-      <div class="controls" style="margin-top: 2px;">
-        <div class="operator-bar" style="flex: 1;">
-          <button class="op-btn" data-op="+">+</button>
-          <button class="op-btn" data-op="-">-</button>
-          <button class="op-btn" data-op="*">×</button>
-          <button class="op-btn" data-op="/">÷</button>
-        </div>
-
-
-        <div style="display: flex; gap: 4px;">
-          <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
-          <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
-          <button id="shareBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Share Items text">📤</button>
-      <!-- Controls group ke andar shareBtn ke baju me paste karein -->
-<button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
-
-        </div>
+      <div style="display: flex; gap: 4px;">
+        <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+        <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
+        <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
+        <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
+        <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
       </div>
     </div>
+  </div>
 
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
-    
     (function(){
       const container = document.getElementById("container");
       const totalBox  = document.getElementById("total");
@@ -519,6 +518,7 @@
       const dateEl = document.getElementById("date");
       const timeEl = document.getElementById("time");
       const saveBtn = document.getElementById("saveBtn");
+      const localSaveBtn = document.getElementById("localSaveBtn");
       const clearBtn = document.getElementById("clearBtn");
       const shareBtn = document.getElementById("shareBtn");
       const entryModeBtn = document.getElementById("entryModeBtn");
@@ -532,24 +532,23 @@
       const panelTitle = document.getElementById("panelTitle");
       const bottomDashboard = document.getElementById("bottomDashboard");
       const custBlock = document.getElementById("custBlock");
-const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
-const csvBtn = document.getElementById("csvBtn");
+      const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
+      const csvBtn = document.getElementById("csvBtn");
 
-// Local Database initialization for active invoices
-let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
+      // Local Storage Invoices Initialization
+      let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
       
       let currentMode = 'bill'; 
       let activeInput = null;
       let editingItemCode = null; 
 
-      // Data Engine Setup
+      // Data Engine Database Setup
       let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
         { code: "101", name: "Aata", retail: 40, wholesale: 38 },
         { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
         { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
       ];
 
-      // Fixes view scaling shift layout mechanics on soft keyboard popups
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
           document.body.style.height = window.visualViewport.height + 'px';
@@ -607,6 +606,34 @@ let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_histor
         let s = numberToWordsIndian(rupees) + " Rupees";
         if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
         return s + " Only";
+      }
+
+      function parseAndSaveNewItem(text) {
+        const cleanText = text.trim();
+        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
+        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
+
+        let name = "", code = "", price = 0;
+
+        if(patternWithCode.test(cleanText)) {
+          const match = cleanText.match(patternWithCode);
+          name = match[1].trim();
+          code = match[2].trim();
+          price = parseFloat(match[3]);
+        } else if(simplePattern.test(cleanText)) {
+          const match = cleanText.match(simplePattern);
+          name = match[1].trim();
+          price = parseFloat(match[2]);
+          code = (itemDatabase.length + 101).toString();
+        }
+
+        if(name && price > 0) {
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if(!exists) {
+            itemDatabase.push({ code, name, retail: price, wholesale: price });
+            localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          }
+        }
       }
 
       function renderDatabaseList() {
@@ -716,10 +743,10 @@ let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_histor
         const input = document.createElement("div");
         input.className = "input";
         
-        // Native Keyboard configuration adjustments for mic processing compatibility
         input.contentEditable = true;
         input.setAttribute("enterkeyhint", "next");
         input.setAttribute("autocorrect", "on");
+        input.setAttribute("autocomplete", "on"); 
         input.setAttribute("spellcheck", "false");
         input.textContent = text;
 
@@ -776,39 +803,19 @@ let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_histor
             wrapper.appendChild(suggestBox);
           }
         });
-/*
+
         input.addEventListener("blur", function() {
           setTimeout(() => {
             const box = wrapper.querySelector(".suggest-box");
             if(box) box.remove();
+            
+            const currentText = input.textContent.trim();
+            if (currentText) {
+              parseAndSaveNewItem(currentText);
+            }
             render();
-          }, 250);
+          }, 350); 
         });
-*/
-        // makeRow function ke andar input attributes aur blur listener ko isse replace karein:
-
-input.contentEditable = true;
-input.setAttribute("enterkeyhint", "next");
-input.setAttribute("autocorrect", "on");
-input.setAttribute("autocomplete", "on"); // Mic engine processing activation hooks
-input.setAttribute("spellcheck", "false");
-input.textContent = text;
-
-// Soft blur configuration jo mic input text processing ko skip hone se rokega
-input.addEventListener("blur", function() {
-  setTimeout(() => {
-    const box = wrapper.querySelector(".suggest-box");
-    if(box) box.remove();
-    
-    // Yahan directly parse save lagane se mic keyboard buffer crash hota hai
-    // Isliye soft check lagaya gaya hai
-    const currentText = input.textContent.trim();
-    if (currentText) {
-      parseAndSaveNewItem(currentText);
-    }
-    render();
-  }, 350); // Delay thoda badhaya taaki mobile mic text input safely execute ho sake
-});
 
         input.addEventListener("keydown", function(e){
           if(e.key === "Enter"){
@@ -889,7 +896,7 @@ input.addEventListener("blur", function() {
         if (currentMode === 'bill') {
           totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
           totalWordsBox.textContent = "In Words: " + totalInWords(grand);
-          totalWordsBox.style.display = "none"; // Kept initialized in background as requested
+          totalWordsBox.style.display = "none"; 
         } else {
           totalBox.textContent = "----";
           totalWordsBox.style.display = "none";
@@ -906,12 +913,9 @@ input.addEventListener("blur", function() {
           container.style.display = "none";     
           custBlock.style.display = "none"; 
           dbListContainer.style.display = "flex"; 
-          bottomDashboard.style.display = "none"; // Hides fixed layout completely to stop vibrations
+          bottomDashboard.style.display = "none"; 
           renderDatabaseList();
-          // toggleViewMode inside entry status block append:
-renderDatabaseList();
-renderBillsHistoryList(); // Fire history viewer rendering automatically
-
+          renderBillsHistoryList(); 
         } else {
           modeStatus.textContent = "Billing Active";
           modeStatus.classList.remove("entry");
@@ -968,7 +972,7 @@ renderBillsHistoryList(); // Fire history viewer rendering automatically
         });
       });
 
-      // Image Canvas exporter
+      // Pure Image Canvas exporter (Only downloads PNG)
       async function saveAsImage(){
         const paper = document.getElementById("paper");
         await new Promise(r=>requestAnimationFrame(r));
@@ -980,10 +984,42 @@ renderBillsHistoryList(); // Fire history viewer rendering automatically
         link.href = canvas.toDataURL('image/png');
         link.click();
       }
-      
       saveBtn.addEventListener("click", saveAsImage);
 
-      // Web API Sharing Engine (Packs max 20 list elements gracefully)
+      // Dedicated Browser Data Storage Save Logic
+      localSaveBtn.addEventListener("click", function() {
+        const customerName = document.getElementById("custNameInput").textContent.trim();
+        
+        if(!customerName) {
+          alert("Data save karne ke liye 'Cust Name' (Customer Name) zaroor entered karein!");
+          return;
+        }
+
+        const dateObj = new Date();
+        const yearStamp = dateObj.getFullYear();
+        const sequentialId = (savedBillsHistory.length + 101).toString();
+        const generatedBillCode = `NB-${yearStamp}-${sequentialId}`;
+
+        let rowItems = [];
+        [...container.children].forEach(row => {
+          const itemValue = row.querySelector(".input").textContent.trim();
+          if(itemValue) rowItems.push(itemValue);
+        });
+
+        savedBillsHistory.push({
+          billCode: generatedBillCode,
+          custName: customerName,
+          date: dateEl.textContent,
+          time: timeEl.textContent,
+          items: rowItems,
+          total: totalBox.textContent
+        });
+
+        localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
+        alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
+      });
+
+      // Web API Sharing Engine 
       shareBtn.addEventListener("click", async () => {
         let itemsListText = "";
         const lines = [...container.children].slice(0, 20);
@@ -1020,6 +1056,81 @@ renderBillsHistoryList(); // Fire history viewer rendering automatically
         }
       });
 
+      // CSV Generation and Download Logic
+      csvBtn.addEventListener("click", function() {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Serial No,Item Description,Amount (INR)\n";
+        [...container.children].forEach((row, idx) => {
+          const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
+          const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
+          if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
+        });
+        csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `ledger_report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      // Render Bills History List
+      function renderBillsHistoryList() {
+        dbBillsHistoryList.innerHTML = "";
+        
+        if(savedBillsHistory.length === 0) {
+          dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
+          return;
+        }
+
+        [...savedBillsHistory].reverse().forEach((bill, revIdx) => {
+          const actualIdx = savedBillsHistory.length - 1 - revIdx;
+          
+          const bRow = document.createElement("div");
+          bRow.className = "bill-history-row";
+
+          const details = document.createElement("div");
+          details.className = "bill-meta-details";
+          details.innerHTML = `${bill.custName || 'Unknown Cust'} <span>Code: ${bill.billCode} | Total: ${bill.total}</span>`;
+
+          const actions = document.createElement("div");
+          actions.className = "db-item-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "db-action-btn";
+          editBtn.innerHTML = "✏️";
+          editBtn.addEventListener("click", () => {
+            document.getElementById("custNameInput").textContent = bill.custName;
+            
+            container.innerHTML = "";
+            bill.items.forEach((itemText, rIdx) => {
+              container.appendChild(makeRow(rIdx, itemText));
+            });
+            
+            toggleViewMode('bill'); 
+            render();
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "db-action-btn";
+          deleteBtn.innerHTML = "❌";
+          deleteBtn.addEventListener("click", () => {
+            if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
+              savedBillsHistory.splice(actualIdx, 1);
+              localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
+              renderBillsHistoryList();
+            }
+          });
+
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+          bRow.appendChild(details);
+          bRow.appendChild(actions);
+          dbBillsHistoryList.appendChild(bRow);
+        });
+      }
+
       clearBtn.addEventListener("click", function(){
         container.innerHTML = "";
         document.getElementById("custNameInput").textContent = "";
@@ -1030,148 +1141,6 @@ renderBillsHistoryList(); // Fire history viewer rendering automatically
       container.appendChild(makeRow(0));
       render();
     })();
-    /*
-// Local Storage Bills Database
-let savedBills = JSON.parse(localStorage.getItem("notebook_saved_bills")) || {};
-
-const billNoInput = document.getElementById("billNoInput");
-const dbBillSaveBtn = document.getElementById("dbBillSaveBtn");
-const loadBillBtn = document.getElementById("loadBillBtn");
-
-// Save current bill to storage
-dbBillSaveBtn.addEventListener("click", function() {
-  const billKey = billNoInput.value.trim();
-  if(!billKey) {
-    alert("Kripya pehle Bill Number ya Name entered karein!");
-    return;
-  }
-  
-  let rowsData = [];
-  [...container.children].forEach(row => {
-    const text = row.querySelector(".input").textContent.trim();
-    if(text) rowsData.push(text);
-  });
-  
-  savedBills[billKey] = {
-    shopName: document.getElementById("shopNameInput").value,
-    custName: document.getElementById("custNameInput").textContent.trim(),
-    date: dateEl.textContent,
-    time: timeEl.textContent,
-    items: rowsData,
-    total: totalBox.textContent
-  };
-  
-  localStorage.setItem("notebook_saved_bills", JSON.stringify(savedBills));
-  alert(`Bill "${billKey}" successfully save ho gaya!`);
-});
-
-// Load and show list of saved bills
-loadBillBtn.addEventListener("click", function() {
-  const keys = Object.keys(savedBills);
-  if(keys.length === 0) {
-    alert("Koi saved bill nahi mila!");
-    return;
-  }
-  
-  let msg = "Saved Bills ki list:\n\n";
-  keys.forEach((k, idx) => msg += `${idx + 1}) ${k} (Total: ${savedBills[k].total})\n`);
-  msg += "\nEdit karne ke liye Bill ka exact naam enter karke dubara load karein ya cancel karein.";
-  
-  const selectedKey = prompt(msg);
-  if(selectedKey && savedBills[selectedKey]) {
-    billNoInput.value = selectedKey;
-    document.getElementById("shopNameInput").value = savedBills[selectedKey].shopName;
-    document.getElementById("custNameInput").textContent = savedBills[selectedKey].custName;
-    
-    container.innerHTML = "";
-    savedBills[selectedKey].items.forEach((itemText, idx) => {
-      container.appendChild(makeRow(idx, itemText));
-    });
-    
-    render();
-    alert(`Bill "${selectedKey}" successfully load ho gaya!`);
-  } else if (selectedKey) {
-    alert("Galat Bill Name!");
-  }
-});
-    */
-// CSV Generation and Download Logic
-csvBtn.addEventListener("click", function() {
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Serial No,Item Description,Amount (INR)\n";
-  [...container.children].forEach((row, idx) => {
-    const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
-    const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
-    if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
-  });
-  csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `ledger_report.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-});
-
-function renderBillsHistoryList() {
-  dbBillsHistoryList.innerHTML = "";
-  
-  if(savedBillsHistory.length === 0) {
-    dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
-    return;
-  }
-
-  // Latest bill top par dikhane ke liye reverse indexing map
-  [...savedBillsHistory].reverse().forEach((bill, revIdx) => {
-    const actualIdx = savedBillsHistory.length - 1 - revIdx;
-    
-    const bRow = document.createElement("div");
-    bRow.className = "bill-history-row";
-
-    const details = document.createElement("div");
-    details.className = "bill-meta-details";
-    details.innerHTML = `${bill.custName || 'Unknown Cust'} <span>Code: ${bill.billCode} | Total: ${bill.total}</span>`;
-
-    const actions = document.createElement("div");
-    actions.className = "db-item-actions";
-
-    // Edit ✏️ Button logic: Sets contents back to active paper session
-    const editBtn = document.createElement("button");
-    editBtn.className = "db-action-btn";
-    editBtn.innerHTML = "✏️";
-    editBtn.addEventListener("click", () => {
-      document.getElementById("custNameInput").textContent = bill.custName;
-      
-      container.innerHTML = "";
-      bill.items.forEach((itemText, rIdx) => {
-        container.appendChild(makeRow(rIdx, itemText));
-      });
-      
-      toggleViewMode('bill'); // Switch back to sheet instantly
-      render();
-    });
-
-    // Delete ❌ Button logic with explicit confirmation parameters
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "db-action-btn";
-    deleteBtn.innerHTML = "❌";
-    deleteBtn.addEventListener("click", () => {
-      if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
-        savedBillsHistory.splice(actualIdx, 1);
-        localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
-        renderBillsHistoryList();
-      }
-    });
-
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-    bRow.appendChild(details);
-    bRow.appendChild(actions);
-    dbBillsHistoryList.appendChild(bRow);
-  });
-}
-
   </script>
 </body>
 </html>
