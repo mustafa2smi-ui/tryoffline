@@ -1028,9 +1028,9 @@ async function saveAsImage(){
         link.download = `notebook-invoice-${stamp}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-      }
+      } */
       saveBtn.addEventListener("click", saveAsImage);
-*/
+
       // Dedicated Browser Data Storage Save Logic
       localSaveBtn.addEventListener("click", function() {
         const customerName = document.getElementById("custNameInput").textContent.trim();
