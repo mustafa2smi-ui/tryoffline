@@ -124,7 +124,7 @@
       flex-direction: column;
       gap: 4px;
     }
-
+/*
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
@@ -136,6 +136,19 @@
       }
       .row-list { padding-bottom: 20px; }
       .db-list-container { padding-bottom: 20px; }
+    }
+    */
+    @media (max-width: 600px) {
+      body { padding: 0; }
+      .brand-header { border-radius: 0; }
+      .paper { border-radius: 0; }
+      .bottom-dashboard {
+        border-radius: 0; 
+        position: relative; bottom: 0; left: 0; width: 100%;
+        padding-bottom: env(safe-area-inset-bottom, 8px);
+      }
+      .row-list { padding-bottom: 150px; }
+      .db-list-container { padding-bottom: 150px; }
     }
   </style>
 </head>
