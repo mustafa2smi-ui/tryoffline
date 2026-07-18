@@ -196,7 +196,6 @@
 
       <div class="row-list" id="container"></div>
 
-
       <!-- FIX #1: Hidden total overlay that appears only during image capture -->
       <div class="total-overlay-for-image" id="totalOverlayForImage"></div>
 
@@ -586,7 +585,7 @@
             patchBox.textContent = `Code: ${codeMatch[1]}`;
             patchBox.classList.add("visible");
           } else {
-            const wordTokens = text.split(/\s+*/);
+            const wordTokens = text.split(/\s+/);
             const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
             if (foundItem) {
               patchBox.textContent = `Code: ${foundItem.code}`;
@@ -597,7 +596,7 @@
           }
 
           if (currentMode === 'bill') {
-            const m = text.match(/([0-9.\s()+\-/^]+)$/);
+            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
             if(m){
               const expr = m[1].trim();
               if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
@@ -623,68 +622,7 @@
           totalOverlayForImage.textContent = "";
         }
       }
-/*
-            function render(){
-        let grand = 0;
 
-        [...container.children].forEach(row => {
-          const inputEl = row.querySelector(".input");
-          const text = inputEl.textContent.trim();
-          const resBox = row.querySelector(".result");
-          const patchBox = row.querySelector(".code-patch");
-          
-          let val = 0;
-
-          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
-          if (codeMatch) {
-            patchBox.textContent = `Code: ${codeMatch[1]}`;
-            patchBox.classList.add("visible");
-          } else {
-            const wordTokens = text.split(/\s+/);
-            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
-            if (foundItem) {
-              patchBox.textContent = `Code: ${foundItem.code}`;
-              patchBox.classList.add("visible");
-            } else {
-              patchBox.classList.remove("visible");
-            }
-          }
-
-          if (currentMode === 'bill') {
-            const m = text.match(/([0-9.\s()+\-/^]+)$/);
-            if(m){
-              const expr = m[1].trim();
-              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
-            }
-            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-            grand += val;
-            resBox.style.display = "block";
-          } else {
-            resBox.style.display = "none";
-          }
-        });
-
-        // 🌟 Dono jagah ke text aur words ko dynamic sync karna
-        const formattedTotal = "₹" + grand.toLocaleString('en-IN');
-        const formattedWords = "In Words: " + totalInWords(grand);
-
-        if (currentMode === 'bill') {
-          // 1. Dashboard Total Panel Update
-          totalBox.textContent = formattedTotal;
-          totalWordsBox.textContent = formattedWords;
-          totalWordsBox.style.display = "none"; 
-
-          // 2. Paper Bottom Total Update (Yeh Image me capture hoga)
-          document.getElementById("paperTotalVal").textContent = formattedTotal;
-          document.getElementById("paperTotalWords").textContent = formattedWords;
-          document.getElementById("paperTotalZone").style.display = "flex";
-        } else {
-          totalBox.textContent = "----";
-          totalWordsBox.style.display = "none";
-          document.getElementById("paperTotalZone").style.display = "none";
-        }
-      }
-*/
       function toggleViewMode(mode) {
         currentMode = mode;
         if(mode === 'entry') {
