@@ -23,33 +23,37 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Strict Flexbox frame to prevent any gray space gaps */
     body {
       margin: 0; background: var(--bg); color: var(--ink);
       font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
       display: flex; justify-content: center; align-items: stretch;
-      height: 100vh; height: 100dvh; overflow: hidden; padding: 0;
+      height: 100vh; height: 100dvh; overflow: hidden; padding: 5px;
+      /* FIX #2: Prevent body scrolling when keyboard is open */
+      position: fixed;
+      width: 100%;
     }
 
-    .wrap {
-      max-width: 600px; width: 100%; margin: 0 auto;
-      display: flex; flex-direction: column; height: 100%;
+    .wrap { 
+      max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; 
+      /* FIX #2: Prevent the wrap from being scrollable/draggable */
+      overflow: hidden;
     }
 
-    .brand-header { background: var(--gradient-head); padding: 10px; box-shadow: 0 2px 8px var(--shadow); z-index: 10; }
+    .brand-header { background: var(--gradient-head); padding: 10px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }
     .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
 
-    .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; }
+    .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; margin-bottom: 5px; flex-shrink: 0; }
     .db-entry-panel h4 { color: #fff; font-size: 13px; margin-bottom: 2px; }
     .db-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; width: 100%; }
     .db-input { background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; outline: none; width: 100%; }
     .db-input::placeholder { color: #95a5a6; }
 
-    /* Pure scrollable component sheet setup */
-    .paper {
-      background: var(--paper); display: flex; flex-direction: column;
-      flex: 1; overflow-y: auto; position: relative; border-left: 6px solid #e74c3c;
+    .paper { 
+      background: var(--paper); display: flex; flex-direction: column; flex: 1; overflow-y: auto; 
+      position: relative; border-left: 6px solid #e74c3c; 
+      /* FIX #2: Ensure smooth scrolling only within paper */
+      -webkit-overflow-scrolling: touch;
     }
     .paper::before { content: ""; position: absolute; top: 0; left: 18px; bottom: 0; width: 1px; background: rgba(231, 76, 60, 0.35); pointer-events: none; z-index: 10; }
     
@@ -72,7 +76,6 @@
     .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 1px 4px; border-radius: 3px; margin-top: 2px; align-self: flex-start; margin-left: 18px; }
     .code-patch.visible { display: inline-block; }
 
-    /* Flipped upward suggestions list */
     .suggest-box { position: absolute; left: 0; bottom: 100%; width: 100%; background: #ffffff; border: 2px solid var(--line); z-index: 99999; max-height: 140px; overflow-y: auto; box-shadow: 0 -4px 15px rgba(0,0,0,0.25); border-radius: 4px; margin-bottom: 4px; }
     .suggest-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: var(--ink); font-weight: 600; }
     .suggest-item:active { background: var(--line); }
@@ -85,13 +88,16 @@
     .db-item-actions { display: flex; gap: 8px; }
     .db-action-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 5px; }
 
-    /* Position Relative Layout to strictly prevent floating screen vibration gaps */
-    .bottom-dashboard {
-      background: #111b24; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
-      padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000;
-      position: relative; width: 100%; padding-bottom: env(safe-area-inset-bottom, 8px);
+    .bottom-dashboard { 
+      background: #111b24; border-radius: 0 0 8px 8px; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4); 
+      padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000; 
+      flex-shrink: 0;
+      /* FIX #2: Prevent dashboard from being draggable */
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      position: relative;
     }
-    
     .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
     .total-row { display: flex; justify-content: space-between; align-items: center; }
     .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
@@ -112,13 +118,38 @@
     .bill-history-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
+
+    /* FIX #1: Total amount overlay for image capture */
+    .total-overlay-for-image {
+      background: #1a252f;
+      color: #d35400;
+      padding: 8px 15px;
+      border-top: 2px solid #b0c4de;
+      font-weight: 800;
+      font-size: 18px;
+      text-align: right;
+      display: none; /* Hidden by default, only shown during image capture */
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 0; }
+      .brand-header { border-radius: 0; }
+      .paper { border-radius: 0; }
+      .bottom-dashboard {
+        border-radius: 0; 
+        position: relative; bottom: 0; left: 0; width: 100%;
+        padding-bottom: env(safe-area-inset-bottom, 8px);
+      }
+      .row-list { padding-bottom: 150px; }
+      .db-list-container { padding-bottom: 150px; }
+    }
   </style>
 </head>
 <body>
 
   <div class="wrap">
     
-    <!-- TOP APP BAR -->
+    <!-- OPTIMIZED TOP HEADER BAR -->
     <div class="brand-header">
       <div class="controls">
         <div style="display: flex; gap: 4px;">
@@ -128,6 +159,7 @@
         
         <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.5); color: #fff; font-size: 16px; font-weight: 800; text-align: center; width: 45%; outline: none;" placeholder="Shop Name" value="Notebook Bill">
         
+        <!-- WHOLESALE RATE IS NOW SELECTED BY DEFAULT -->
         <select id="priceModeSelect" class="price-select">
           <option value="wholesale" selected>Wholesale</option>
           <option value="retail">Retail</option>
@@ -135,7 +167,7 @@
       </div>
     </div>
 
-    <!-- ENTRY FLOW MANAGER -->
+    <!-- ENTRY FORM OVERLAY CONTAINER -->
     <div id="dbEntryPanel" class="db-entry-panel">
       <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
       <div class="db-grid">
@@ -147,7 +179,7 @@
       <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
     </div>
 
-    <!-- REAL WHITE SCROLL SHEET -->
+    <!-- MAIN SCOLLABLE NOTEBOOK SHEET -->
     <div id="paper" class="paper">
       <div class="paper-header">
         <div id="meta">
@@ -164,6 +196,9 @@
 
       <div class="row-list" id="container"></div>
 
+      <!-- FIX #1: Hidden total overlay that appears only during image capture -->
+      <div class="total-overlay-for-image" id="totalOverlayForImage"></div>
+
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
         <div id="dbItemsList" style="margin-bottom: 20px;"></div>
@@ -173,7 +208,7 @@
       </div>
     </div>
 
-    <!-- DYNAMIC DASHBOARD ZONE -->
+    <!-- COMPACT BOTTOM CONTROL PANEL -->
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
@@ -231,6 +266,7 @@
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
       const csvBtn = document.getElementById("csvBtn");
+      const totalOverlayForImage = document.getElementById("totalOverlayForImage");
 
       let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
       let currentMode = 'bill'; 
@@ -576,10 +612,14 @@
         if (currentMode === 'bill') {
           totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
           totalWordsBox.textContent = "In Words: " + totalInWords(grand);
-          totalWordsBox.style.display = "none"; 
+          totalWordsBox.style.display = "block";
+          
+          // FIX #1: Update the hidden overlay for image capture
+          totalOverlayForImage.textContent = "Total: ₹" + grand.toLocaleString('en-IN') + " | " + totalInWords(grand);
         } else {
           totalBox.textContent = "----";
           totalWordsBox.style.display = "none";
+          totalOverlayForImage.textContent = "";
         }
       }
 
@@ -638,41 +678,63 @@
         });
       });
 
-      /* ---------- FIXED HIGH QUALITY SNAPSHOT ENGINE ---------- */
+      /* ---------- FIX #1: IMPROVED SAVE AS IMAGE WITH TOTAL AMOUNT ---------- */
       async function saveAsImage(){
         const paper = document.getElementById("paper");
         
-        // Safety lock: Render full calculations before taking screenshot
+        // Ensure we're in bill mode for proper rendering
         const originalMode = currentMode;
-        currentMode = 'bill';
-        render();
+        if (originalMode !== 'bill') {
+          currentMode = 'bill';
+          render();
+        }
         
-        // Force calculation boxes visible inside hidden layouts
+        // Show the total overlay inside the paper element temporarily
+        totalOverlayForImage.style.display = "block";
+        
+        // Force all result boxes to be visible
         const allResults = paper.querySelectorAll(".result");
         allResults.forEach(r => r.style.display = "block");
 
+        // Wait for render
         await new Promise(r => requestAnimationFrame(r));
-        if (typeof html2canvas === 'undefined') { alert('Tools asset loading error, try again.'); return; }
+        await new Promise(r => requestAnimationFrame(r));
         
-        // Full frame clone height calculations targeting hidden overflows
-        const canvas = await html2canvas(paper, {
-          backgroundColor: "#ffffff",
-          scale: 2,
-          windowWidth: paper.scrollWidth,
-          windowHeight: paper.scrollHeight,
-          height: paper.scrollHeight,
-          y: paper.getBoundingClientRect().top + window.pageYOffset
-        });
+        if (typeof html2canvas === 'undefined') { 
+          alert('Image library loading error. Please try again.'); 
+          totalOverlayForImage.style.display = "none";
+          return; 
+        }
         
-        // Restore active configuration context back
-        currentMode = originalMode;
-        render();
+        try {
+          // Capture the paper WITH the total overlay
+          const canvas = await html2canvas(paper, {
+            backgroundColor: "#ffffff", 
+            scale: 2,
+            logging: false,
+            allowTaint: true,
+            useCORS: true
+          });
+          
+          // Hide the overlay after capture
+          totalOverlayForImage.style.display = "none";
+          
+          // Restore original mode if needed
+          if (originalMode !== 'bill') {
+            currentMode = originalMode;
+            render();
+          }
 
-        const link = document.createElement('a');
-        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-        link.download = `notebook-invoice-${stamp}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+          const link = document.createElement('a');
+          const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+          link.download = `notebook-invoice-${stamp}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } catch (error) {
+          console.error("Image save failed:", error);
+          totalOverlayForImage.style.display = "none";
+          alert("Failed to save image. Please try again.");
+        }
       }
       saveBtn.addEventListener("click", saveAsImage);
 
