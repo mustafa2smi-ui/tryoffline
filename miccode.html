@@ -21,92 +21,375 @@
       --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); 
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      margin: 0; background: var(--bg); color: var(--ink);
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
       font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-      display: flex; justify-content: center; align-items: stretch;
-      height: 100vh; height: 100dvh; overflow: hidden; padding: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      height: 100vh;
+      height: 100dvh; 
+      overflow: hidden; 
+      padding: 5px;
     }
 
-    .wrap { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; }
+    .wrap {
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
 
-    .brand-header { background: var(--gradient-head); padding: 10px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); }
-    .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
+    /* Brand Header with Corners Optimization */
+    .brand-header {
+      background: var(--gradient-head);
+      padding: 10px;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
 
-    .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; margin-bottom: 5px; }
-    .db-entry-panel h4 { color: #fff; font-size: 13px; margin-bottom: 2px; }
-    .db-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; width: 100%; }
-    .db-input { background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; outline: none; width: 100%; }
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mode-toggle-btn {
+      background: #34495e;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Entry Panel Flexible Setup */
+    .db-entry-panel {
+      background: #1a252f;
+      border: 1px solid var(--line);
+      padding: 10px;
+      display: none; 
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .db-entry-panel h4 {
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .db-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 6px;
+      width: 100%;
+    }
+
+    .db-input {
+      background: #2c3e50;
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+    }
+
     .db-input::placeholder { color: #95a5a6; }
 
-    .paper { background: var(--paper); display: flex; flex-direction: column; flex: 1; overflow-y: auto; position: relative; border-left: 6px solid #e74c3c; }
-    .paper::before { content: ""; position: absolute; top: 0; left: 18px; bottom: 0; width: 1px; background: rgba(231, 76, 60, 0.35); pointer-events: none; z-index: 10; }
-    
-    .paper-header { padding: 8px 10px 5px 24px; border-bottom: 2px solid var(--line); text-align: center; }
-    #meta { font-size: 11px; font-weight: bold; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
-    .paper-header h1 { color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: 1px; }
-
-    .row-list { padding: 5px 5px 20px 24px; flex: 1; }
-    .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 4px 0; }
-    .row-main { display: flex; align-items: center; width: 100%; }
-    .sl { width: 15px; color: var(--muted); font-weight: 700; font-size: 12px; }
-    .input-wrapper { flex: 1; position: relative; padding-left: 5px; }
-    
-    .input {
-      width: 100%; border: none; outline: none; background: transparent;
-      color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 3px 0;
+    /* SCROLLABLE PAPER AREA */
+    .paper {
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      flex: 1; 
+      overflow-y: auto; 
+      position: relative;
+      border-left: 6px solid #e74c3c;
     }
 
-    .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }
-    .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 1px 4px; border-radius: 3px; margin-top: 2px; align-self: flex-start; margin-left: 18px; }
+    .paper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 18px; 
+      bottom: 0;
+      width: 1px;
+      background: rgba(231, 76, 60, 0.35);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .paper-header {
+      padding: 8px 10px 5px 24px;
+      border-bottom: 2px solid var(--line);
+      text-align: center;
+    }
+
+    #meta {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .paper-header h1 {
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .row-list {
+      padding: 5px 5px 20px 24px;
+      flex: 1;
+    }
+
+    .row {
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--line);
+      padding: 4px 0;
+    }
+
+    .row-main {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .sl { width: 15px; color: var(--muted); font-weight: 700; font-size: 12px; }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      padding-left: 5px;
+    }
+
+    .input {
+      width: 100%;
+      outline: none;
+      white-space: pre-wrap;
+      min-height: 20px;
+      color: var(--ink);
+      font-family: inherit;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .result {
+      width: 75px;
+      text-align: right;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .code-patch {
+      display: none;
+      background: var(--green-patch);
+      color: var(--green-text);
+      font-size: 10px;
+      font-weight: 700;
+      font-style: italic;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-top: 2px;
+      align-self: flex-start;
+      margin-left: 18px;
+    }
+
     .code-patch.visible { display: inline-block; }
 
-    .suggest-box { position: absolute; left: 0; bottom: 100%; width: 100%; background: #ffffff; border: 2px solid var(--line); z-index: 99999; max-height: 140px; overflow-y: auto; box-shadow: 0 -4px 15px rgba(0,0,0,0.25); border-radius: 4px; margin-bottom: 4px; }
-    .suggest-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: var(--ink); font-weight: 600; }
+    /* Suggestions Dropdown *
+    .suggest-box {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      background: #ffffff;
+      border: 2px solid var(--line);
+      z-index: 9999;
+      max-height: 140px;
+      overflow-y: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      border-radius: 4px;
+    }
+    */
+/* Puraane .suggest-box block ko isse replace karein */
+.suggest-box {
+  position: absolute;
+  left: 0;
+  bottom: 100%; /* NICHE ke bajay ab input line ke UPAR khulega */
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid var(--line);
+  z-index: 99999; /* Z-index tight kiya taaki sabke upar rahe */
+  max-height: 140px;
+  overflow-y: auto;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.25); /* Shadow direction upar ki taraf flip kiya */
+  border-radius: 4px;
+  margin-bottom: 4px; /* Input se halka sa gap spacing */
+}
+
+    .suggest-item {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
     .suggest-item:active { background: var(--line); }
 
-    .db-list-container { display: none; padding: 10px 10px 10px 24px; flex-direction: column; gap: 8px; }
-    .db-list-header { font-size: 12px; font-weight: bold; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 5px; }
-    .db-item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+    /* Alphabetical DB Viewer style */
+    .db-list-container {
+      display: none; 
+      padding: 10px 10px 10px 24px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .db-list-header {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 4px;
+      margin-bottom: 5px;
+    }
+
+    .db-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+
     .db-item-details { font-size: 14px; color: var(--ink); font-weight: 600; }
     .db-item-details span { color: var(--muted); font-size: 11px; font-weight: normal; margin-left: 5px; }
     .db-item-actions { display: flex; gap: 8px; }
     .db-action-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 5px; }
 
-    .bottom-dashboard { background: #111b24; border-radius: 0 0 8px 8px; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4); padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000; }
-    .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
-    .total-row { display: flex; justify-content: space-between; align-items: center; }
+    /* FIXED BOTTOM ZONE (CalcNote Interface) */
+    .bottom-dashboard {
+      background: #111b24;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1000;
+    }
+
+    .total-board {
+      background: #1a252f;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
     .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
     .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px; }
 
-    .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
-    .sq-btn { width: 42px; height: 42px; font-size: 18px; }
-    .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; height: 30px; font-weight: 600; outline: none; cursor: pointer; font-size: 12px; }
+    .btn {
+      background: linear-gradient(to bottom, #f1c40f, #f39c12);
+      color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px;
+      cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow);
+      transition: all 0.15s ease; display: flex; align-items: center; justify-content: center;
+    }
 
-    .mode-banner { background: #1abc9c; color: white; text-align: center; font-size: 10px; font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; }
+    .sq-btn { width: 42px; height: 42px; font-size: 18px; }
+
+    .price-select {
+      background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px;
+      padding: 0 4px; height: 30px; font-weight: 600; outline: none; cursor: pointer; font-size: 12px;
+    }
+
+    .mode-banner {
+      background: #1abc9c; color: white; text-align: center; font-size: 10px;
+      font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px;
+    }
     .mode-banner.entry { background: #3498db; }
 
+    /* Hybrid Compact Operator Panel */
     .operator-bar { display: flex; gap: 4px; justify-content: space-between; }
-    .op-btn { flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line); padding: 10px 0; border-radius: 4px; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+    .op-btn {
+      flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line);
+      padding: 10px 0; border-radius: 4px; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation;
+    }
     .op-btn:active { background: var(--line); color: #000; }
-    
-    /* Dedicated Custom Speech Mic Button style */
-    .mic-btn { background: #9b59b6; border-color: #8e44ad; color: #fff; font-size: 18px; }
-    .mic-btn.listening { background: #e74c3c; border-color: #c0392b; animation: pulse 1s infinite; }
-
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
+/*
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
       .paper { border-radius: 0; }
-      .bottom-dashboard { border-radius: 0; position: fixed; bottom: 0; left: 0; width: 100%; padding-bottom: env(safe-area-inset-bottom, 6px); }
-      .row-list { padding-bottom: 150px; }
-      .db-list-container { padding-bottom: 150px; }
+      .bottom-dashboard {
+        border-radius: 0; 
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        padding-bottom: env(safe-area-inset-bottom, 8px);
+      }
+      /* Dashboard space padding inside mobile paper layout *
+      .row-list { padding-bottom: 140px; }
+      .db-list-container { padding-bottom: 140px; }
+    }
+    */
+      /* Puraane @media (max-width: 600px) block ko isse replace karein *
+  @media (max-width: 600px) {
+    body { padding: 0; }
+    .brand-header { border-radius: 0; }
+    .paper { border-radius: 0; }
+    
+    /* Strict Floating Fixed layout for CalcNote action board *
+    .bottom-dashboard {
+      border-radius: 0; 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%;
+      padding-bottom: env(safe-area-inset-bottom, 6px);
+    }
+    
+    /* Paper ke rows ko bottom panel ke size ke barabar space dena *
+    .row-list { padding-bottom: 150px; }
+    .db-list-container { padding-bottom: 150px; }*
+  }
+    */
+    @media (max-width: 600px) {
+      body { padding: 0; }
+      .brand-header { border-radius: 0; }
+      .paper { border-radius: 0; }
+      .bottom-dashboard { border-radius: 0; padding-bottom: env(safe-area-inset-bottom, 8px); }
     }
   </style>
 </head>
@@ -114,7 +397,7 @@
 
   <div class="wrap">
     
-    <!-- BRAND TOP BAR -->
+    <!-- OPTIMIZED TOP HEADER BAR -->
     <div class="brand-header">
       <div class="controls">
         <div style="display: flex; gap: 4px;">
@@ -131,7 +414,7 @@
       </div>
     </div>
 
-    <!-- DATABASE ENTRY PANEL -->
+    <!-- ENTRY FORM OVERLAY CONTAINER -->
     <div id="dbEntryPanel" class="db-entry-panel">
       <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
       <div class="db-grid">
@@ -143,7 +426,7 @@
       <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
     </div>
 
-    <!-- SCROLLABLE NOTEBOOK -->
+    <!-- MAIN SCOLLABLE NOTEBOOK SHEET -->
     <div id="paper" class="paper">
       <div class="paper-header">
         <div id="meta">
@@ -152,21 +435,24 @@
         </div>
         <h1>DAILY LEDGER SHEET</h1>
         
+        <!-- Customer details section -->
         <div id="custBlock" style="margin-top: 5px; font-size: 13px; font-weight: 600; color: var(--muted); display: flex; justify-content: center; gap: 5px;">
           <span>Cust Name:</span>
           <div contenteditable="true" id="custNameInput" style="border-bottom: 1px solid var(--line); min-width: 140px; outline: none; text-align: left; color: var(--ink);" placeholder="Enter Name"></div>
         </div>
       </div>
 
+      <!-- Billing layout rows -->
       <div class="row-list" id="container"></div>
 
+      <!-- Alphabetical View container for database entries -->
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
         <div id="dbItemsList"></div>
       </div>
     </div>
 
-    <!-- CALCNOTE BOTTOM ZONE -->
+    <!-- COMPACT BOTTOM CONTROL PANEL -->
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
@@ -178,20 +464,28 @@
         <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
       </div>
 
-      <!-- Action & Operators row -->
+      <!-- Combined Row: Operators + Action Utilities -->
       <div class="controls" style="margin-top: 2px;">
         <div class="operator-bar" style="flex: 1;">
-          <!-- 🎙️ Pro Voice Native Mic Button Link -->
-          <button class="op-btn mic-btn" id="nativeMicBtn" title="Voice Typing">🎙️</button>
           <button class="op-btn" data-op="+">+</button>
           <button class="op-btn" data-op="-">-</button>
           <button class="op-btn" data-op="*">×</button>
           <button class="op-btn" data-op="/">÷</button>
         </div>
+        <!-- Dashboard controls div ke andar ise paste karein -->
+<div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
+  <input type="text" id="billNoInput" style="flex: 1; background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 6px; border-radius: 4px; font-size: 13px; outline: none;" placeholder="Bill No / Name (e.g. Bill-01)">
+  <button id="dbBillSaveBtn" class="btn" style="font-size: 12px; padding: 0 8px; background: #2ecc71; border-color: #27ae60; color:#fff;">Save Bill</button>
+  <button id="loadBillBtn" class="btn" style="font-size: 12px; padding: 0 8px; background: #3498db; border-color: #2980b9; color:#fff;">Load List</button>
+</div>
+
         <div style="display: flex; gap: 4px;">
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
           <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
           <button id="shareBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Share Items text">📤</button>
+      <!-- Controls group ke andar shareBtn ke baju me paste karein -->
+<button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
+
         </div>
       </div>
     </div>
@@ -201,6 +495,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    
     (function(){
       const container = document.getElementById("container");
       const totalBox  = document.getElementById("total");
@@ -221,22 +516,32 @@
       const panelTitle = document.getElementById("panelTitle");
       const bottomDashboard = document.getElementById("bottomDashboard");
       const custBlock = document.getElementById("custBlock");
-      const nativeMicBtn = document.getElementById("nativeMicBtn");
 
       let currentMode = 'bill'; 
       let activeInput = null;
       let editingItemCode = null; 
 
+      // Data Engine Setup
       let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
         { code: "101", name: "Aata", retail: 40, wholesale: 38 },
         { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
         { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
       ];
 
+      // Fixes view scaling shift layout mechanics on soft keyboard popups
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
           document.body.style.height = window.visualViewport.height + 'px';
         });
+      }
+
+      function setCaretToEnd(el){
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
       }
 
       function nowDateTimeTick(){
@@ -283,58 +588,59 @@
         return s + " Only";
       }
 
-      function parseAndSaveNewItem(text) {
-        const cleanText = text.trim();
-        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
-        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
-        let name = "", code = "", price = 0;
-
-        if(patternWithCode.test(cleanText)) {
-          const match = cleanText.match(patternWithCode);
-          name = match[1].trim(); code = match[2].trim(); price = parseFloat(match[3]);
-        } else if(simplePattern.test(cleanText)) {
-          const match = cleanText.match(simplePattern);
-          name = match[1].trim(); price = parseFloat(match[2]);
-          code = (itemDatabase.length + 101).toString();
-        }
-
-        if(name && price > 0) {
-          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
-          if(!exists) {
-            itemDatabase.push({ code, name, retail: price, wholesale: price });
-            localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
-          }
-        }
-      }
-
       function renderDatabaseList() {
         dbItemsList.innerHTML = "";
         const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
+        
         if(sortedDatabase.length === 0) {
-          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>"; return;
+          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>";
+          return;
         }
-        sortedDatabase.forEach(item => {
-          const itemRow = document.createElement("div"); itemRow.className = "db-item-row";
-          const details = document.createElement("div"); details.className = "db-item-details";
-          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Retail: ₹${item.retail} | Whol: ₹${item.wholesale}</span>`;
-          const actions = document.createElement("div"); actions.className = "db-item-actions";
 
-          const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+        sortedDatabase.forEach(item => {
+          const itemRow = document.createElement("div");
+          itemRow.className = "db-item-row";
+
+          const details = document.createElement("div");
+          details.className = "db-item-details";
+          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Retail: ₹${item.retail} | Whol: ₹${item.wholesale}</span>`;
+
+          const actions = document.createElement("div");
+          actions.className = "db-item-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "db-action-btn";
+          editBtn.innerHTML = "✏️";
           editBtn.addEventListener("click", () => {
-            document.getElementById("dbCode").value = item.code; document.getElementById("dbName").value = item.name;
-            document.getElementById("dbRetail").value = item.retail; document.getElementById("dbWholesale").value = item.wholesale;
-            editingItemCode = item.code; panelTitle.textContent = "✏️ Edit Product in Ledger Database";
-            dbSaveBtn.textContent = "Update Product"; dbSaveBtn.style.background = "#e67e22"; dbSaveBtn.style.borderColor = "#d35400";
+            document.getElementById("dbCode").value = item.code;
+            document.getElementById("dbName").value = item.name;
+            document.getElementById("dbRetail").value = item.retail;
+            document.getElementById("dbWholesale").value = item.wholesale;
+            
+            editingItemCode = item.code; 
+            panelTitle.textContent = "✏️ Edit Product in Ledger Database";
+            dbSaveBtn.textContent = "Update Product";
+            dbSaveBtn.style.background = "#e67e22";
+            dbSaveBtn.style.borderColor = "#d35400";
           });
 
-          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "db-action-btn";
+          deleteBtn.innerHTML = "❌";
           deleteBtn.addEventListener("click", () => {
             if(confirm(`Delete "${item.name}"?`)) {
               itemDatabase = itemDatabase.filter(i => i.code !== item.code);
-              localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase)); renderDatabaseList(); render();
+              localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+              renderDatabaseList();
+              render();
             }
           });
-          actions.appendChild(editBtn); actions.appendChild(deleteBtn); itemRow.appendChild(details); itemRow.appendChild(actions); dbItemsList.appendChild(itemRow);
+
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+          itemRow.appendChild(details);
+          itemRow.appendChild(actions);
+          dbItemsList.appendChild(itemRow);
         });
       }
 
@@ -348,94 +654,165 @@
           if (editingItemCode) {
             const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
             if (idx > -1) itemDatabase[idx] = { code, name, retail, wholesale };
-            editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
-            dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+            editingItemCode = null;
+            panelTitle.textContent = "📥 Add Product to Ledger Database";
+            dbSaveBtn.textContent = "Save to Database";
+            dbSaveBtn.style.background = "#3498db";
+            dbSaveBtn.style.borderColor = "#2980b9";
           } else {
             const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
             if (exists) { alert("Product matches an existing entry!"); return; }
             itemDatabase.push({ code, name, retail, wholesale });
           }
           localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
-          document.getElementById("dbCode").value = ""; document.getElementById("dbName").value = "";
-          document.getElementById("dbRetail").value = ""; document.getElementById("dbWholesale").value = "";
-          renderDatabaseList(); render();
-        } else { alert("Fill all required fields code, name & pricing!"); }
+          document.getElementById("dbCode").value = "";
+          document.getElementById("dbName").value = "";
+          document.getElementById("dbRetail").value = "";
+          document.getElementById("dbWholesale").value = "";
+          renderDatabaseList();
+          render();
+        } else {
+          alert("Fill all required fields code, name & pricing!");
+        }
       });
 
       priceModeSelect.addEventListener("change", render);
 
       /* ---------- Row Factory Engine ---------- */
       function makeRow(i, text=""){
-        const row = document.createElement("div"); row.className = "row";
-        const rowMain = document.createElement("div"); rowMain.className = "row-main";
-        const sl = document.createElement("div"); sl.className = "sl"; sl.textContent = i+1;
-        const wrapper = document.createElement("div"); wrapper.className = "input-wrapper";
+        const row = document.createElement("div");
+        row.className = "row";
+        const rowMain = document.createElement("div");
+        rowMain.className = "row-main";
 
-        const input = document.createElement("input"); input.type = "text"; input.className = "input";
+        const sl = document.createElement("div");
+        sl.className = "sl";
+        sl.textContent = i+1;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        const input = document.createElement("div");
+        input.className = "input";
         
-        input.setAttribute("enterkeyhint", "next"); input.setAttribute("autocorrect", "on");
-        input.setAttribute("autocomplete", "off"); input.setAttribute("spellcheck", "false");
-        input.value = text; 
+        // Native Keyboard configuration adjustments for mic processing compatibility
+        input.contentEditable = true;
+        input.setAttribute("enterkeyhint", "next");
+        input.setAttribute("autocorrect", "on");
+        input.setAttribute("spellcheck", "false");
+        input.textContent = text;
 
         wrapper.appendChild(input);
-        const result = document.createElement("div"); result.className = "result";
-        rowMain.appendChild(sl); rowMain.appendChild(wrapper); rowMain.appendChild(result);
-        const codePatch = document.createElement("div"); codePatch.className = "code-patch";
-        row.appendChild(rowMain); row.appendChild(codePatch);
+        const result = document.createElement("div");
+        result.className = "result";
+
+        rowMain.appendChild(sl);
+        rowMain.appendChild(wrapper);
+        rowMain.appendChild(result);
+
+        const codePatch = document.createElement("div");
+        codePatch.className = "code-patch";
+        
+        row.appendChild(rowMain);
+        row.appendChild(codePatch);
 
         input.addEventListener("input", function() {
           render();
-          const val = input.value.trim().toLowerCase();
+          const val = input.textContent.trim().toLowerCase();
           const oldBox = wrapper.querySelector(".suggest-box");
-          if(oldBox) oldBox.remove(); if(!val) return;
+          if(oldBox) oldBox.remove();
+          if(!val) return;
 
-          const matches = itemDatabase.filter(item => item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val));
+          const matches = itemDatabase.filter(item => 
+            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+          );
+
           if(matches.length > 0) {
-            const suggestBox = document.createElement("div"); suggestBox.className = "suggest-box";
+            const suggestBox = document.createElement("div");
+            suggestBox.className = "suggest-box";
+            
             matches.forEach(match => {
-              const itemDiv = document.createElement("div"); itemDiv.className = "suggest-item";
+              const itemDiv = document.createElement("div");
+              itemDiv.className = "suggest-item";
               const pMode = priceModeSelect.value;
               const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
               itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
               
               const selectItem = (e) => {
-                e.preventDefault(); e.stopPropagation();
-                input.value = `${match.name} ${activePrice}`; suggestBox.remove(); render();
-                input.focus(); input.setSelectionRange(input.value.length, input.value.length);
+                e.preventDefault(); 
+                e.stopPropagation();
+                input.textContent = `${match.name} ${activePrice}`;
+                suggestBox.remove();
+                render();
+                setCaretToEnd(input);
                 activeInput = input;
               };
-              itemDiv.addEventListener("mousedown", selectItem); itemDiv.addEventListener("touchstart", selectItem);
+
+              itemDiv.addEventListener("mousedown", selectItem);
+              itemDiv.addEventListener("touchstart", selectItem);
               suggestBox.appendChild(itemDiv);
             });
             wrapper.appendChild(suggestBox);
           }
         });
-
+/*
         input.addEventListener("blur", function() {
           setTimeout(() => {
-            const box = wrapper.querySelector(".suggest-box"); if(box) box.remove();
-            const currentText = input.value.trim();
-            if (currentText) { parseAndSaveNewItem(currentText); }
+            const box = wrapper.querySelector(".suggest-box");
+            if(box) box.remove();
             render();
-          }, 300);
+          }, 250);
         });
+*/
+        // makeRow function ke andar input attributes aur blur listener ko isse replace karein:
+
+input.contentEditable = true;
+input.setAttribute("enterkeyhint", "next");
+input.setAttribute("autocorrect", "on");
+input.setAttribute("autocomplete", "on"); // Mic engine processing activation hooks
+input.setAttribute("spellcheck", "false");
+input.textContent = text;
+
+// Soft blur configuration jo mic input text processing ko skip hone se rokega
+input.addEventListener("blur", function() {
+  setTimeout(() => {
+    const box = wrapper.querySelector(".suggest-box");
+    if(box) box.remove();
+    
+    // Yahan directly parse save lagane se mic keyboard buffer crash hota hai
+    // Isliye soft check lagaya gaya hai
+    const currentText = input.textContent.trim();
+    if (currentText) {
+      parseAndSaveNewItem(currentText);
+    }
+    render();
+  }, 350); // Delay thoda badhaya taaki mobile mic text input safely execute ho sake
+});
 
         input.addEventListener("keydown", function(e){
           if(e.key === "Enter"){
             e.preventDefault();
-            if(input.value.trim() !== ""){
-              container.appendChild(makeRow(container.children.length)); updateSL(); render();
+            if(input.textContent.trim() !== ""){
+              container.appendChild(makeRow(container.children.length));
+              updateSL();
+              render();
               const lastInput = container.lastChild.querySelector(".input");
-              lastInput.focus(); scrollToActiveInput(lastInput);
+              lastInput.focus();
+              scrollToActiveInput(lastInput);
             }
           }
-          if(e.key === "Backspace" && input.value.trim() === ""){
+          if(e.key === "Backspace" && input.textContent.trim() === ""){
             if(container.children.length > 1){
-              e.preventDefault(); const prev = row.previousElementSibling || row.nextElementSibling;
-              row.remove(); updateSL(); render();
+              e.preventDefault();
+              const prev = row.previousElementSibling || row.nextElementSibling;
+              row.remove();
+              updateSL();
+              render();
               if(prev){
-                const target = prev.querySelector(".input"); target.focus();
-                target.setSelectionRange(target.value.length, target.value.length); scrollToActiveInput(target);
+                const target = prev.querySelector(".input");
+                target.focus();
+                setCaretToEnd(target);
+                scrollToActiveInput(target);
               }
             }
           }
@@ -444,56 +821,87 @@
         return row;
       }
 
-      function updateSL(){ [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; }); }
+      function updateSL(){
+        [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
+      }
 
       function render(){
         let grand = 0;
+
         [...container.children].forEach(row => {
-          const inputEl = row.querySelector(".input"); const text = inputEl.value.trim(); 
-          const resBox = row.querySelector(".result"); const patchBox = row.querySelector(".code-patch");
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.textContent.trim();
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
           let val = 0;
 
           const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
-          if (codeMatch) { patchBox.textContent = `Code: ${codeMatch[1]}`; patchBox.classList.add("visible"); }
-          else {
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
             const wordTokens = text.split(/\s+/);
             const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
-            if (foundItem) { patchBox.textContent = `Code: ${foundItem.code}`; patchBox.classList.add("visible"); }
-            else { patchBox.classList.remove("visible"); }
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
           }
 
           if (currentMode === 'bill') {
             const m = text.match(/([0-9.\s()+\-*/^]+)$/);
-            if(m){ const expr = m[1].trim(); if(expr && /[0-9]/.test(expr)) val = evalExpr(expr); }
-            resBox.textContent = val ? val.toLocaleString('en-IN') : ""; grand += val; resBox.style.display = "block";
-          } else { resBox.style.display = "none"; }
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            resBox.style.display = "none";
+          }
         });
 
         if (currentMode === 'bill') {
           totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
-          totalWordsBox.textContent = "In Words: " + totalInWords(grand); totalWordsBox.style.display = "none"; 
-        } else { totalBox.textContent = "----"; totalWordsBox.style.display = "none"; }
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "none"; // Kept initialized in background as requested
+        } else {
+          totalBox.textContent = "----";
+          totalWordsBox.style.display = "none";
+        }
       }
 
-      /* ---------- View Mode Toggle ---------- */
+      /* ---------- Structural Engine Mode Toggles ---------- */
       function toggleViewMode(mode) {
         currentMode = mode;
         if(mode === 'entry') {
-          modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
-          dbEntryPanel.style.display = "flex"; container.style.display = "none";     
-          custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
-          priceModeSelect.disabled = true; priceModeSelect.style.opacity = "0.5"; priceModeSelect.style.cursor = "not-allowed";
+          modeStatus.textContent = "Database Entry Active";
+          modeStatus.classList.add("entry");
+          dbEntryPanel.style.display = "flex"; 
+          container.style.display = "none";     
+          custBlock.style.display = "none"; 
+          dbListContainer.style.display = "flex"; 
+          bottomDashboard.style.display = "none"; // Hides fixed layout completely to stop vibrations
           renderDatabaseList();
         } else {
-          modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
-          dbEntryPanel.style.display = "none"; container.style.display = "block";     
-          custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
-          priceModeSelect.disabled = false; priceModeSelect.style.opacity = "1"; priceModeSelect.style.cursor = "pointer";
-          editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
-          dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+          modeStatus.textContent = "Billing Active";
+          modeStatus.classList.remove("entry");
+          dbEntryPanel.style.display = "none"; 
+          container.style.display = "block";     
+          custBlock.style.display = "flex"; 
+          dbListContainer.style.display = "none"; 
+          bottomDashboard.style.display = "flex"; 
+          editingItemCode = null;
+          panelTitle.textContent = "📥 Add Product to Ledger Database";
+          dbSaveBtn.textContent = "Save to Database";
+          dbSaveBtn.style.background = "#3498db";
+          dbSaveBtn.style.borderColor = "#2980b9";
         }
         render();
-        if (window.visualViewport) { document.body.style.height = window.visualViewport.height + 'px'; }
       }
 
       entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
@@ -505,125 +913,193 @@
       }
 
       container.addEventListener("focusin", function(e) {
-        if(e.target.classList.contains("input")) { activeInput = e.target; scrollToActiveInput(activeInput); }
+        if(e.target.classList.contains("input")) {
+          activeInput = e.target;
+          scrollToActiveInput(activeInput);
+        }
       });
 
-      // Quick Operators Bar Integration
-      document.querySelectorAll(".op-btn:not(.mic-btn)").forEach(btn => {
+      // Quick Operator insertion core
+      document.querySelectorAll(".op-btn").forEach(btn => {
         btn.addEventListener("click", function(e) {
           e.preventDefault();
           if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
           if (activeInput) {
             activeInput.focus();
             const op = btn.getAttribute("data-op");
-            const startPos = activeInput.selectionStart; const endPos = activeInput.selectionEnd; const currentVal = activeInput.value;
-            activeInput.value = currentVal.substring(0, startPos) + op + currentVal.substring(endPos, currentVal.length);
-            render(); activeInput.focus(); activeInput.setSelectionRange(startPos + 1, startPos + 1); scrollToActiveInput(activeInput);
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode(op);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            render();
+            scrollToActiveInput(activeInput);
           }
         });
       });
 
-      /* ---------- 🔥 HIGH TECH NATIVE MIC SPEECH ENGINE PROCESSOR ---------- */
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.lang = 'hi-IN'; // Multi-lingual speech recognition capability (Hindi + English combination support)
-        recognition.interimResults = false;
-
-        nativeMicBtn.addEventListener("click", function(e) {
-          e.preventDefault();
-          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
-          if (!activeInput) return;
-
-          activeInput.focus();
-          
-          if (nativeMicBtn.classList.contains("listening")) {
-            recognition.stop();
-          } else {
-            try {
-              recognition.start();
-            } catch(err) { console.log(err); }
-          }
-        });
-
-        recognition.onstart = function() {
-          nativeMicBtn.classList.add("listening");
-          nativeMicBtn.textContent = "🛑"; // Show stop indicator
-        };
-
-        recognition.onend = function() {
-          nativeMicBtn.classList.remove("listening");
-          nativeMicBtn.textContent = "🎙️";
-          if(activeInput) activeInput.focus();
-        };
-
-        recognition.onresult = function(event) {
-          const resultText = event.results[0][0].transcript;
-          
-          // Smart Math Engine Translator (Convert verbal words like "guna", "plus" to signs)
-          let sanitizedResult = resultText.toLowerCase()
-            .replace(/गुना|into|×/g, "*")
-            .replace(/प्लस|जोड़|plus/g, "+")
-            .replace(/माइनस|घटाव|minus/g, "-")
-            .replace(/भागे|divide/g, "/")
-            .replace(/\s+/g, " "); // Clean extra word spaces
-
-          if (activeInput) {
-            const startPos = activeInput.selectionStart;
-            const endPos = activeInput.selectionEnd;
-            const currentVal = activeInput.value;
-            
-            activeInput.value = currentVal.substring(0, startPos) + sanitizedResult + currentVal.substring(endPos, currentVal.length);
-            render();
-            activeInput.setSelectionRange(activeInput.value.length, activeInput.value.length);
-            scrollToActiveInput(activeInput);
-          }
-        };
-      } else {
-        // Fallback info if target system web architecture lacks native API integrations
-        nativeMicBtn.style.opacity = "0.3";
-        nativeMicBtn.addEventListener("click", () => alert("Aapka browser system mic handle nahi kar pa raha hai. Chrome use karein."));
-      }
-
-      // Snapshot Image Render
+      // Image Canvas exporter
       async function saveAsImage(){
         const paper = document.getElementById("paper");
         await new Promise(r=>requestAnimationFrame(r));
-        if (typeof html2canvas === 'undefined') { alert('Tools background load ho raha hai, do second baad click karein.'); return; }
+        if (typeof html2canvas === 'undefined') { alert('Tools asset loading error, try again.'); return; }
         const canvas = await html2canvas(paper, {backgroundColor: "#ffffff", scale:2});
         const link = document.createElement('a');
         const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-        link.download = `notebook-invoice-${stamp}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+        link.download = `notebook-invoice-${stamp}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
       }
+      
       saveBtn.addEventListener("click", saveAsImage);
 
-      // Sharing Text Engine (Max 20 Items)
+      // Web API Sharing Engine (Packs max 20 list elements gracefully)
       shareBtn.addEventListener("click", async () => {
-        let itemsListText = ""; const lines = [...container.children].slice(0, 20);
+        let itemsListText = "";
+        const lines = [...container.children].slice(0, 20);
+        
         lines.forEach((row, index) => {
-          const itemText = row.querySelector(".input").value.trim(); const itemTotal = row.querySelector(".result").textContent.trim();
-          if(itemText) { itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`; }
+          const itemText = row.querySelector(".input").textContent.trim();
+          const itemTotal = row.querySelector(".result").textContent.trim();
+          if(itemText) {
+            itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`;
+          }
         });
-        if([...container.children].length > 20) { itemsListText += "...and more products listed.\n"; }
+
+        if([...container.children].length > 20) {
+          itemsListText += "...and more products listed.\n";
+        }
 
         const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
         const customerName = document.getElementById("custNameInput").textContent.trim() || 'N/A';
         const payloadMessage = `*${shopTitle}*\nCust: ${customerName}\n---------------------\n${itemsListText}---------------------\n*Total bill: ${totalBox.textContent}*\n\n`;
 
         if (navigator.share) {
-          try { await navigator.share({ title: shopTitle, text: payloadMessage, url: window.location.href }); } catch (err) { console.log(err); }
+          try {
+            await navigator.share({
+              title: shopTitle,
+              text: payloadMessage,
+              url: window.location.href 
+            });
+          } catch (err) {
+            console.log("Sharing rejected:", err);
+          }
         } else {
-          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`); alert("Bill details copy ho gayi hain!");
+          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`);
+          alert("Bill ki details copy ho gayi hain!");
         }
       });
 
       clearBtn.addEventListener("click", function(){
-        container.innerHTML = ""; document.getElementById("custNameInput").textContent = ""; container.appendChild(makeRow(0)); render();
+        container.innerHTML = "";
+        document.getElementById("custNameInput").textContent = "";
+        container.appendChild(makeRow(0));
+        render();
       });
 
-      container.appendChild(makeRow(0)); render();
+      container.appendChild(makeRow(0));
+      render();
     })();
+    
+// Local Storage Bills Database
+let savedBills = JSON.parse(localStorage.getItem("notebook_saved_bills")) || {};
+
+const billNoInput = document.getElementById("billNoInput");
+const dbBillSaveBtn = document.getElementById("dbBillSaveBtn");
+const loadBillBtn = document.getElementById("loadBillBtn");
+
+// Save current bill to storage
+dbBillSaveBtn.addEventListener("click", function() {
+  const billKey = billNoInput.value.trim();
+  if(!billKey) {
+    alert("Kripya pehle Bill Number ya Name entered karein!");
+    return;
+  }
+  
+  let rowsData = [];
+  [...container.children].forEach(row => {
+    const text = row.querySelector(".input").textContent.trim();
+    if(text) rowsData.push(text);
+  });
+  
+  savedBills[billKey] = {
+    shopName: document.getElementById("shopNameInput").value,
+    custName: document.getElementById("custNameInput").textContent.trim(),
+    date: dateEl.textContent,
+    time: timeEl.textContent,
+    items: rowsData,
+    total: totalBox.textContent
+  };
+  
+  localStorage.setItem("notebook_saved_bills", JSON.stringify(savedBills));
+  alert(`Bill "${billKey}" successfully save ho gaya!`);
+});
+
+// Load and show list of saved bills
+loadBillBtn.addEventListener("click", function() {
+  const keys = Object.keys(savedBills);
+  if(keys.length === 0) {
+    alert("Koi saved bill nahi mila!");
+    return;
+  }
+  
+  let msg = "Saved Bills ki list:\n\n";
+  keys.forEach((k, idx) => msg += `${idx + 1}) ${k} (Total: ${savedBills[k].total})\n`);
+  msg += "\nEdit karne ke liye Bill ka exact naam enter karke dubara load karein ya cancel karein.";
+  
+  const selectedKey = prompt(msg);
+  if(selectedKey && savedBills[selectedKey]) {
+    billNoInput.value = selectedKey;
+    document.getElementById("shopNameInput").value = savedBills[selectedKey].shopName;
+    document.getElementById("custNameInput").textContent = savedBills[selectedKey].custName;
+    
+    container.innerHTML = "";
+    savedBills[selectedKey].items.forEach((itemText, idx) => {
+      container.appendChild(makeRow(idx, itemText));
+    });
+    
+    render();
+    alert(`Bill "${selectedKey}" successfully load ho gaya!`);
+  } else if (selectedKey) {
+    alert("Galat Bill Name!");
+  }
+});
+// CSV Generation and Download Logic
+const csvBtn = document.getElementById("csvBtn");
+csvBtn.addEventListener("click", function() {
+  let csvContent = "data:text/csv;charset=utf-8,";
+  
+  // Headers configuration
+  csvContent += "Serial No,Item Description,Amount (INR)\n";
+  
+  [...container.children].forEach((row, idx) => {
+    const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " "); // Comma remove taaki CSV skip na ho
+    const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
+    
+    if(itemText) {
+      csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
+    }
+  });
+  
+  // Total Row injection
+  csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
+  
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0,10);
+  
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `ledger_report_${stamp}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
   </script>
 </body>
 </html>
