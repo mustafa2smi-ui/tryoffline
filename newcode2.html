@@ -485,6 +485,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    /*
     (function(){
       const container = document.getElementById("container");
       const totalBox  = document.getElementById("total");
@@ -667,7 +668,7 @@
 
       priceModeSelect.addEventListener("change", render);
 
-      /* ---------- Row Factory Engine ---------- */
+      /* ---------- Row Factory Engine ---------- *
       function makeRow(i, text=""){
         const row = document.createElement("div");
         row.className = "row";
@@ -752,7 +753,7 @@
             render();
           }, 250);
         });
-*/
+*
         // makeRow function ke andar input attributes aur blur listener ko isse replace karein:
 
 input.contentEditable = true;
@@ -841,7 +842,7 @@ input.addEventListener("blur", function() {
           }
 
           if (currentMode === 'bill') {
-            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            const m = text.match(/([0-9.\s()+\-/^]+)$/);
             if(m){
               const expr = m[1].trim();
               if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
@@ -864,7 +865,7 @@ input.addEventListener("blur", function() {
         }
       }
 
-      /* ---------- Structural Engine Mode Toggles ---------- */
+      /* ---------- Structural Engine Mode Toggles ---------- *
       function toggleViewMode(mode) {
         currentMode = mode;
         if(mode === 'entry') {
@@ -994,6 +995,548 @@ input.addEventListener("blur", function() {
       container.appendChild(makeRow(0));
       render();
     })();
+    */
+        (function(){
+      const container = document.getElementById("container");
+      const totalBox  = document.getElementById("total");
+      const totalWordsBox = document.getElementById("totalWords");
+      const dateEl = document.getElementById("date");
+      const timeEl = document.getElementById("time");
+      const saveBtn = document.getElementById("saveBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const shareBtn = document.getElementById("shareBtn");
+      const entryModeBtn = document.getElementById("entryModeBtn");
+      const billModeBtn = document.getElementById("billModeBtn");
+      const modeStatus = document.getElementById("modeStatus");
+      const priceModeSelect = document.getElementById("priceModeSelect");
+      const dbEntryPanel = document.getElementById("dbEntryPanel");
+      const dbSaveBtn = document.getElementById("dbSaveBtn");
+      const dbListContainer = document.getElementById("dbListContainer");
+      const dbItemsList = document.getElementById("dbItemsList");
+      const panelTitle = document.getElementById("panelTitle");
+      const bottomDashboard = document.getElementById("bottomDashboard");
+      const custBlock = document.getElementById("custBlock");
+
+      let currentMode = 'bill'; 
+      let activeInput = null;
+      let editingItemCode = null; 
+
+      // Data Engine Setup
+      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [
+        { code: "101", name: "Aata", retail: 40, wholesale: 38 },
+        { code: "102", name: "Shakkar", retail: 45, wholesale: 42 },
+        { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
+      ];
+
+      // Soft keyboard popups lift layout mechanism
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          document.body.style.height = window.visualViewport.height + 'px';
+        });
+      }
+
+      function nowDateTimeTick(){
+        const now = new Date();
+        dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
+        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+      }
+      setInterval(nowDateTimeTick, 1000);
+      nowDateTimeTick();
+
+      function evalExpr(expr){
+        try{
+          const js = expr.replace(/\^/g,"**");
+          const val = Function('"use strict";return('+js+')')();
+          if(typeof val === "number" && isFinite(val))
+            return Number.isInteger(val)?val:parseFloat(val.toFixed(2));
+        }catch(e){}
+        return 0;
+      }
+
+      function numberToWordsIndian(num){
+        num = Math.floor(Math.abs(num));
+        if (num === 0) return "Zero";
+        const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+        const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+        function twoDigits(n){ if(n<20) return ones[n]; return tens[Math.floor(n/10)] + (n%10?" " + ones[n%10]:""); }
+        function threeDigits(n){ const h=Math.floor(n/100), r=n%100; return (h?ones[h]+" Hundred":"") + (h&&r?" ":"") + (r?twoDigits(r):""); }
+        let words = "";
+        const crore = Math.floor(num/10000000); num%=10000000;
+        const lakh  = Math.floor(num/100000);   num%=100000;
+        const thou  = Math.floor(num/1000);     num%=1000;
+        if(crore) words += threeDigits(crore) + " Crore";
+        if(lakh)  words += (words?" ":"") + twoDigits(lakh) + " Lakh";
+        if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
+        if(num)   words += (words?" ":"") + threeDigits(num);
+        return words.trim();
+      }
+
+      function totalInWords(amt){
+        const rupees = Math.floor(amt);
+        const paise = Math.round((amt - rupees) * 100);
+        let s = numberToWordsIndian(rupees) + " Rupees";
+        if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
+        return s + " Only";
+      }
+
+      // Dynamic backend auto-learning parser
+      function parseAndSaveNewItem(text) {
+        const cleanText = text.trim();
+        const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
+        const simplePattern = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s+([0-9.]+)$/i;
+
+        let name = "", code = "", price = 0;
+
+        if(patternWithCode.test(cleanText)) {
+          const match = cleanText.match(patternWithCode);
+          name = match[1].trim();
+          code = match[2].trim();
+          price = parseFloat(match[3]);
+        } else if(simplePattern.test(cleanText)) {
+          const match = cleanText.match(simplePattern);
+          name = match[1].trim();
+          price = parseFloat(match[2]);
+          code = (itemDatabase.length + 101).toString();
+        }
+
+        if(name && price > 0) {
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+          if(!exists) {
+            itemDatabase.push({ code, name, retail: price, wholesale: price });
+            localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          }
+        }
+      }
+
+      function renderDatabaseList() {
+        dbItemsList.innerHTML = "";
+        const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
+        
+        if(sortedDatabase.length === 0) {
+          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>";
+          return;
+        }
+
+        sortedDatabase.forEach(item => {
+          const itemRow = document.createElement("div");
+          itemRow.className = "db-item-row";
+
+          const details = document.createElement("div");
+          details.className = "db-item-details";
+          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Retail: ₹${item.retail} | Whol: ₹${item.wholesale}</span>`;
+
+          const actions = document.createElement("div");
+          actions.className = "db-item-actions";
+
+          const editBtn = document.createElement("button");
+          editBtn.className = "db-action-btn";
+          editBtn.innerHTML = "✏️";
+          editBtn.addEventListener("click", () => {
+            document.getElementById("dbCode").value = item.code;
+            document.getElementById("dbName").value = item.name;
+            document.getElementById("dbRetail").value = item.retail;
+            document.getElementById("dbWholesale").value = item.wholesale;
+            
+            editingItemCode = item.code; 
+            panelTitle.textContent = "✏️ Edit Product in Ledger Database";
+            dbSaveBtn.textContent = "Update Product";
+            dbSaveBtn.style.background = "#e67e22";
+            dbSaveBtn.style.borderColor = "#d35400";
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "db-action-btn";
+          deleteBtn.innerHTML = "❌";
+          deleteBtn.addEventListener("click", () => {
+            if(confirm(`Delete "${item.name}"?`)) {
+              itemDatabase = itemDatabase.filter(i => i.code !== item.code);
+              localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+              renderDatabaseList();
+              render();
+            }
+          });
+
+          actions.appendChild(editBtn);
+          actions.appendChild(deleteBtn);
+          itemRow.appendChild(details);
+          itemRow.appendChild(actions);
+          dbItemsList.appendChild(itemRow);
+        });
+      }
+
+      dbSaveBtn.addEventListener("click", function() {
+        const code = document.getElementById("dbCode").value.trim();
+        const name = document.getElementById("dbName").value.trim();
+        const retail = parseFloat(document.getElementById("dbRetail").value) || 0;
+        const wholesale = parseFloat(document.getElementById("dbWholesale").value) || 0;
+
+        if (code && name && (retail || wholesale)) {
+          if (editingItemCode) {
+            const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
+            if (idx > -1) itemDatabase[idx] = { code, name, retail, wholesale };
+            editingItemCode = null;
+            panelTitle.textContent = "📥 Add Product to Ledger Database";
+            dbSaveBtn.textContent = "Save to Database";
+            dbSaveBtn.style.background = "#3498db";
+            dbSaveBtn.style.borderColor = "#2980b9";
+          } else {
+            const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
+            if (exists) { alert("Product matches an existing entry!"); return; }
+            itemDatabase.push({ code, name, retail, wholesale });
+          }
+          localStorage.setItem("ledger_db_v2", JSON.stringify(itemDatabase));
+          document.getElementById("dbCode").value = "";
+          document.getElementById("dbName").value = "";
+          document.getElementById("dbRetail").value = "";
+          document.getElementById("dbWholesale").value = "";
+          renderDatabaseList();
+          render();
+        } else {
+          alert("Fill all required fields code, name & pricing!");
+        }
+      });
+
+      priceModeSelect.addEventListener("change", render);
+
+      /* ---------- Standard HTML Input Engine (Full Mic Activation) ---------- */
+      function makeRow(i, text=""){
+        const row = document.createElement("div");
+        row.className = "row";
+        const rowMain = document.createElement("div");
+        rowMain.className = "row-main";
+
+        const sl = document.createElement("div");
+        sl.className = "sl";
+        sl.textContent = i+1;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        // Div ki jagah Standard Input for full keyboard voice support
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "input";
+        
+        // Notebook custom raw style injects
+        input.style.width = "100%";
+        input.style.border = "none";
+        input.style.outline = "none";
+        input.style.background = "transparent";
+        input.style.color = "var(--ink)";
+        input.style.fontFamily = "inherit";
+        input.style.fontSize = "15px";
+        input.style.fontWeight = "600";
+        input.style.padding = "3px 0";
+
+        input.setAttribute("enterkeyhint", "next");
+        input.setAttribute("autocorrect", "on");
+        input.setAttribute("autocomplete", "off");
+        input.setAttribute("spellcheck", "false");
+        input.value = text; 
+
+        wrapper.appendChild(input);
+        const result = document.createElement("div");
+        result.className = "result";
+
+        rowMain.appendChild(sl);
+        rowMain.appendChild(wrapper);
+        rowMain.appendChild(result);
+
+        const codePatch = document.createElement("div");
+        codePatch.className = "code-patch";
+        
+        row.appendChild(rowMain);
+        row.appendChild(codePatch);
+
+        // Suggestions Dropdown Logic (Flipped Upward)
+        input.addEventListener("input", function() {
+          render();
+          const val = input.value.trim().toLowerCase();
+          const oldBox = wrapper.querySelector(".suggest-box");
+          if(oldBox) oldBox.remove();
+          if(!val) return;
+
+          const matches = itemDatabase.filter(item => 
+            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+          );
+
+          if(matches.length > 0) {
+            const suggestBox = document.createElement("div");
+            suggestBox.className = "suggest-box";
+            
+            matches.forEach(match => {
+              const itemDiv = document.createElement("div");
+              itemDiv.className = "suggest-item";
+              const pMode = priceModeSelect.value;
+              const activePrice = pMode === 'wholesale' ? match.wholesale : match.retail;
+              itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
+              
+              const selectItem = (e) => {
+                e.preventDefault(); 
+                e.stopPropagation();
+                input.value = `${match.name} ${activePrice}`;
+                suggestBox.remove();
+                render();
+                
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+                activeInput = input;
+              };
+
+              itemDiv.addEventListener("mousedown", selectItem);
+              itemDiv.addEventListener("touchstart", selectItem);
+              suggestBox.appendChild(itemDiv);
+            });
+            wrapper.appendChild(suggestBox);
+          }
+        });
+
+        input.addEventListener("blur", function() {
+          setTimeout(() => {
+            const box = wrapper.querySelector(".suggest-box");
+            if(box) box.remove();
+            
+            const currentText = input.value.trim();
+            if (currentText) {
+              parseAndSaveNewItem(currentText);
+            }
+            render();
+          }, 300);
+        });
+
+        input.addEventListener("keydown", function(e){
+          if(e.key === "Enter"){
+            e.preventDefault();
+            if(input.value.trim() !== ""){
+              container.appendChild(makeRow(container.children.length));
+              updateSL();
+              render();
+              const lastInput = container.lastChild.querySelector(".input");
+              lastInput.focus();
+              scrollToActiveInput(lastInput);
+            }
+          }
+          if(e.key === "Backspace" && input.value.trim() === ""){
+            if(container.children.length > 1){
+              e.preventDefault();
+              const prev = row.previousElementSibling || row.nextElementSibling;
+              row.remove();
+              updateSL();
+              render();
+              if(prev){
+                const target = prev.querySelector(".input");
+                target.focus();
+                target.setSelectionRange(target.value.length, target.value.length);
+                scrollToActiveInput(target);
+              }
+            }
+          }
+        });
+
+        return row;
+      }
+
+      function updateSL(){
+        [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
+      }
+
+      function render(){
+        let grand = 0;
+
+        [...container.children].forEach(row => {
+          const inputEl = row.querySelector(".input");
+          const text = inputEl.value.trim(); 
+          const resBox = row.querySelector(".result");
+          const patchBox = row.querySelector(".code-patch");
+          
+          let val = 0;
+
+          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+          if (codeMatch) {
+            patchBox.textContent = `Code: ${codeMatch[1]}`;
+            patchBox.classList.add("visible");
+          } else {
+            const wordTokens = text.split(/\s+/);
+            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+            if (foundItem) {
+              patchBox.textContent = `Code: ${foundItem.code}`;
+              patchBox.classList.add("visible");
+            } else {
+              patchBox.classList.remove("visible");
+            }
+          }
+
+          if (currentMode === 'bill') {
+            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            if(m){
+              const expr = m[1].trim();
+              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
+            }
+            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+            grand += val;
+            resBox.style.display = "block";
+          } else {
+            resBox.style.display = "none";
+          }
+        });
+
+        if (currentMode === 'bill') {
+          totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
+          totalWordsBox.textContent = "In Words: " + totalInWords(grand);
+          totalWordsBox.style.display = "none"; 
+        } else {
+          totalBox.textContent = "----";
+          totalWordsBox.style.display = "none";
+        }
+      }
+
+      /* ---------- Structural Engine Mode Toggles ---------- */
+      function toggleViewMode(mode) {
+        currentMode = mode;
+        if(mode === 'entry') {
+          modeStatus.textContent = "Database Entry Active";
+          modeStatus.classList.add("entry");
+          dbEntryPanel.style.display = "flex"; 
+          container.style.display = "none";     
+          custBlock.style.display = "none"; 
+          dbListContainer.style.display = "flex"; 
+          bottomDashboard.style.display = "none"; 
+
+          // Dropdown disable logic in entry setup
+          priceModeSelect.disabled = true;
+          priceModeSelect.style.opacity = "0.5";
+          priceModeSelect.style.cursor = "not-allowed";
+
+          renderDatabaseList();
+        } else {
+          modeStatus.textContent = "Billing Active";
+          modeStatus.classList.remove("entry");
+          dbEntryPanel.style.display = "none"; 
+          container.style.display = "block";     
+          custBlock.style.display = "flex"; 
+          dbListContainer.style.display = "none"; 
+          bottomDashboard.style.display = "flex"; 
+
+          // Re-enable dropdown inside billing layout
+          priceModeSelect.disabled = false;
+          priceModeSelect.style.opacity = "1";
+          priceModeSelect.style.cursor = "pointer";
+
+          editingItemCode = null;
+          panelTitle.textContent = "📥 Add Product to Ledger Database";
+          dbSaveBtn.textContent = "Save to Database";
+          dbSaveBtn.style.background = "#3498db";
+          dbSaveBtn.style.borderColor = "#2980b9";
+        }
+        render();
+
+        if (window.visualViewport) {
+          document.body.style.height = window.visualViewport.height + 'px';
+        }
+      }
+
+      entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
+      billModeBtn.addEventListener("click", () => toggleViewMode('bill'));
+
+      function scrollToActiveInput(element) {
+        if (!element) return;
+        setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+      }
+
+      container.addEventListener("focusin", function(e) {
+        if(e.target.classList.contains("input")) {
+          activeInput = e.target;
+          scrollToActiveInput(activeInput);
+        }
+      });
+
+      // Quick Operator Setup
+      document.querySelectorAll(".op-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
+          if (activeInput) {
+            activeInput.focus();
+            const op = btn.getAttribute("data-op");
+            
+            // Native input text selection insertion mechanics
+            const startPos = activeInput.selectionStart;
+            const endPos = activeInput.selectionEnd;
+            const currentVal = activeInput.value;
+            
+            activeInput.value = currentVal.substring(0, startPos) + op + currentVal.substring(endPos, currentVal.length);
+            
+            render();
+            activeInput.focus();
+            activeInput.setSelectionRange(startPos + 1, startPos + 1);
+            scrollToActiveInput(activeInput);
+          }
+        });
+      });
+
+      // Canvas Snapshot Engine
+      async function saveAsImage(){
+        const paper = document.getElementById("paper");
+        await new Promise(r=>requestAnimationFrame(r));
+        if (typeof html2canvas === 'undefined') { alert('Tools loading, please try again.'); return; }
+        const canvas = await html2canvas(paper, {backgroundColor: "#ffffff", scale:2});
+        const link = document.createElement('a');
+        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+        link.download = `notebook-invoice-${stamp}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+      
+      saveBtn.addEventListener("click", saveAsImage);
+
+      // Sharing Text Engine (Up to 20 Elements)
+      shareBtn.addEventListener("click", async () => {
+        let itemsListText = "";
+        const lines = [...container.children].slice(0, 20);
+        
+        lines.forEach((row, index) => {
+          const itemText = row.querySelector(".input").value.trim(); 
+          const itemTotal = row.querySelector(".result").textContent.trim();
+          if(itemText) {
+            itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`;
+          }
+        });
+
+        if([...container.children].length > 20) {
+          itemsListText += "...and more products listed.\n";
+        }
+
+        const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
+        const customerName = document.getElementById("custNameInput").textContent.trim() || 'N/A';
+        const payloadMessage = `*${shopTitle}*\nCust: ${customerName}\n---------------------\n${itemsListText}---------------------\n*Total bill: ${totalBox.textContent}*\n\n`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: shopTitle,
+              text: payloadMessage,
+              url: window.location.href 
+            });
+          } catch (err) {
+            console.log("Sharing rejected:", err);
+          }
+        } else {
+          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`);
+          alert("Bill details copy ho gayi hain!");
+        }
+      });
+
+      clearBtn.addEventListener("click", function(){
+        container.innerHTML = "";
+        document.getElementById("custNameInput").textContent = "";
+        container.appendChild(makeRow(0));
+        render();
+      });
+
+      container.appendChild(makeRow(0));
+      render();
+    })();
+
   </script>
 </body>
 </html>
