@@ -23,13 +23,11 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Cleaned framework layout to destroy gray background cards overlay on mobile screens */
     body {
       margin: 0; background: var(--bg); color: var(--ink);
       font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
       display: flex; justify-content: center; align-items: stretch;
-      min-height: 100vh; min-height: 100dvh;
-      width: 100%; overflow: hidden; padding: 5px;
+      height: 100vh; height: 100dvh; overflow: hidden; padding: 5px;
     }
 
     .wrap { 
@@ -85,13 +83,11 @@
     .db-item-actions { display: flex; gap: 8px; }
     .db-action-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 5px; }
 
+    /* FIXED AUTOMATIC KEYBOARD LIFT LAYOUT FOR BOTTOM DASHBOARD */
     .bottom-dashboard { 
       background: #111b24; border-radius: 0 0 8px 8px; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4); 
       padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000; 
       flex-shrink: 0;
-      touch-action: none;
-      -webkit-user-select: none;
-      user-select: none;
       position: relative;
     }
     .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
@@ -115,40 +111,17 @@
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
 
-    /* Custom visual notebook grid alignment line for clean image prints */
-    .total-overlay-for-image {
-      margin-top: 15px;
-      padding: 12px 10px 5px 24px;
-      border-top: 2px solid var(--line);
-      display: none; 
-      flex-direction: column;
-      gap: 4px;
-    }
-/*
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
       .paper { border-radius: 0; }
       .bottom-dashboard {
         border-radius: 0; 
-        position: flex; bottom: 0; left: 0; width: 100%;
+        position: fixed; bottom: 0; left: 0; width: 100%;
         padding-bottom: env(safe-area-inset-bottom, 8px);
       }
-      .row-list { padding-bottom: 20px; }
-      .db-list-container { padding-bottom: 20px; }
-    }
-    */
-    @media (max-width: 600px) {
-      body { padding: 0; }
-      .brand-header { border-radius: 0; }
-      .paper { border-radius: 0; }
-      .bottom-dashboard {
-        border-radius: 0; 
-        position: relative; bottom: 0; left: 0; width: 100%;
-        padding-bottom: env(safe-area-inset-bottom, 8px);
-      }
-      .row-list { padding-bottom: 150px; }
-      .db-list-container { padding-bottom: 150px; }
+      .row-list { padding-bottom: 140px; }
+      .db-list-container { padding-bottom: 140px; }
     }
   </style>
 </head>
@@ -202,15 +175,6 @@
 
       <div class="row-list" id="container"></div>
 
-      <!-- Combined structural visual block for image dynamic prints -->
-      <div class="total-overlay-for-image" id="totalOverlayForImage">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span style="font-weight: bold; font-size: 14px; color: var(--muted);">Grand Total:</span>
-          <span id="imgTotalVal" style="font-weight: 800; font-size: 18px; color: var(--accent);">₹0.00</span>
-        </div>
-        <div id="imgTotalWords" style="font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px;">In Words: Zero Rupees Only</div>
-      </div>
-
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
         <div id="dbItemsList" style="margin-bottom: 20px;"></div>
@@ -242,7 +206,6 @@
 
         <div style="display: flex; gap: 4px;">
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
-          <button id="saveBtn" class="btn sq-btn" title="Save Image">💾</button>
           <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
           <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
           <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
@@ -252,8 +215,6 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
   <script>
     (function(){
       const container = document.getElementById("container");
@@ -261,7 +222,6 @@
       const totalWordsBox = document.getElementById("totalWords");
       const dateEl = document.getElementById("date");
       const timeEl = document.getElementById("time");
-      const saveBtn = document.getElementById("saveBtn");
       const localSaveBtn = document.getElementById("localSaveBtn");
       const clearBtn = document.getElementById("clearBtn");
       const shareBtn = document.getElementById("shareBtn");
@@ -278,9 +238,6 @@
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
       const csvBtn = document.getElementById("csvBtn");
-      const totalOverlayForImage = document.getElementById("totalOverlayForImage");
-      const imgTotalVal = document.getElementById("imgTotalVal");
-      const imgTotalWords = document.getElementById("imgTotalWords");
 
       let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
       let currentMode = 'bill'; 
@@ -293,6 +250,7 @@
         { code: "103", name: "Chawal", retail: 60, wholesale: 55 }
       ];
 
+      // Pure Hukum Mere Aaka soft keyboard viewport lift engine
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
           document.body.style.height = window.visualViewport.height + 'px';
@@ -629,11 +587,7 @@
         if (currentMode === 'bill') {
           totalBox.textContent = formattedTotal;
           totalWordsBox.textContent = formattedWords;
-          totalWordsBox.style.display = "none"; 
-          
-          // Sync calculation back to hidden component
-          imgTotalVal.textContent = formattedTotal;
-          imgTotalWords.textContent = formattedWords;
+          totalWordsBox.style.display = "block"; 
         } else {
           totalBox.textContent = "----";
           totalWordsBox.style.display = "none";
@@ -695,45 +649,7 @@
         });
       });
 
-      /* ---------- STRUCTURAL BIG SIZE CANVAS EXPORTER WITH FULL AMOUNT LIST ---------- */
-      async function saveAsImage(){
-        const paper = document.getElementById("paper");
-        
-        const originalMode = currentMode;
-        currentMode = 'bill';
-        render();
-        
-        // Dynamic Snapshot Logic: Screenshot runtime context ke dauran image overlay aur result metrics block state toggle
-        totalOverlayForImage.style.display = "flex";
-        
-        const allResults = paper.querySelectorAll(".result");
-        allResults.forEach(r => r.style.display = "block");
-
-        await new Promise(r => requestAnimationFrame(r));
-        if (typeof html2canvas === 'undefined') { alert('Tools asset loading error, try again.'); return; }
-        
-        // Fix structural clipping mechanics by targeting dynamic paper scrolling viewports
-        const canvas = await html2canvas(paper, {
-          backgroundColor: "#ffffff",
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          scrollY: -window.scrollY,
-          windowHeight: paper.scrollHeight
-        });
-        
-        totalOverlayForImage.style.display = "none";
-        currentMode = originalMode;
-        render();
-
-        const link = document.createElement('a');
-        const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-        link.download = `notebook-invoice-${stamp}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      }
-      saveBtn.addEventListener("click", saveAsImage);
-
+      // Browser Storage Save Mechanism
       localSaveBtn.addEventListener("click", function() {
         const customerName = document.getElementById("custNameInput").textContent.trim();
         if(!customerName) { alert("Data save karne ke liye 'Cust Name' zaroor entered karein!"); return; }
@@ -762,6 +678,7 @@
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
       });
 
+      // WhatsApp/Web Share API
       shareBtn.addEventListener("click", async () => {
         let itemsListText = "";
         const lines = [...container.children].slice(0, 20);
@@ -783,6 +700,7 @@
         }
       });
 
+      // Excel CSV Download
       csvBtn.addEventListener("click", function() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Serial No,Item Description,Amount (INR)\n";
