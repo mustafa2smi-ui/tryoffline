@@ -38,10 +38,11 @@
       overflow: hidden;
     }
 
-    .brand-header { background: var(--gradient-head); padding: 10px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }
+    /*.brand-header { background: var(--gradient-head); padding: 10px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }*/
+   .brand-header { background: var(--gradient-head); padding: 6px 8px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }
     .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
-
+    /*.mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }*/
+.mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 4px 7px; font-size: 12px; font-weight: 800; cursor: pointer; height: 26px; }
     /* 🔥 SCANNER SECTION STYLES (from first code) */
     .scanner-section { background: #000; padding: 8px; display: none; flex-direction: column; align-items: center; flex-shrink: 0; }
     #reader { width: 100%; max-width: 420px; background: #000; border-radius: 8px; overflow: hidden; }
@@ -51,8 +52,9 @@
     .btn-resume-cam { background: #ff9800; }
     
     /* 🔥 CAMERA TOGGLE BUTTON STYLE (matches second code's theme) */
-    .cam-toggle-btn { background: #3498db; color: #fff; border: 1px solid #2980b9; border-radius: 4px; padding: 5px 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
-
+  /*  .cam-toggle-btn { background: #3498db; color: #fff; border: 1px solid #2980b9; border-radius: 4px; padding: 5px 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+*/
+    .cam-toggle-btn { background: #3498db; color: #fff; border: 1px solid #2980b9; border-radius: 4px; padding: 4px 7px; font-size: 11px; font-weight: 700; cursor: pointer; height: 26px; }
     .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; margin-bottom: 5px; flex-shrink: 0; }
     .db-entry-panel h4 { color: #fff; font-size: 13px; margin-bottom: 2px; }
     .db-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; width: 100%; }
@@ -66,23 +68,31 @@
     }
     .paper::before { content: ""; position: absolute; top: 0; left: 18px; bottom: 0; width: 1px; background: rgba(231, 76, 60, 0.35); pointer-events: none; z-index: 10; }
     
-    .paper-header { padding: 8px 10px 5px 24px; border-bottom: 2px solid var(--line); text-align: center; }
+  /*  .paper-header { padding: 8px 10px 5px 24px; border-bottom: 2px solid var(--line); text-align: center; }*/
+   .paper-header { padding: 6px 10px 3px 24px; border-bottom: 2px solid var(--line); text-align: center; }
     #meta { font-size: 11px; font-weight: bold; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
-    .paper-header h1 { color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: 1px; }
-
-    .row-list { padding: 5px 5px 20px 24px; flex: 1; }
-    .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 4px 0; }
+  /*  .paper-header h1 { color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: 1px; }*/
+.paper-header h1 { color: var(--ink); font-size: 15px; font-weight: 800; letter-spacing: 1px; margin: 2px 0; }
+  /*  .row-list { padding: 5px 5px 20px 24px; flex: 1; } */
+   .row-list { padding: 5px 5px 20px 24px; flex: 1; }
+    /* .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 4px 0; } */
+   .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 2px 0; }
     .row-main { display: flex; align-items: center; width: 100%; }
     .sl { width: 15px; color: var(--muted); font-weight: 700; font-size: 12px; }
     .input-wrapper { flex: 1; position: relative; padding-left: 5px; }
     
-    .input {
+ /*   .input {
       width: 100%; border: none; outline: none; background: transparent;
       color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 3px 0;
     }
-
+*/
+    .input {
+  width: 100%; border: none; outline: none; background: transparent;
+  color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 2px 0; line-height: 1.3;
+}
     .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }
-    .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 1px 4px; border-radius: 3px; margin-top: 2px; align-self: flex-start; margin-left: 18px; }
+   /* .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 1px 4px; border-radius: 3px; margin-top: 2px; align-self: flex-start; margin-left: 18px; } */
+  .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 0px 4px; border-radius: 3px; margin-top: 1px; align-self: flex-start; margin-left: 18px; }
     .code-patch.visible { display: inline-block; }
 
     .suggest-box { position: absolute; left: 0; bottom: 100%; width: 100%; background: #ffffff; border: 2px solid var(--line); z-index: 99999; max-height: 140px; overflow-y: auto; box-shadow: 0 -4px 15px rgba(0,0,0,0.25); border-radius: 4px; margin-bottom: 4px; }
@@ -111,8 +121,8 @@
 
     .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
     .sq-btn { width: 42px; height: 42px; font-size: 18px; }
-    .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; height: 30px; font-weight: 600; outline: none; cursor: pointer; font-size: 12px; }
-
+   /* .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; height: 30px; font-weight: 600; outline: none; cursor: pointer; font-size: 12px; }*/
+.price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 3px; height: 26px; font-weight: 600; outline: none; cursor: pointer; font-size: 11px; }
     .mode-banner { background: #1abc9c; color: white; text-align: center; font-size: 10px; font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; }
     .mode-banner.entry { background: #3498db; }
 
@@ -157,13 +167,15 @@
           <button id="btnCamToggle" class="cam-toggle-btn" title="Toggle Barcode Scanner">📷</button>
           
           <!-- 🖨️ HARDWARE PRINT ENGINE CAPABILITIES SELECTOR MAP -->
-          <select id="printModeSelect" class="price-select" style="background: #9b59b6; border-color: #8e44ad;">
-            <option value="ENG" selected>Print: ENG</option>
+        <!--  <select id="printModeSelect" class="price-select" style="background: #9b59b6; border-color: #8e44ad;">-->
+           <select id="printModeSelect" class="price-select" style="background: #9b59b6; border-color: #8e44ad; height: 26px; font-size: 11px;">
+          <option value="ENG" selected>Print: ENG</option>
             <option value="MULTI">Print: MULTI</option>
             <option value="COMP">Print: COMP</option>
           </select>
           
-          <select id="priceModeSelect" class="price-select">
+        <!--  <select id="priceModeSelect" class="price-select">-->
+            <select id="priceModeSelect" class="price-select" style="height: 26px; font-size: 11px;">
             <option value="wholesale" selected>Wholesale</option>
             <option value="retail">Retail</option>
           </select>
@@ -282,7 +294,9 @@
       let isScannerRunning = false;
       let lastScannedCode = "";
       let isProcessingScan = false;
-
+// Expose scanner functions globally for onclick handlers
+window.stopHardwareCamera = stopHardwareCamera;
+window.resumeHardwareScanning = resumeHardwareScanning;
       let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
       let currentMode = 'bill'; 
       let activeInput = null;
@@ -1071,8 +1085,10 @@ async function printBill() {
     const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
 
     let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
-    esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\nS.No Item                     Amount\n--------------------------------\n';
-
+    /*esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\nS.No Item                     Amount\n--------------------------------\n';*/
+esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+esc += 'S.No Item                      Amt\n';
+esc += '--------------------------------\n';
     for (let i = 0; i < validRows.length; i++) {
       let rowItem = validRows[i];
       let finalPrintName = "";
