@@ -3,168 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Notebook Bill</title>
-  <meta name="theme-color" content="#1a252f">
+  <title>Notebook Bill - Pro</title>
   <style>
-    :root { --bg: #1a252f; --paper: #ffffff; --ink: #0a2540; --muted: #5b7a9c; --accent: #d35400; --line: #b0c4de; --danger: #c0392b; --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Segoe UI', Arial, sans-serif; display: flex; justify-content: center; align-items: stretch; height: 100vh; height: 100dvh; overflow: hidden; padding: 5px; }
-    .wrap { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .brand-header { background: var(--gradient-head); padding: 10px; border-radius: 8px 8px 0 0; flex-shrink: 0; }
-    .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 5px 8px; font-size: 13px; font-weight: 800; cursor: pointer; }
-    .db-entry-panel { background: #1a252f; border: 1px solid var(--line); padding: 10px; display: none; flex-direction: column; gap: 8px; margin-bottom: 5px; flex-shrink: 0; }
-    .db-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 6px; }
-    .db-input { background: #2c3e50; color: #fff; padding: 8px; border-radius: 4px; font-size: 13px; border: none; }
-    .paper { background: #ffffff; display: flex; flex-direction: column; flex: 1; overflow-y: auto; position: relative; border-left: 6px solid #e74c3c; }
-    .paper-header { padding: 8px 10px 5px 24px; border-bottom: 2px solid var(--line); }
-    .row-list { padding: 5px 5px 20px 24px; flex: 1; }
-    .row { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); padding: 4px 0; }
-    .row-main { display: flex; align-items: center; width: 100%; }
-    .sl { width: 15px; color: var(--muted); font-size: 12px; }
-    .input { width: 100%; border: none; outline: none; background: transparent; font-size: 15px; font-weight: 600; }
-    .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; }
-    .bottom-dashboard { background: #111b24; padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000; flex-shrink: 0; position: relative; }
-    .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
-    .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; height: 42px; display: flex; align-items: center; justify-content: center; }
-    .sq-btn { width: 42px; }
-    .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; height: 30px; }
-    .scanner-wrapper-zone { display: none; flex-direction: column; align-items: center; background: #000; padding: 10px; width: 100%; }
-    #reader { width: 100%; max-width: 320px; }
+    :root { --bg: #1a252f; --paper: #ffffff; --ink: #0a2540; --accent: #d35400; --line: #b0c4de; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-family: sans-serif; }
+    .wrap { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 600px; margin: 0 auto; }
+    .brand-header { background: #1abc9c; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .paper { background: white; flex: 1; overflow-y: auto; padding: 15px; }
+    .row { display: flex; border-bottom: 1px solid var(--line); padding: 5px 0; align-items: center; }
+    .input { flex: 1; outline: none; font-size: 16px; font-weight: 600; padding: 5px; }
+    .result { width: 80px; text-align: right; color: var(--accent); font-weight: bold; }
+    .bottom-dashboard { background: #111b24; padding: 10px; color: white; display: flex; flex-direction: column; gap: 8px; }
+    .scanner-wrapper { display: none; background: #000; padding: 10px; }
+    .btn { padding: 8px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="brand-header">
-      <div class="controls">
-        <div style="display: flex; gap: 4px;">
-          <button id="entryModeBtn" class="mode-toggle-btn" style="background:#3498db;">🖋️ E</button>
-          <button id="billModeBtn" class="mode-toggle-btn" style="background:#1abc9c;">💵 B</button>
-          <button id="btnCamToggle" class="mode-toggle-btn" style="background:#e67e22;">📷 Cam</button>
-        </div>
-        <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed #fff; color: #fff; width: 30%;" value="Notebook Bill">
-        <select id="printModeSelect" class="price-select"><option value="ENG">Print: ENG</option><option value="MULTI">Print: MULTI</option></select>
-        <select id="priceModeSelect" class="price-select"><option value="wholesale">W'sale</option><option value="retail">Retail</option></select>
-      </div>
+      <button onclick="toggleScanner()" class="btn" style="background:#e67e22;">📷 Scan</button>
+      <select id="printModeSelect"><option value="ENG">Print: ENG</option><option value="MULTI">Print: MULTI</option></select>
     </div>
 
-    <div id="dbEntryPanel" class="db-entry-panel">
-      <div class="db-grid">
-        <input type="text" id="dbCode" class="db-input" placeholder="Code">
-        <input type="text" id="dbName" class="db-input" placeholder="Name">
-        <input type="number" id="dbRetail" class="db-input" placeholder="Retail">
-        <input type="number" id="dbWholesale" class="db-input" placeholder="W'sale">
-      </div>
-      <button id="dbSaveBtn" class="btn">Save</button>
+    <div id="scannerWrapper" class="scanner-wrapper">
+      <div id="reader" style="width:100%"></div>
+      <button onclick="stopScanner()" class="btn" style="background:#e74c3c; width:100%; margin-top:5px;">Stop</button>
     </div>
 
     <div id="paper" class="paper">
-      <div class="paper-header">
-        <div id="custBlock">Cust: <span contenteditable="true" id="custNameInput" style="border-bottom:1px solid #000;"></span></div>
-      </div>
-      <div class="scanner-wrapper-zone" id="scannerWrapperZone"><div id="reader"></div><button id="btnResumeCamUI" class="btn" style="width:100%; display:none;">Scan Again</button></div>
-      <div class="row-list" id="container"></div>
-      <div class="db-list-container" id="dbListContainer" style="display:none;">
-        <div id="dbItemsList"></div>
-        <div id="dbBillsHistoryList"></div>
-      </div>
+      <div id="custBlock">Cust: <span contenteditable="true" id="custNameInput" style="border-bottom:1px solid #000;"></span></div>
+      <div id="container"></div>
     </div>
 
-    <div class="bottom-dashboard" id="bottomDashboard">
-      <div id="modeStatus" style="font-size:10px; color:#fff; text-align:center;">Billing Mode</div>
-      <div class="total-val" id="total">₹0.00</div>
-      <div class="controls">
-        <div class="operator-bar" style="display:flex; flex:1; gap:4px;">
-           <button class="op-btn" data-op="+">+</button><button class="op-btn" data-op="-">-</button>
-           <button class="op-btn" data-op="*">×</button><button class="op-btn" data-op="/">÷</button>
-        </div>
-        <div style="display:flex; gap:4px;">
-          <button id="clearBtn" class="btn sq-btn">🗑️</button>
-          <button id="printBtn" class="btn sq-btn">🖨️</button>
-          <button id="localSaveBtn" class="btn sq-btn">💾</button>
-          <button id="csvBtn" class="btn sq-btn">📊</button>
-        </div>
+    <div class="bottom-dashboard">
+      <div id="total" style="font-size:24px; font-weight:bold; text-align:right;">₹0.00</div>
+      <div style="display:flex; gap:5px;">
+        <button id="clearBtn" class="btn" style="background:#c0392b;">🗑️</button>
+        <button id="printBtn" class="btn" style="background:#8e44ad;">🖨️</button>
+        <button id="localSaveBtn" class="btn" style="background:#27ae60;">💾</button>
+        <button id="csvBtn" class="btn" style="background:#f39c12;">📊</button>
       </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Logic initialization
-      const container = document.getElementById("container");
-      const totalBox  = document.getElementById("total");
-      const localSaveBtn = document.getElementById("localSaveBtn");
-      const clearBtn = document.getElementById("clearBtn");
-      const printBtn = document.getElementById("printBtn");
-      const entryModeBtn = document.getElementById("entryModeBtn");
-      const billModeBtn = document.getElementById("billModeBtn");
-      const dbEntryPanel = document.getElementById("dbEntryPanel");
-      const dbListContainer = document.getElementById("dbListContainer");
-      const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
-      const csvBtn = document.getElementById("csvBtn");
-      const btnCamToggle = document.getElementById("btnCamToggle");
-      const scannerWrapperZone = document.getElementById("scannerWrapperZone");
+    const container = document.getElementById("container");
+    const totalBox = document.getElementById("total");
+    let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [];
 
-      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v2")) || [];
-      let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
+    // Row Logic
+    function makeRow(text="") {
+      const row = document.createElement("div"); row.className = "row";
+      row.innerHTML = `<div class="input" contenteditable="true">${text}</div><div class="result"></div>`;
+      row.querySelector(".input").oninput = render;
+      return row;
+    }
 
-      function toggleViewMode(mode) {
-        if(mode === 'entry') {
-          dbEntryPanel.style.display = "flex";
-          container.style.display = "none";
-          dbListContainer.style.display = "flex";
-          document.getElementById("bottomDashboard").style.display = "none";
-          renderBillsHistoryList();
-        } else {
-          dbEntryPanel.style.display = "none";
-          container.style.display = "block";
-          dbListContainer.style.display = "none";
-          document.getElementById("bottomDashboard").style.display = "flex";
+    function render() {
+      let grand = 0;
+      [...container.children].forEach(row => {
+        const text = row.querySelector(".input").textContent;
+        let match = text.match(/(\d+)$/);
+        let val = match ? parseInt(match[1]) : 0;
+        row.querySelector(".result").textContent = val ? "₹"+val : "";
+        grand += val;
+      });
+      totalBox.textContent = "₹" + grand.toLocaleString();
+    }
+
+    // Barcode Scanner
+    let html5QrCode;
+    function toggleScanner() {
+      const sw = document.getElementById("scannerWrapper");
+      if(sw.style.display === 'flex') stopScanner();
+      else { sw.style.display = 'flex'; startScanner(); }
+    }
+    function startScanner() {
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 150 }, (text) => {
+        stopScanner();
+        let item = itemDatabase.find(i => i.code == text);
+        if(item) {
+          container.appendChild(makeRow(item.name + " " + item.retail));
+          render();
+        } else alert("Item not found");
+      });
+    }
+    function stopScanner() { 
+      document.getElementById("scannerWrapper").style.display = 'none';
+      if(html5QrCode) html5QrCode.stop();
+    }
+
+    // Printer Logic with Translation
+    async function translateText(text) {
+        if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`);
+        const data = await res.json();
+        return data[0][0][0];
+    }
+
+    printBtn.onclick = async () => {
+      const mode = document.getElementById("printModeSelect").value;
+      const device = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'Bluetooth' }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] });
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+      const char = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+      
+      let esc = "\x1B\x40\x1B\x61\x01STORE BILL\n--------------------------------\n";
+      for (let row of [...container.children]) {
+        let text = row.querySelector(".input").textContent;
+        let amt = row.querySelector(".result").textContent;
+        if(!text) continue;
+        
+        let printName = text;
+        if(mode === 'ENG') {
+            printName = await translateText(text);
+            printName = printName.replace(/[^\x00-\x7F]/g, ""); // Strip non-ascii
         }
+        
+        // Alignment: Name (20 chars) + Amount (12 chars) = 32 chars width
+        esc += printName.substring(0,20).padEnd(20) + amt.replace('₹','Rs.').padStart(12) + "\n";
       }
+      esc += "--------------------------------\nTOTAL: " + totalBox.textContent.replace('₹','Rs.') + "\n\n\n";
+      await char.writeValue(new TextEncoder().encode(esc));
+    };
 
-      function makeRow(i, text=""){
-        const row = document.createElement("div"); row.className = "row";
-        row.innerHTML = `<div class="row-main"><div class="sl">${i+1}</div><div class="input-wrapper"><div class="input" contenteditable="true">${text}</div></div><div class="result"></div></div>`;
-        return row;
-      }
-
-      function render(){
-        let grand = 0;
-        [...container.children].forEach(row => {
-          const inputEl = row.querySelector(".input");
-          const resBox = row.querySelector(".result");
-          const text = inputEl.textContent.trim();
-          let m = text.match(/([0-9.\s()+\-*/^]+)$/);
-          let val = 0;
-          if(m) val = Function('"use strict";return('+m[1]+')')();
-          resBox.textContent = val ? "₹" + val : "";
-          grand += (val || 0);
-        });
-        totalBox.textContent = "₹" + grand.toLocaleString('en-IN');
-      }
-
-      // Initial State
-      container.appendChild(makeRow(0));
-      toggleViewMode('bill');
-
-      // Buttons
-      entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
-      billModeBtn.addEventListener("click", () => toggleViewMode('bill'));
-      
-      clearBtn.addEventListener("click", () => {
-        container.innerHTML = ""; container.appendChild(makeRow(0)); render();
-      });
-
-      // Simple Camera Wrapper
-      btnCamToggle.addEventListener("click", () => {
-        scannerWrapperZone.style.display = (scannerWrapperZone.style.display === 'flex') ? 'none' : 'flex';
-      });
-      
-      // Basic Print, CSV, Storage code here (simplified for stability)
-      console.log("App Initialized");
-    });
+    container.appendChild(makeRow());
   </script>
 </body>
 </html>
