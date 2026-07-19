@@ -821,15 +821,40 @@ document.getElementById("dbPrice").value = item.price;
     exprPart = text;
   }
   
-  // STEP B: Clean — remove common units and currency symbols
-  const cleanedExpr = exprPart
+  // STEP B: Clean — remove units and currency symbols, keep spaces/operators/digits
+  let cleaned = exprPart
     .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
     .replace(/[₹$€£]/g, '')
     .trim();
   
-  // STEP C: Check if cleaned result looks valid and evaluate
-  if (cleanedExpr && /[0-9]/.test(cleanedExpr)) {
-    val = evalExpr(cleanedExpr);
+  // STEP C: Collapse spaces around operators (e.g., "150 * 5" → "150*5")
+  cleaned = cleaned.replace(/\s*([+\-*/^])\s*/g, '$1');
+  
+  // STEP D: Split by spaces, find the token with an operator (most likely calculation)
+  const tokens = cleaned.split(/\s+/);
+  let calcExpr = '';
+  
+  // Priority: find token containing an operator
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    if (/[+\-*/^]/.test(tokens[i]) && /[0-9]/.test(tokens[i])) {
+      calcExpr = tokens[i];
+      break;
+    }
+  }
+  
+  // Fallback: last token with a number
+  if (!calcExpr) {
+    for (let i = tokens.length - 1; i >= 0; i--) {
+      if (/^[0-9.]+$/.test(tokens[i])) {
+        calcExpr = tokens[i];
+        break;
+      }
+    }
+  }
+  
+  // STEP E: Evaluate
+  if (calcExpr && /[0-9]/.test(calcExpr)) {
+    val = evalExpr(calcExpr);
   }
   
   resBox.textContent = val ? val.toLocaleString('en-IN') : "";
