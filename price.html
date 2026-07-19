@@ -812,20 +812,32 @@ document.getElementById("dbPrice").value = item.price;
           }
 
           if (currentMode === 'bill') {
-            // Extract expression: find the last part that looks like a calculation
-// First, strip common units from the text for matching purposes
-const strippedForMatch = text.replace(/\b(rs|c|kg|g|ml|ltr|pcs|pc|pack|box|gram|cartoon|bag|dozen)\b/gi, '');
-const m = strippedForMatch.match(/([0-9.\s()+\-*/^]+)$/);
-            if(m){
-              const expr = m[1].trim();
-              if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
-            }
-            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-            grand += val;
-            resBox.style.display = "block";
-          } else {
-            resBox.style.display = "none";
-          }
+  // STEP A: Extract everything after the first word (item name)
+  const words = text.split(/\s+/);
+  let exprPart = '';
+  if (words.length > 1) {
+    exprPart = words.slice(1).join(' ');
+  } else {
+    exprPart = text;
+  }
+  
+  // STEP B: Clean — remove common units and currency symbols
+  const cleanedExpr = exprPart
+    .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
+    .replace(/[₹$€£]/g, '')
+    .trim();
+  
+  // STEP C: Check if cleaned result looks valid and evaluate
+  if (cleanedExpr && /[0-9]/.test(cleanedExpr)) {
+    val = evalExpr(cleanedExpr);
+  }
+  
+  resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+  grand += val;
+  resBox.style.display = "block";
+} else {
+  resBox.style.display = "none";
+}
         });
 
         const formattedTotal = "₹" + grand.toLocaleString('en-IN');
