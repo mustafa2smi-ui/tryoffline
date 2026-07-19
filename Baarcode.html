@@ -963,7 +963,7 @@
         printWindow.document.write(htmlContent);
         printWindow.document.close();
       }
-
+/*
       async function printBill() {
         let validRows = [];
         [...container.children].forEach(row => {
@@ -1038,6 +1038,111 @@
         }
       }
       printBtn.addEventListener("click", printBill);
+*/
+      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TRANSLATION & ALIGNMENT ---------- */
+async function printBill() {
+  let validRows = [];
+  [...container.children].forEach(row => {
+    const itemText = row.querySelector(".input").textContent.trim();
+    const itemTotal = row.querySelector(".result").textContent.trim();
+    if(itemText) validRows.push({ text: itemText, total: itemTotal });
+  });
+
+  if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
+  
+  const currentPrintMode = printModeSelect.value;
+  if (currentPrintMode === 'COMP') {
+    executeComputerBrowserPrint();
+    return;
+  }
+
+  try {
+    if (!printerDevice) {
+      printerDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: 'Bluetooth' }, { namePrefix: 'SRS' }, { namePrefix: 'MPT' }, { namePrefix: 'MTP' }],
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+    }
+    const server = await printerDevice.gatt.connect();
+    const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+    const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+    const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
+    const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
+
+    let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
+    esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\nS.No Item                     Amount\n--------------------------------\n';
+
+    for (let i = 0; i < validRows.length; i++) {
+      let rowItem = validRows[i];
+      let finalPrintName = "";
+
+      if (currentPrintMode === 'MULTI') {
+        finalPrintName = rowItem.text;
+      } else {
+        // ENG Mode: Smart Multi-Language Word Extraction & Translation Engine
+        let rawLineText = rowItem.text;
+        
+        // Check if line contains Hindi, Tamil, Urdu or regional characters
+        if (/[^\x00-\x7F]/.test(rawLineText)) {
+          // Splitting logic: Text words ko math characters aur numbers se alag karna
+          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
+          let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+          
+          if(wordsPart) {
+            let translatedWords = await autoTranslateText(wordsPart);
+            // Re-combine translated text safely with its core mathematical formula expressions
+            rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
+          }
+        }
+        // Final hardware text filtering layer to eliminate any accidental junk character printouts
+        finalPrintName = rawLineText.replace(/[^\x00-\x7F]/g, "").trim() || "Item Row";
+      }
+
+      // Strict 32-Column Thermal Space Alignment Blueprint
+      let sNo = (i + 1).toString().padEnd(3, ' '); // 3 chars
+      let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
+      let amtStr = cleanAmt.padStart(9, ' '); // 9 chars
+      
+      let nameSpace = 32 - sNo.length - amtStr.length; // Max remaining 20 chars for item text description
+      let choppedName = finalPrintName.substring(0, nameSpace).padEnd(nameSpace, ' ');
+
+      esc += sNo + choppedName + amtStr + "\n";
+    }
+    
+    // Total cleanup swapping any remaining symbol references to clean standard Rs string format
+    let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
+    esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
+    
+    let encoder = new TextEncoder("utf-8");
+    if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
+    
+    const data = encoder.encode(esc);
+    const chunkSize = 100;
+    for (let i = 0; i < data.length; i += chunkSize) {
+      await characteristic.writeValue(data.slice(i, i + chunkSize));
+      await new Promise(r => setTimeout(r, 50));
+    }
+    alert("Printed successfully! 🎉");
+  } catch (error) {
+    alert("Print Error: " + error.message);
+    printerDevice = null;
+  }
+}
+printBtn.addEventListener("click", printBill);
+
+/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- */
+async function autoTranslateText(text) {
+  if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data[0][0][0];
+  } catch (e) { 
+    return text; // Fallback in case of server timeout network drops
+  }
+}
 
       function renderBillsHistoryList() {
         dbBillsHistoryList.innerHTML = "";
