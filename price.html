@@ -463,7 +463,7 @@ window.resumeHardwareScanning = resumeHardwareScanning;
       }
       setInterval(nowDateTimeTick, 1000);
       nowDateTimeTick();
-
+/*
       function evalExpr(expr){
         try{
           const js = expr.replace(/\^/g,"**");
@@ -473,7 +473,22 @@ window.resumeHardwareScanning = resumeHardwareScanning;
         }catch(e){}
         return 0;
       }
-
+*/
+      function evalExpr(expr) {
+  try {
+    // Strip all non-numeric, non-operator characters
+    // Keep: digits (0-9), decimal point (.), operators (+, -, *, /, ^), parentheses
+    const cleaned = expr.replace(/[^\d.+\-*/^()]/g, '');
+    
+    if (!cleaned || !/[0-9]/.test(cleaned)) return 0;
+    
+    const js = cleaned.replace(/\^/g, "**");
+    const val = Function('"use strict";return(' + js + ')')();
+    if (typeof val === "number" && isFinite(val))
+      return Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+  } catch (e) {}
+  return 0;
+}
       function numberToWordsIndian(num){
         num = Math.floor(Math.abs(num));
         if (num === 0) return "Zero";
@@ -499,7 +514,7 @@ window.resumeHardwareScanning = resumeHardwareScanning;
         if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
         return s + " Only";
       }
-
+/*
       function parseAndSaveNewItem(text) {
   const cleanText = text.trim();
   const patternWithCode = /^([a-zA-Z0-9\u0900-\u097F\s]+)\s*\[([a-zA-Z0-9]+)\]\s*([0-9.]+)$/i;
@@ -524,7 +539,52 @@ window.resumeHardwareScanning = resumeHardwareScanning;
     }
   }
 }
+*/
+      function parseAndSaveNewItem(text) {
+  const cleanText = text.trim();
+  if (!cleanText) return;
 
+  // Extract item name: everything before the first space
+  const firstSpaceIdx = cleanText.indexOf(' ');
+  if (firstSpaceIdx === -1) return; // No space, can't parse
+  
+  const itemName = cleanText.substring(0, firstSpaceIdx).trim();
+  const restText = cleanText.substring(firstSpaceIdx + 1).trim();
+  
+  if (!itemName || !restText) return;
+
+  // Try to find a standalone plain number at the end (for DB saving)
+  // Pattern: text followed by optional units then a plain number at the end
+  const plainPriceMatch = restText.match(/(\d+\.?\d*)\s*$/);
+  
+  // Also check if the whole restText is just a plain number (with optional trailing units)
+  const simpleNumberMatch = restText.match(/^(\d+\.?\d*)\s*[a-zA-Z]*$/);
+  
+  let priceVal = 0;
+  let canSave = false;
+
+  if (simpleNumberMatch) {
+    // Case: "10rs" or "10" or "500ml"
+    priceVal = parseFloat(simpleNumberMatch[1]);
+    canSave = true;
+  } else if (plainPriceMatch && !/[+\-*/^]/.test(restText)) {
+    // Case: "1 bag 2500" → extracts 2500
+    // But NOT: "150*10" (has operator)
+    priceVal = parseFloat(plainPriceMatch[1]);
+    canSave = true;
+  }
+
+  if (canSave && itemName && priceVal > 0) {
+    const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+    if (!exists) {
+      // Generate a code
+      const code = (itemDatabase.length + 101).toString();
+      itemDatabase.push({ code, name: itemName, price: priceVal });
+      localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
+      renderDatabaseList();
+    }
+  }
+}
       function renderDatabaseList() {
         dbItemsList.innerHTML = "";
         const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
