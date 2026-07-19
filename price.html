@@ -812,7 +812,10 @@ document.getElementById("dbPrice").value = item.price;
           }
 
           if (currentMode === 'bill') {
-            const m = text.match(/([0-9.\s()+\-*/^]+)$/);
+            // Extract expression: find the last part that looks like a calculation
+// First, strip common units from the text for matching purposes
+const strippedForMatch = text.replace(/\b(rs|c|kg|g|ml|ltr|pcs|pc|pack|box|gram|cartoon|bag|dozen)\b/gi, '');
+const m = strippedForMatch.match(/([0-9.\s()+\-*/^]+)$/);
             if(m){
               const expr = m[1].trim();
               if(expr && /[0-9]/.test(expr)) val = evalExpr(expr);
