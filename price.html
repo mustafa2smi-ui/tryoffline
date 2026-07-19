@@ -540,6 +540,7 @@ window.resumeHardwareScanning = resumeHardwareScanning;
   }
 }
 */
+      /*
       function parseAndSaveNewItem(text) {
   const cleanText = text.trim();
   if (!cleanText) return;
@@ -567,7 +568,7 @@ window.resumeHardwareScanning = resumeHardwareScanning;
     // Case: "10rs" or "10" or "500ml"
     priceVal = parseFloat(simpleNumberMatch[1]);
     canSave = true;
-  } else if (plainPriceMatch && !/[+\-*/^]/.test(restText)) {
+  } else if (plainPriceMatch && !/[+\-/^]/.test(restText)) {
     // Case: "1 bag 2500" → extracts 2500
     // But NOT: "150*10" (has operator)
     priceVal = parseFloat(plainPriceMatch[1]);
@@ -578,6 +579,59 @@ window.resumeHardwareScanning = resumeHardwareScanning;
     const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase());
     if (!exists) {
       // Generate a code
+      const code = (itemDatabase.length + 101).toString();
+      itemDatabase.push({ code, name: itemName, price: priceVal });
+      localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
+      renderDatabaseList();
+    }
+  }
+}
+    */
+      function parseAndSaveNewItem(text) {
+  const cleanText = text.trim();
+  if (!cleanText) return;
+
+  // Split into words
+  const words = cleanText.split(/\s+/);
+  if (words.length < 2) return;
+
+  // First word = item name
+  const itemName = words[0];
+  
+  // Rest = potential price/expression
+  const restPart = words.slice(1).join(' ');
+  
+  // Clean: remove units and currency symbols
+  const cleaned = restPart
+    .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
+    .replace(/[₹$€£]/g, '')
+    .trim();
+  
+  if (!itemName || !cleaned) return;
+
+  // Split cleaned part into tokens
+  const tokens = cleaned.split(/\s+/);
+  
+  // Look for a standalone number (no operators) to save as price
+  let priceVal = 0;
+  
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const token = tokens[i];
+    // Only save if it's a plain number (no operators)
+    if (/^[0-9.]+$/.test(token)) {
+      priceVal = parseFloat(token);
+      break;
+    }
+    // If we hit an operator, don't save (it's an expression)
+    if (/[+\-*/^]/.test(token)) {
+      break;
+    }
+  }
+
+  // Save to database if valid
+  if (itemName && priceVal > 0) {
+    const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+    if (!exists) {
       const code = (itemDatabase.length + 101).toString();
       itemDatabase.push({ code, name: itemName, price: priceVal });
       localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
@@ -750,17 +804,20 @@ document.getElementById("dbPrice").value = item.price;
         });
 
         input.addEventListener("keydown", function(e){
-          if(e.key === "Enter"){
-            e.preventDefault();
-            if(input.textContent.trim() !== ""){
-              container.appendChild(makeRow(container.children.length));
-              updateSL();
-              render();
-              const lastInput = container.lastChild.querySelector(".input");
-              lastInput.focus();
-              scrollToActiveInput(lastInput);
-            }
-          }
+  if(e.key === "Enter"){
+    e.preventDefault();
+    const currentText = input.textContent.trim();
+    if(currentText !== ""){
+      // Try to save to database before creating new row
+      parseAndSaveNewItem(currentText);
+      container.appendChild(makeRow(container.children.length));
+      updateSL();
+      render();
+      const lastInput = container.lastChild.querySelector(".input");
+      lastInput.focus();
+      scrollToActiveInput(lastInput);
+    }
+  }
           if(e.key === "Backspace" && input.textContent.trim() === ""){
             if(container.children.length > 1){
               e.preventDefault();
