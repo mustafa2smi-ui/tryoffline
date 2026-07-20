@@ -460,6 +460,7 @@
         document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
       };
 */
+      /*
             window.requestOTP = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
         if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
@@ -503,6 +504,62 @@
           }
         } catch(e) { alert("Network Connection Error! Check data status."); }
         document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+      };
+*/
+            window.requestOTP = async function() {
+        let emailVal = authEmail.value.trim().toLowerCase();
+        if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+        document.getElementById("btnSendRequest").innerText = "Checking Records System...";
+        
+        try {
+          let res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'requestOTP', email: emailVal })
+          }).then(r => r.json());
+
+          // 🚨 DOUBLE CHECK & SCAN LAYER TRIGGER
+          if(res.exists) {
+            // 1. Inputs aur purane buttons ko instant gayab (hide) karein
+            document.getElementById("authEmail").style.display = "none";
+            document.getElementById("btnSendRequest").style.display = "none";
+            document.getElementById("btnInstantVerify").style.display = "none";
+            
+            // 2. Dynamic subject aur clear email body ready karein
+            let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+            let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai aur yeh database mein already registered dikha raha hai. Kripya mujhe aage ka subscription plan active karwana hai.`);
+            
+            // 3. Exact yellow formatting box aur dynamic Direct Gmail Link Render karein
+            authMessage.innerHTML = `
+              <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
+                <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 8px; font-size: 16px;'>🚨 Email Already Registered!</span>
+                Aapka email ID hamare database me entry hai. Kripya aap apne gmail me jakar msg likhe ki aap kya chahte hai trial/subscription plan.
+              </div>
+              <a href="mailto:${ADMIN_EMAIL_ADDRESS}?subject=${customMailSubject}&body=${customMailBody}" class="btn" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 46px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Open Gmail to Message Admin ✉️</a>
+            `;
+            return; // Engine ko yahin rokh dein taaki baaki niche ka code na chale
+          }
+
+          if(res.success) {
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            emailSection.style.display = 'none';
+            otpSection.style.display = 'block';
+            authMessage.innerHTML = `Dynamic 6-digit access OTP security pass token successfully sent across email address matching destination: <b>${emailVal}</b>`;
+          } else {
+            alert(res.message);
+          }
+        } catch(e) { 
+          // Agar network error sacha hai toh hi alert aaye, duplicate status par block na kare
+          console.error("Diagnostic error logic:", e);
+          alert("Processing pipeline issue. Agar email registered hai toh Admin Status Check karein."); 
+        }
+        
+        // Button reset state reset safe gate context if not blocked above
+        if(document.getElementById("btnSendRequest")) {
+          document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+        }
       };
 
       window.verifyOTP = async function() {
