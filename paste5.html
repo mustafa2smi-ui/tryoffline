@@ -506,6 +506,7 @@
         document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
       };
 */
+      /*
             window.requestOTP = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
         if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
@@ -559,6 +560,65 @@
         // Button reset state reset safe gate context if not blocked above
         if(document.getElementById("btnSendRequest")) {
           document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+        }
+      };
+*/
+            window.requestOTP = async function() {
+        let emailVal = authEmail.value.trim().toLowerCase();
+        if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+        // 🛡️ ULTRA-SIMPLE FRONTEND SCANNED CHECK LAYER
+        // Agar user ka purana email local history me entry hai, toh direct yellow box dikhao bina server ke jhamela ke
+        if(userLicence.email && userLicence.email.toLowerCase() === emailVal) {
+          
+          // 1. Sirf input box aur purane buttons ko change/chhupa dena hai
+          document.getElementById("authEmail").style.display = "none";
+          document.getElementById("btnSendRequest").style.display = "none";
+          document.getElementById("btnInstantVerify").style.display = "none";
+          
+          // 2. Dynamic support mail content allocation parameters mapping
+          let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+          let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai aur yeh database mein already registered dikha raha hai. Kripya mujhe aage ka subscription plan active karwana hai.`);
+          
+          // 3. Render exact yellow message and clean Gmail button
+          authMessage.innerHTML = `
+            <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
+              <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 6px; font-size: 15px;'>🚨 Email Already Registered!</span>
+              Aapka email ID hamare database me entry hai. Kripya aap apne gmail me jakar msg likhe ki aap kya chahte hai trial/subscription plan.
+            </div>
+            <a href="mailto:${ADMIN_EMAIL_ADDRESS}?subject=${customMailSubject}&body=${customMailBody}" class="btn" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 45px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail to Message Admin ✉️</a>
+          `;
+          return; // Stop processing right here
+        }
+
+        // ------------------------------------------------------------------
+        // Baaki aapka pehle wala original code bina kisi chhed-chhad ke:
+        // ------------------------------------------------------------------
+        document.getElementById("btnSendRequest").innerText = "Sending OTP Token...";
+        document.getElementById("btnSendRequest").disabled = true;
+        generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+        try {
+          console.log("Dev OTP Diagnostic Bypass:", generatedOTP);
+          await fetch(`${gasUrl}?action=register&email=${encodeURIComponent(emailVal)}&otp=${generatedOTP}`, { mode: 'no-cors' });
+          
+          userLicence.email = emailVal;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          
+          emailSection.style.display = 'none';
+          otpSection.style.display = 'block';
+          authMessage.innerHTML = `Dynamic 6-digit access OTP security pass token successfully sent across email address matching destination: <b>${emailVal}</b>`;
+        } catch(err) {
+          userLicence.email = emailVal;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          emailSection.style.display = 'none';
+          otpSection.style.display = 'block';
+          authMessage.innerHTML = "Offline Verification active. Code is printed on dev console.";
+        } finally {
+          if(document.getElementById("btnSendRequest")) {
+            document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+            document.getElementById("btnSendRequest").disabled = false;
+          }
         }
       };
 
