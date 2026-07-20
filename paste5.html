@@ -426,7 +426,7 @@
         authTitle.style.color = "var(--danger)";
         authMessage.innerHTML = message;
       }
-/*
+
       // Expose globally parsed trigger nodes functions safely for explicit button hooks interface actions
       window.requestOTP = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
@@ -459,7 +459,7 @@
         } catch(e) { alert("Network Connection Error! Check data status."); }
         document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
       };
-*/
+
       /*
             window.requestOTP = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
@@ -563,6 +563,7 @@
         }
       };
 */
+      /*
             window.requestOTP = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
         if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
@@ -621,7 +622,7 @@
           }
         }
       };
-
+*/
       window.verifyOTP = async function() {
         let otpVal = authOTP.value.trim();
         if(!otpVal) return alert('Enter validation token pin code');
