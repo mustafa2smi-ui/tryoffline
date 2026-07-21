@@ -1371,7 +1371,7 @@ async function autoTranslateText(text) {
   }
 }
 */
-     /* ---------- 🖨️ PAYWALL MODAL CONTROLLER FUNCTIONS ---------- */
+     /* ---------- 🖨️ PAYWALL MODAL CONTROLLER FUNCTIONS ---------- *
 
 // 1. Paywall Modal Ko Khoolne Ka Function
 function openPrintPaywall() {
@@ -1395,7 +1395,7 @@ function goToSubscriptionPage() {
   window.location.replace("paste5.html"); // Aapka Subscription Page
 }
 
-/* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH SUBSCRIPTION LOCK ---------- */
+/* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH SUBSCRIPTION LOCK ---------- *
 async function printBill() {
   // 🔒 1. Global Paywall Interceptor Check
   let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
@@ -1452,8 +1452,8 @@ async function printBill() {
         let rawLineText = rowItem.text;
         
         if (/[^\x00-\x7F]/.test(rawLineText)) {
-          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
-          let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*\,}^]+/g, " ").trim();
+          let mathPart = rawLineText.replace(/[^\d.\s()+\-*\^]+/g, " ").trim();
           
           if(wordsPart) {
             let translatedWords = await autoTranslateText(wordsPart);
@@ -1493,7 +1493,7 @@ async function printBill() {
   }
 }
 
-/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- */
+/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- *
 async function autoTranslateText(text) {
   if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
@@ -1506,7 +1506,7 @@ async function autoTranslateText(text) {
   }
 }
 
-/* ---------- 🎯 EVENT BINDING ---------- */
+/* ---------- 🎯 EVENT BINDING ---------- *
 // Computer/A4 Print Function Me Bi Interceptor Attach Karein (Safety Layer)
 if (typeof executeComputerBrowserPrint === "function") {
   const originalCompPrint = executeComputerBrowserPrint;
@@ -1524,6 +1524,162 @@ if (typeof executeComputerBrowserPrint === "function") {
 if(document.getElementById("printBtn")) {
   document.getElementById("printBtn").addEventListener("click", printBill);
 }
+*/
+      /* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE (NO MORE INCOGNITO NEEDED) ---------- */
+(function() {
+  // Har page refresh par unique timestamp token generate karke browser cache bypass karta hai
+  let currentToken = new Date().getTime();
+  if (!window.location.href.includes("v_token=")) {
+    // History Replace karke silently fresh URL inject karta hai
+    let separator = window.location.href.includes("?") ? "&" : "?";
+    window.history.replaceState(null, "", window.location.href + separator + "v_token=" + currentToken);
+  }
+})();
+
+/* ---------- 🖨️ PAYWALL MODAL CONTROLLER FUNCTIONS (GLOBAL BINDING) ---------- */
+
+// 1. Paywall Modal Ko Kholne Ka Function
+window.openPrintPaywall = function() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "flex";
+  } else {
+    alert("Pro Feature Locked! Kripya Subscription Plan active karein.");
+  }
+};
+
+// 2. Not Now Button (Modal Close Karega)
+window.closePrintPaywall = function() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+};
+
+// 3. Get Subscription Button (Current Page Close / Replace Karke Naya Page Kholega)
+window.goToSubscriptionPage = function() {
+  try {
+    // Current page ko history se replace karke direct subscription page kholega
+    window.location.replace("paste5.html"); 
+  } catch (err) {
+    window.location.href = "paste5.html"; // Fallback Link
+  }
+};
+
+/* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH SUBSCRIPTION LOCK ---------- */
+async function printBill() {
+  // 🔒 1. Global Paywall Interceptor Check
+  let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+  
+  if (!userLicence.isVerified) {
+    window.openPrintPaywall(); // Square Modal Box Open Karega
+    return; // Print execution yahin rok do!
+  }
+
+  // 🔒 2. Validation: Items Check
+  let validRows = [];
+  if (typeof container !== 'undefined' && container.children) {
+    [...container.children].forEach(row => {
+      const itemText = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+      const itemTotal = row.querySelector(".result") ? row.querySelector(".result").textContent.trim() : "";
+      if(itemText) validRows.push({ text: itemText, total: itemTotal });
+    });
+  }
+
+  if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
+  
+  // 🔒 3. Computer / A4 Print Mode Check
+  const currentPrintMode = (typeof printModeSelect !== 'undefined') ? printModeSelect.value : 'COMP';
+  if (currentPrintMode === 'COMP') {
+    if (typeof executeComputerBrowserPrint === "function") {
+      executeComputerBrowserPrint();
+    } else {
+      window.print();
+    }
+    return;
+  }
+
+  // 🔒 4. Thermal Bluetooth Print Execution Mode
+  try {
+    if (!printerDevice) {
+      printerDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: 'Bluetooth' }, { namePrefix: 'SRS' }, { namePrefix: 'MPT' }, { namePrefix: 'MTP' }],
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+    }
+    const server = await printerDevice.gatt.connect();
+    const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+    const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+    const shopTitle = (document.getElementById("shopNameInput")) ? document.getElementById("shopNameInput").value || 'Notebook Bill' : 'Notebook Bill';
+    const cName = (document.getElementById('custNameInput')) ? document.getElementById('custNameInput').textContent.trim() || "Cash Customer" : "Cash Customer";
+
+    let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
+    esc += '\x1B\x61\x00Date: ' + (typeof dateEl !== 'undefined' ? dateEl.textContent : '') + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+    esc += 'S.No Item                      Amt\n';
+    esc += '--------------------------------\n';
+    
+    for (let i = 0; i < validRows.length; i++) {
+      let rowItem = validRows[i];
+      let finalPrintName = "";
+
+      if (currentPrintMode === 'MULTI') {
+        finalPrintName = rowItem.text;
+      } else {
+        let rawLineText = rowItem.text;
+        if (/[^\x00-\x7F]/.test(rawLineText)) {
+          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
+          let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+          
+          if(wordsPart && typeof autoTranslateText === "function") {
+            let translatedWords = await autoTranslateText(wordsPart);
+            rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
+          }
+        }
+        finalPrintName = rawLineText.replace(/[^\x00-\x7F]/g, "").trim() || "Item Row";
+      }
+
+      let sNo = (i + 1).toString().padEnd(3, ' ');
+      let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
+      let amtStr = cleanAmt.padStart(9, ' ');
+      
+      let nameSpace = 32 - sNo.length - amtStr.length;
+      let choppedName = finalPrintName.substring(0, nameSpace).padEnd(nameSpace, ' ');
+
+      esc += sNo + choppedName + amtStr + "\n";
+    }
+    
+    let totalTextVal = (typeof totalBox !== 'undefined') ? totalBox.textContent : '0';
+    let finalCleanTotal = totalTextVal.replace(/[₹रु]/g, 'Rs.');
+    esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
+    
+    let encoder = new TextEncoder("utf-8");
+    if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
+    
+    const data = encoder.encode(esc);
+    const chunkSize = 100;
+    for (let i = 0; i < data.length; i += chunkSize) {
+      await characteristic.writeValue(data.slice(i, i + chunkSize));
+      await new Promise(r => setTimeout(r, 50));
+    }
+    alert("Printed successfully! 🎉");
+  } catch (error) {
+    alert("Print Error: " + error.message);
+    printerDevice = null;
+  }
+}
+
+/* ---------- 🎯 EVENT BINDING & INTERCEPTOR ---------- */
+document.addEventListener("DOMContentLoaded", function() {
+  const printBtn = document.getElementById("printBtn");
+  if (printBtn) {
+    // Direct Event Binding
+    printBtn.onclick = function(e) {
+      e.preventDefault();
+      printBill();
+    };
+  }
+});
 
       function renderBillsHistoryList() {
         dbBillsHistoryList.innerHTML = "";
