@@ -152,6 +152,45 @@
   </style>
 </head>
 <body>
+<!-- 🔒 PRO FEATURES ACCESS & ACTIVATION OVERLAY -->
+<div id="authLockScreen" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(5px);">
+  <div style="background: #1e272e; border: 2px solid #3498db; border-radius: 12px; width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; color: white; font-family: sans-serif;">
+    
+    <h2 id="authTitle" style="margin-top: 0; color: #3498db; font-size: 20px;">🔒 Pro Features Subscription</h2>
+    
+    <!-- Dynamic Notice / Warning Box -->
+    <div id="authMessage" style="margin-bottom: 20px; font-size: 14px; line-height: 1.5; color: #dcdde1;">
+      Pro features (Thermal Printing, Custom Reports, etc.) ka upyog karne ke liye apna registered Email daal kar Activation Status verify karein ya new plan request karein.
+    </div>
+
+    <!-- EMAIL INPUT SECTION -->
+    <div id="emailSection">
+      <input type="email" id="authEmail" placeholder="Enter Registered Gmail ID" style="width: 100%; height: 45px; border-radius: 6px; border: 1px solid #485460; background: #2f3640; color: white; padding: 0 12px; box-sizing: border-box; font-size: 15px; margin-bottom: 12px; outline: none;">
+      
+      <button id="btnInstantVerify" onclick="checkDeviceLockInstant()" style="width: 100%; height: 45px; background: linear-gradient(to bottom, #2ecc71, #27ae60); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">
+        Check Current Activation Status 🔄
+      </button>
+
+      <button id="btnSendRequest" onclick="requestOTP()" style="width: 100%; height: 45px; background: linear-gradient(to bottom, #3498db, #2980b9); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2);">
+        Request Pro Activation 🚀
+      </button>
+    </div>
+
+    <!-- OTP INPUT SECTION -->
+    <div id="otpSection" style="display: none;">
+      <input type="text" id="authOTP" placeholder="Enter 6-Digit OTP Token" maxlength="6" style="width: 100%; height: 45px; border-radius: 6px; border: 1px solid #485460; background: #2f3640; color: white; padding: 0 12px; box-sizing: border-box; font-size: 18px; letter-spacing: 4px; text-align: center; margin-bottom: 12px; outline: none;">
+      
+      <button onclick="verifyOTP()" style="width: 100%; height: 45px; background: linear-gradient(to bottom, #e67e22, #d35400); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;">
+        Verify & Unlock Features 🔓
+      </button>
+      
+      <button onclick="cancelOTPFlow()" style="background: transparent; color: #95a5a6; border: none; text-decoration: underline; cursor: pointer; font-size: 13px;">
+        ← Back to Email
+      </button>
+    </div>
+
+  </div>
+</div>
 
   <div class="wrap">
     
@@ -287,6 +326,166 @@
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
       const csvBtn = document.getElementById("csvBtn");
+      // 🌐 Global Config Variables
+      const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_LIVE_URL_HERE"; 
+      const ADMIN_EMAIL_ADDRESS = "support@webmy.in"; // Aapka Admin Email
+
+      // Local License Memory Initialization
+      let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+        email: "",
+        token: "",
+        isVerified: false
+      };
+
+      // HTML Element References
+      const authLockScreen = document.getElementById("authLockScreen");
+      const authTitle = document.getElementById("authTitle");
+      const authMessage = document.getElementById("authMessage");
+      const emailSection = document.getElementById("emailSection");
+      const otpSection = document.getElementById("otpSection");
+      const authEmail = document.getElementById("authEmail");
+
+      // Auto-Fill Saved Email If Present
+      if(userLicence.email && authEmail) {
+        authEmail.value = userLicence.email;
+      }
+
+      // 🔍 1. INSTANT ACTIVATION VERIFICATION (Check Status Button)
+      window.checkDeviceLockInstant = async function() {
+        let emailVal = authEmail.value.trim().toLowerCase();
+        
+        if(!emailVal && userLicence.email) {
+          emailVal = userLicence.email.toLowerCase();
+        }
+
+        if(!emailVal || !emailVal.includes("@")) {
+          return alert('Kripya pehle valid Email ID enter karein!');
+        }
+
+        const btnVerify = document.getElementById("btnInstantVerify");
+        if(btnVerify) btnVerify.innerText = "Connecting Live Cloud Server...";
+        
+        try {
+          // Direct GET Request with Token Match
+          let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(userLicence.token || '')}`, {
+            method: 'GET'
+          }).then(r => r.json());
+
+          if(res.authorized) {
+            userLicence.isVerified = true;
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            
+            alert("🎉 Access Granted: Active! Features Unlocked.");
+            
+            if(authLockScreen) authLockScreen.style.display = "none";
+            location.reload(); // Refresh Page to enable Pro Features
+          } else {
+            alert("Status: Admin ne abhi tak Status 'Active' nahi kiya hai ya email registered nahi hai.");
+          }
+        } catch(e) { 
+          alert("Connection drop! Check internet and try again."); 
+        }
+        
+        if(btnVerify) btnVerify.innerText = "Check Current Activation Status 🔄";
+      };
+
+      // 🚀 2. REQUEST PRO ACTIVATION / OTP FUNCTION
+      window.requestOTP = async function() {
+        let emailVal = authEmail.value.trim().toLowerCase();
+        if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+        const btnSend = document.getElementById("btnSendRequest");
+        if(btnSend) btnSend.innerText = "Checking Records System...";
+        
+        try {
+          let res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'requestOTP', email: emailVal })
+          }).then(r => r.json());
+
+          if(res.success) {
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            emailSection.style.display = 'none';
+            otpSection.style.display = 'block';
+            authMessage.innerHTML = `6-Digit Activation Token sent to email: <b>${emailVal}</b>`;
+          } else {
+            if(res.exists) {
+              // Hide Buttons & Inputs for Already Registered Mail
+              if(authEmail) authEmail.style.display = "none";
+              if(document.getElementById("btnSendRequest")) document.getElementById("btnSendRequest").style.display = "none";
+              if(document.getElementById("btnInstantVerify")) document.getElementById("btnInstantVerify").style.display = "none";
+
+              let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+              let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai aur yeh database mein already registered dikha raha hai. Kripya mujhe aage ka subscription plan active karwana hai.`);
+
+              authMessage.innerHTML = `
+                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
+                  <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 6px; font-size: 15px;'>🚨 Email Already Registered!</span>
+                  Aapka email ID hamare database me entry hai. Kripya aap apne gmail me jakar msg likhe ki aap kya chahte hai trial/subscription plan.
+                </div>
+                <a href="mailto:${ADMIN_EMAIL_ADDRESS}?subject=${customMailSubject}&body=${customMailBody}" target="_blank" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 45px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Open Gmail to Message Admin ✉️</a>
+              `;
+            } else {
+              alert(res.message);
+            }
+          }
+        } catch(e) { 
+          alert("Network Connection Error! Check data status."); 
+        }
+
+        if(btnSend) btnSend.innerText = "Request Pro Activation 🚀";
+      };
+
+      // 🔑 3. VERIFY OTP TOKEN FUNCTION
+      window.verifyOTP = async function() {
+        let otpVal = document.getElementById("authOTP").value.trim();
+        let emailVal = userLicence.email || authEmail.value.trim().toLowerCase();
+
+        if(!otpVal || otpVal.length !== 6) return alert("Kripya 6-digit OTP enter karein!");
+
+        try {
+          let res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'verifyOTP', email: emailVal, otp: otpVal })
+          }).then(r => r.json());
+
+          if(res.success) {
+            userLicence.token = res.token; // Save Token Provided By Backend
+            userLicence.isVerified = true;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+            alert("🎉 OTP Verified Successfully! Feature Unlocked.");
+            if(authLockScreen) authLockScreen.style.display = "none";
+            location.reload();
+          } else {
+            alert(res.message || "Invalid OTP Token!");
+          }
+        } catch(e) {
+          alert("Verification Failed! Check Internet.");
+        }
+      };
+
+      // 🔙 4. CANCEL OTP FLOW
+      window.cancelOTPFlow = function() {
+        if(emailSection) emailSection.style.display = 'block';
+        if(otpSection) otpSection.style.display = 'none';
+        if(authEmail) authEmail.style.display = "block";
+        if(document.getElementById("btnSendRequest")) document.getElementById("btnSendRequest").style.display = "block";
+        if(document.getElementById("btnInstantVerify")) document.getElementById("btnInstantVerify").style.display = "block";
+      };
+
+      // 🛡️ 5. FEATURE LOCK INTERCEPTOR (Triggered on Restricted Actions like Print)
+      function requireProFeatureAccess() {
+        if (!userLicence.isVerified) {
+          if(authLockScreen) authLockScreen.style.display = "flex";
+          return false; // Stop Execution
+        }
+        return true; // Access Allowed
+      }
 
       // 🔥 SCANNER VARIABLES (from first code)
       let html5QrCode = null;
