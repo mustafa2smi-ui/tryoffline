@@ -1255,44 +1255,9 @@ document.getElementById("dbPrice").value = item.price;
       }
       printBtn.addEventListener("click", printBill);
 */
-      // 1. Paywall Modal Ko Khoolne Ka Function
-function openPrintPaywall() {
-  const modal = document.getElementById("printPaywallModal");
-  if (modal) {
-    modal.style.display = "flex";
-  }
-}
+      
 
-// 2. Not Now Button (Modal Close Karega)
-function closePrintPaywall() {
-  const modal = document.getElementById("printPaywallModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
-}
-
-// 3. Get Subscription Button (Current Page Close / Replace Karke Naya Page Kholega)
-function goToSubscriptionPage() {
-  // 'replace' se current page browser history se hat jayega aur subscription page khul jayega
-  window.location.replace("paste5.html"); // 👈 Yahan apne subscription page ka exact file name dalein
-}
-
-// 4. Print Button Check (Print Trigger Function)
-function triggerPrintAction() {
-  // Local licence state check
-  let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
-
-  // Agar user verified/active NAHI hai -> Alert Box Prompt Dikhao
-  if (!userLicence.isVerified) {
-    openPrintPaywall();
-    return false;
-  }
-
-  // Agar User Active hai -> Actual Printing Trigger Karo
-  window.print();
-}
-
-      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TRANSLATION & ALIGNMENT ---------- */
+      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TRANSLATION & ALIGNMENT ---------- *
 async function printBill() {
     // 🔒 Global Print Interceptor Check
   let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
@@ -1331,7 +1296,7 @@ async function printBill() {
     const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
 
     let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
-    /*esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\nS.No Item                     Amount\n--------------------------------\n';*/
+    /*esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\nS.No Item                     Amount\n--------------------------------\n';*\
 esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
 esc += 'S.No Item                      Amt\n';
 esc += '--------------------------------\n';
@@ -1348,8 +1313,8 @@ esc += '--------------------------------\n';
         // Check if line contains Hindi, Tamil, Urdu or regional characters
         if (/[^\x00-\x7F]/.test(rawLineText)) {
           // Splitting logic: Text words ko math characters aur numbers se alag karna
-          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
-          let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*\^]+/g, " ").trim();
+          let mathPart = rawLineText.replace(/[^\d.\s()+\-*\^]+/g, " ").trim();
           
           if(wordsPart) {
             let translatedWords = await autoTranslateText(wordsPart);
@@ -1393,7 +1358,7 @@ esc += '--------------------------------\n';
 }
 printBtn.addEventListener("click", printBill);
 
-/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- */
+/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- *
 async function autoTranslateText(text) {
   if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
@@ -1404,6 +1369,160 @@ async function autoTranslateText(text) {
   } catch (e) { 
     return text; // Fallback in case of server timeout network drops
   }
+}
+*/
+     /* ---------- 🖨️ PAYWALL MODAL CONTROLLER FUNCTIONS ---------- */
+
+// 1. Paywall Modal Ko Khoolne Ka Function
+function openPrintPaywall() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+// 2. Not Now Button (Modal Close Karega)
+function closePrintPaywall() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+// 3. Get Subscription Button (Current Page Close / Replace Karke Naya Page Kholega)
+function goToSubscriptionPage() {
+  // 'replace' se current page browser history se hat jayega aur subscription page khul jayega
+  window.location.replace("paste5.html"); // Aapka Subscription Page
+}
+
+/* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH SUBSCRIPTION LOCK ---------- */
+async function printBill() {
+  // 🔒 1. Global Paywall Interceptor Check
+  let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+  if (!userLicence.isVerified) {
+    openPrintPaywall(); // Square Modal Box Open Karega
+    return; // Print execution yahin rok do!
+  }
+
+  // 🔒 2. Validation: Items Check
+  let validRows = [];
+  [...container.children].forEach(row => {
+    const itemText = row.querySelector(".input").textContent.trim();
+    const itemTotal = row.querySelector(".result").textContent.trim();
+    if(itemText) validRows.push({ text: itemText, total: itemTotal });
+  });
+
+  if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
+  
+  // 🔒 3. Computer / A4 Print Mode Check
+  const currentPrintMode = printModeSelect.value;
+  if (currentPrintMode === 'COMP') {
+    executeComputerBrowserPrint();
+    return;
+  }
+
+  // 🔒 4. Thermal Bluetooth Print Execution Mode
+  try {
+    if (!printerDevice) {
+      printerDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: 'Bluetooth' }, { namePrefix: 'SRS' }, { namePrefix: 'MPT' }, { namePrefix: 'MTP' }],
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+    }
+    const server = await printerDevice.gatt.connect();
+    const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+    const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+    const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
+    const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
+
+    let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
+    esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+    esc += 'S.No Item                      Amt\n';
+    esc += '--------------------------------\n';
+    
+    for (let i = 0; i < validRows.length; i++) {
+      let rowItem = validRows[i];
+      let finalPrintName = "";
+
+      if (currentPrintMode === 'MULTI') {
+        finalPrintName = rowItem.text;
+      } else {
+        // ENG Mode: Smart Multi-Language Word Extraction & Translation Engine
+        let rawLineText = rowItem.text;
+        
+        if (/[^\x00-\x7F]/.test(rawLineText)) {
+          let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
+          let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+          
+          if(wordsPart) {
+            let translatedWords = await autoTranslateText(wordsPart);
+            rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
+          }
+        }
+        finalPrintName = rawLineText.replace(/[^\x00-\x7F]/g, "").trim() || "Item Row";
+      }
+
+      // Strict 32-Column Thermal Space Alignment Blueprint
+      let sNo = (i + 1).toString().padEnd(3, ' ');
+      let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
+      let amtStr = cleanAmt.padStart(9, ' ');
+      
+      let nameSpace = 32 - sNo.length - amtStr.length;
+      let choppedName = finalPrintName.substring(0, nameSpace).padEnd(nameSpace, ' ');
+
+      esc += sNo + choppedName + amtStr + "\n";
+    }
+    
+    let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
+    esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
+    
+    let encoder = new TextEncoder("utf-8");
+    if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
+    
+    const data = encoder.encode(esc);
+    const chunkSize = 100;
+    for (let i = 0; i < data.length; i += chunkSize) {
+      await characteristic.writeValue(data.slice(i, i + chunkSize));
+      await new Promise(r => setTimeout(r, 50));
+    }
+    alert("Printed successfully! 🎉");
+  } catch (error) {
+    alert("Print Error: " + error.message);
+    printerDevice = null;
+  }
+}
+
+/* ---------- 🔥 CORE TRANSLATION ENGINE MODULE ---------- */
+async function autoTranslateText(text) {
+  if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data[0][0][0];
+  } catch (e) { 
+    return text;
+  }
+}
+
+/* ---------- 🎯 EVENT BINDING ---------- */
+// Computer/A4 Print Function Me Bi Interceptor Attach Karein (Safety Layer)
+if (typeof executeComputerBrowserPrint === "function") {
+  const originalCompPrint = executeComputerBrowserPrint;
+  executeComputerBrowserPrint = function() {
+    let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+    if (!userLicence.isVerified) {
+      openPrintPaywall();
+      return;
+    }
+    originalCompPrint();
+  };
+}
+
+// Print Button Click Event Listener
+if(document.getElementById("printBtn")) {
+  document.getElementById("printBtn").addEventListener("click", printBill);
 }
 
       function renderBillsHistoryList() {
