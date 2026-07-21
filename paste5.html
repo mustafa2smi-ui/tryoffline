@@ -418,7 +418,7 @@ const guestTrialLimit = 1 * 60 * 1000; // 1 Minute (Page kholne ke 1 min baad hi
           }
         }
       }
-
+/*
       function lockAppCompletely(title, message) {
         authLockScreen.style.display = "flex";
         emailSection.style.display = "none";
@@ -459,6 +459,58 @@ const guestTrialLimit = 1 * 60 * 1000; // 1 Minute (Page kholne ke 1 min baad hi
           }
         } catch(e) { alert("Network Connection Error! Check data status."); }
         document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+      };
+*/
+            window.requestOTP = async function() {
+        let emailVal = authEmail.value.trim().toLowerCase();
+        if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+        document.getElementById("btnSendRequest").innerText = "Checking Records System...";
+        
+        try {
+          let res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action: 'requestOTP', email: emailVal })
+          }).then(r => r.json());
+
+          if(res.success) {
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            emailSection.style.display = 'none';
+            otpSection.style.display = 'block';
+            authMessage.innerHTML = `Dynamic 6-digit access OTP security pass token successfully sent across email address matching destination: <b>${emailVal}</b>`;
+          } else {
+            if(res.exists) {
+              // 1. Hide Input Box & Action Buttons
+              if(authEmail) authEmail.style.display = "none";
+              if(document.getElementById("btnSendRequest")) document.getElementById("btnSendRequest").style.display = "none";
+              if(document.getElementById("btnInstantVerify")) document.getElementById("btnInstantVerify").style.display = "none";
+
+              // 2. Format Mail Body Parameters
+              let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+              let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai aur yeh database mein already registered dikha raha hai. Kripya mujhe aage ka subscription plan active karwana hai.`);
+              let adminEmail = (typeof ADMIN_EMAIL_ADDRESS !== 'undefined' && ADMIN_EMAIL_ADDRESS) ? ADMIN_EMAIL_ADDRESS : "support@webmy.in";
+
+              // 3. Render Yellow Notice Box + Direct Gmail Action Link Button
+              authMessage.innerHTML = `
+                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
+                  <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 6px; font-size: 15px;'>🚨 Email Already Registered!</span>
+                  ${res.message}
+                </div>
+                <a href="mailto:${adminEmail}?subject=${customMailSubject}&body=${customMailBody}" target="_blank" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 45px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Open Gmail to Message Admin ✉️</a>
+              `;
+            } else {
+              alert(res.message);
+            }
+          }
+        } catch(e) { 
+          alert("Network Connection Error! Check data status."); 
+        }
+
+        if(document.getElementById("btnSendRequest")) {
+          document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
+        }
       };
 
       /*
