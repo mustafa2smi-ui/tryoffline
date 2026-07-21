@@ -253,7 +253,11 @@
         <div style="display: flex; gap: 4px;">
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
           <!-- 🖨️ DETACHED HARDWARE PRINT ROUTER IMPLEMENTATION BUTTON -->
-          <button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>
+          <!--<button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>-->
+          <!-- Example Print Button -->
+<button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice" onclick="triggerPrintAction()">🖨️</button>
+
+
           <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
           <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
           <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
@@ -262,6 +266,40 @@
     </div>
 
   </div>
+<!-- 🖨️ PRO PRINTING SUBSCRIPTION ALERT MODAL (SQUARE BOX STYLE) -->
+<div id="printPaywallModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 999999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px);">
+  
+  <!-- Square Alert Box Container -->
+  <div style="background: #ffffff; border: 3px solid #2c3e50; border-radius: 4px; width: 100%; max-width: 360px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box;">
+    
+    <!-- Lock Icon & Header -->
+    <div style="font-size: 38px; margin-bottom: 8px;">🖨️🔒</div>
+    <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+      Unlock Printing
+    </h3>
+
+    <!-- Custom Message Body -->
+    <p style="margin: 0 0 20px 0; color: #576574; font-size: 14px; line-height: 1.5; font-weight: 500;">
+      Thermal printing aur billing features ko unlock karne ke liye aapko Pro Subscription plan lena hoga.
+    </p>
+
+    <!-- Action Buttons Container -->
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      
+      <!-- Not Now Button -->
+      <button onclick="closePrintPaywall()" style="flex: 1; height: 44px; background: #c8d6e5; color: #2c3e50; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s;">
+        Not Now
+      </button>
+
+      <!-- Get Subscription Button -->
+      <button onclick="goToSubscriptionPage()" style="flex: 1.2; height: 44px; background: #10ac84; color: #ffffff; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.15); transition: 0.2s;">
+        Get Subscription 🚀
+      </button>
+
+    </div>
+
+  </div>
+</div>
 
   <script>
     (function(){
@@ -1217,6 +1255,43 @@ document.getElementById("dbPrice").value = item.price;
       }
       printBtn.addEventListener("click", printBill);
 */
+      // 1. Paywall Modal Ko Khoolne Ka Function
+function openPrintPaywall() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+// 2. Not Now Button (Modal Close Karega)
+function closePrintPaywall() {
+  const modal = document.getElementById("printPaywallModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+// 3. Get Subscription Button (Current Page Close / Replace Karke Naya Page Kholega)
+function goToSubscriptionPage() {
+  // 'replace' se current page browser history se hat jayega aur subscription page khul jayega
+  window.location.replace("paste5.html"); // 👈 Yahan apne subscription page ka exact file name dalein
+}
+
+// 4. Print Button Check (Print Trigger Function)
+function triggerPrintAction() {
+  // Local licence state check
+  let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+
+  // Agar user verified/active NAHI hai -> Alert Box Prompt Dikhao
+  if (!userLicence.isVerified) {
+    openPrintPaywall();
+    return false;
+  }
+
+  // Agar User Active hai -> Actual Printing Trigger Karo
+  window.print();
+}
+
       /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TRANSLATION & ALIGNMENT ---------- */
 async function printBill() {
   let validRows = [];
