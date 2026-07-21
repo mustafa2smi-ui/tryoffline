@@ -647,7 +647,7 @@ const guestTrialLimit = 1 * 60 * 1000; // 1 Minute (Page kholne ke 1 min baad hi
         } catch(e) { alert("Processing error."); }
         document.getElementById("btnVerifyCode").innerText = "Verify Code & Submit Request 📩";
       };
-
+/*
       window.checkDeviceLockInstant = async function() {
         let emailVal = authEmail.value.trim().toLowerCase();
         if(!emailVal) return alert('Pehle email box fill karein checking ke liye!');
@@ -677,6 +677,55 @@ const guestTrialLimit = 1 * 60 * 1000; // 1 Minute (Page kholne ke 1 min baad hi
           }
         } catch(e) { alert("Connection drop error!"); }
         document.getElementById("btnInstantVerify").innerText = "Check Current Activation Status 🔄";
+      };
+*/
+            window.checkDeviceLockInstant = async function() {
+        // Direct input box se fresh Email padhein
+        let emailVal = authEmail.value.trim().toLowerCase();
+        
+        // Agar input box khali ho, toh local memory ka email use karein
+        if(!emailVal && userLicence.email) {
+          emailVal = userLicence.email.toLowerCase();
+        }
+
+        if(!emailVal) {
+          return alert('Kripya pehle registered Email enter karein check karne ke liye!');
+        }
+
+        document.getElementById("btnInstantVerify").innerText = "Connecting Live Cloud Server...";
+        
+        try {
+          // Direct URL query string ke sath GET/POST fetch karein
+          let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}`, {
+            method: 'GET'
+          }).then(r => r.json());
+
+          if(res.authorized) {
+            // Memory update karein aur verify state TRUE karein
+            userLicence.isVerified = true;
+            userLicence.email = emailVal;
+            if(!userLicence.trialStart) userLicence.trialStart = new Date().getTime();
+            userLicence.lastKnownTime = new Date().getTime();
+            
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            
+            alert("🎉 Status Match: Active! Application Unlocked.");
+            
+            // Screen Lock Modal ko instant Hide/Close karein
+            if(authLockScreen) authLockScreen.style.display = "none";
+            
+            // App refresh karke main UI load karein
+            location.reload();
+          } else {
+            alert("Status: Admin ne abhi tak Status 'Active' nahi kiya hai ya email mismatch hai.");
+          }
+        } catch(e) { 
+          alert("Connection drop! Check internet and try again."); 
+        }
+        
+        if(document.getElementById("btnInstantVerify")) {
+          document.getElementById("btnInstantVerify").innerText = "Check Current Activation Status 🔄";
+        }
       };
 
       function tickLastKnownTime() {
