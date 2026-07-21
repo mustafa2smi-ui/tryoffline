@@ -1437,6 +1437,31 @@ async function autoTranslateText(text) {
       container.appendChild(makeRow(0));
       render();
     })();
+    // Force bind Print Button to triggerPaywall check
+document.addEventListener("DOMContentLoaded", function() {
+  const printButton = document.getElementById("printBtn");
+  if (printButton) {
+    // Purana event handler hatane ke liye clone karke replace karenge
+    const newPrintBtn = printButton.cloneNode(true);
+    printButton.parentNode.replaceChild(newPrintBtn, printButton);
+
+    // Dynamic Paywall Click Event
+    newPrintBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+
+      // Agar status active NAHI hai -> Square Prompt Modal dikhao
+      if (!userLicence.isVerified) {
+        openPrintPaywall();
+      } else {
+        window.print(); // Agar Active hai -> Direct Print
+      }
+    });
+  }
+});
+
   </script>
 </body>
 </html>
