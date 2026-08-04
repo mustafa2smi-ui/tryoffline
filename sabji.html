@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📍 Gao Ki Sabji Mandi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth horizontal scrollbar hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-slate-100 text-gray-800 pb-16">
+<body class="bg-slate-100 text-gray-800 pb-24">
 
     <!-- Header -->
     <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40 flex justify-between items-center">
         <h1 class="font-bold text-base flex items-center gap-1">🥦 Gao Sabji Mandi</h1>
-        <button onclick="toggleModal('vendorModal')" class="text-xs bg-green-900 border border-green-500 px-3 py-1.5 rounded-lg font-medium">Dukandar Login</button>
+        <button onclick="toggleModal('vendorModal')" class="text-xs bg-green-900 border border-green-500 px-3 py-1.5 rounded-full font-medium active:scale-95 transition">Dukandar Login</button>
     </header>
 
     <div class="max-w-md mx-auto p-3">
 
-        <!-- Location Filter -->
-        <div class="mb-3">
-            <label class="text-[11px] font-bold text-gray-600 mb-1 block">📍 Apni Area/Location Select Karein:</label>
-            <select id="locationFilter" onchange="filterData()" class="w-full bg-white border border-gray-300 p-2 rounded-xl text-xs font-bold shadow-sm">
-                <option value="ALL">📍 Sabhi Locations</option>
-            </select>
+        <!-- Oval Tabs (Location Filter) -->
+        <div class="mb-4">
+            <p class="text-[11px] font-bold text-gray-500 mb-2">📍 Area Select Karein:</p>
+            <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                <!-- Dynamic Oval Pills will load here -->
+            </div>
         </div>
 
         <!-- Cards Container -->
@@ -29,6 +34,38 @@
             <p class="text-center text-gray-500 text-xs py-8">Taaza Rates Load Ho Rahe Hain...</p>
         </div>
 
+    </div>
+
+    <!-- Floating Sticky Order Preview Bar -->
+    <div id="stickyOrderBar" class="hidden fixed bottom-3 left-0 right-0 max-w-md mx-auto px-3 z-30">
+        <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl flex justify-between items-center border border-slate-700">
+            <div>
+                <p id="previewItemCount" class="text-xs font-bold text-green-400">0 Items Selected</p>
+                <p class="text-[10px] text-gray-400">Tap to review list & send order</p>
+            </div>
+            <button onclick="toggleModal('orderPreviewModal')" class="bg-green-600 hover:bg-green-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1 active:scale-95 transition">
+                📋 View Order
+            </button>
+        </div>
+    </div>
+
+    <!-- Order Preview Modal -->
+    <div id="orderPreviewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white rounded-t-3xl sm:rounded-2xl p-4 w-full max-w-sm space-y-4 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-gray-800">📋 Aapka Selected Order</h3>
+                <button onclick="toggleModal('orderPreviewModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+
+            <!-- Selected Items List -->
+            <div id="previewList" class="space-y-2 overflow-y-auto flex-1 text-xs">
+                <!-- Items injected dynamically -->
+            </div>
+
+            <button id="whatsappSendBtn" onclick="sendWhatsAppFinal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg">
+                📲 WhatsApp Par List Bhejein
+            </button>
+        </div>
     </div>
 
     <!-- Dukandar Login & Upload Modal -->
@@ -48,8 +85,7 @@
             <!-- Upload Panel -->
             <div id="uploadBox" class="hidden space-y-3">
                 <div class="bg-blue-50 border border-blue-200 p-2 rounded-lg text-[11px] text-blue-800 space-y-1">
-                    <p class="font-bold">💡 Format Tip:</p>
-                    <p>Photo me 3 sabjiyan hain toh aise likhein:</p>
+                    <p class="font-bold">💡 Format Tip (3-4 Sabji Best):</p>
                     <p class="font-mono text-xs bg-white p-1 rounded border">Aloo (30/kg) / Tamatar (60/kg) / Pyaz (40/kg)</p>
                 </div>
                 
@@ -62,13 +98,15 @@
     </div>
 
     <script>
-        // Deployment ke baad apna URL yahan paste karein:
         const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
         
         let allData = [];
-        let orderCart = {}; 
+        let selectedLocation = "ALL";
+        
+        // Cart Object Format: { vendorPhone: { vendorShop: "Name", items: { "Aloo (30/kg)": 2 } } }
+        let currentCart = { phone: null, shop: null, items: {} };
 
-        // DEMO DATA (Jab tak Google Script URL nahi jurta tab tak ye dikhega)
+        // DEMO DATA
         const demoData = [
             {
                 itemId: "P01",
@@ -88,7 +126,7 @@
                     name: "Suresh Sahu",
                     shop: "Suresh Sabji Bhandar",
                     phone: "919876543211",
-                    location: "Station Road Market"
+                    location: "Station Road"
                 },
                 imageUrl: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80",
                 itemRates: "Bhindi (₹50/kg) / Baingan (₹30/kg) / Harimirch (₹80/kg)",
@@ -106,41 +144,53 @@
         }
 
         async function loadData() {
-            // Agar Web App URL default hai toh direct Demo Data load karo
             if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
                 allData = demoData;
-                populateLocations();
+                renderTabs();
                 renderCards(allData);
                 return;
             }
 
-            // Script URL set hone ke baad Google Sheet se Data aayega
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getData`);
                 allData = await res.json();
-                populateLocations();
+                renderTabs();
                 renderCards(allData);
             } catch(e) {
-                document.getElementById('feed').innerHTML = '<p class="text-center text-red-500 text-xs py-4">Data fetch nahi ho paya. Demo dikhaya ja raha hai.</p>';
                 allData = demoData;
-                populateLocations();
+                renderTabs();
                 renderCards(allData);
             }
         }
 
-        function populateLocations() {
-            const select = document.getElementById('locationFilter');
-            const locations = [...new Set(allData.map(item => item.vendor.location))];
-            select.innerHTML = '<option value="ALL">📍 Sabhi Locations</option>';
+        // Render Oval Shaped Tabs with Hover & Active States
+        function renderTabs() {
+            const container = document.getElementById('locationTabs');
+            const locations = ["ALL", ...new Set(allData.map(item => item.vendor.location))];
+            
+            container.innerHTML = '';
             locations.forEach(loc => {
-                select.innerHTML += `<option value="${loc}">📍 ${loc}</option>`;
+                const isSelected = selectedLocation === loc;
+                const label = loc === "ALL" ? "📍 Sabhi Areas" : `📍 ${loc}`;
+                
+                const activeClasses = isSelected 
+                    ? "bg-green-700 text-white border-green-700 shadow-md scale-105" 
+                    : "bg-white text-gray-600 border-gray-200 hover:bg-green-50 hover:text-green-700 hover:border-green-300";
+
+                container.innerHTML += `
+                    <button onclick="selectLocation('${loc}')" 
+                            class="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 ease-in-out cursor-pointer ${activeClasses}">
+                        ${label}
+                    </button>
+                `;
             });
         }
 
-        function filterData() {
-            const val = document.getElementById('locationFilter').value;
-            if (val === "ALL") renderCards(allData);
-            else renderCards(allData.filter(i => i.vendor.location === val));
+        function selectLocation(loc) {
+            selectedLocation = loc;
+            renderTabs();
+            if (loc === "ALL") renderCards(allData);
+            else renderCards(allData.filter(i => i.vendor.location === loc));
         }
 
         function renderCards(data) {
@@ -158,20 +208,24 @@
                 let itemsListHtml = '';
                 itemsArr.forEach((subItem, sIdx) => {
                     const cleanItem = subItem.trim();
-                    const uniqueId = `item_${index}_${sIdx}`;
-                    
+                    const qtyKey = `${item.vendor.phone}_${cleanItem}`;
+                    const currentQty = (currentCart.items && currentCart.items[cleanItem]) || 0;
+
                     itemsListHtml += `
-                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200 text-xs">
+                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
                             <span class="font-semibold text-gray-700">${cleanItem}</span>
-                            <div class="flex items-center gap-2">
-                                <select id="${uniqueId}" onchange="updateCart('${item.vendor.phone}', '${cleanItem}', this.value)" class="border bg-white rounded p-1 text-[11px] font-bold">
-                                    <option value="0">Qty (0)</option>
-                                    <option value="0.5 kg">500g</option>
-                                    <option value="1 kg">1 kg</option>
-                                    <option value="2 kg">2 kg</option>
-                                    <option value="3 kg">3 kg</option>
-                                    <option value="5 kg">5 kg</option>
-                                </select>
+                            
+                            <!-- Oval Plus/Minus Counter -->
+                            <div class="flex items-center bg-white border border-gray-300 rounded-full p-0.5 shadow-sm">
+                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', -1)" 
+                                        class="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-600 font-bold flex items-center justify-center text-xs active:scale-95 transition">
+                                    -
+                                </button>
+                                <span class="w-8 text-center font-bold text-[11px] text-green-700" id="qty_${index}_${sIdx}">${currentQty} kg</span>
+                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', 1)" 
+                                        class="w-6 h-6 rounded-full bg-green-100 hover:bg-green-600 hover:text-white font-bold flex items-center justify-center text-xs text-green-800 active:scale-95 transition">
+                                    +
+                                </button>
                             </div>
                         </div>
                     `;
@@ -179,66 +233,99 @@
 
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <!-- Top Header & Last Update -->
+                        <!-- Header -->
                         <div class="p-2.5 bg-slate-100/70 border-b flex justify-between items-center text-xs">
                             <div>
                                 <h4 class="font-bold text-gray-800">${item.vendor.shop}</h4>
                                 <p class="text-[10px] text-gray-500">📍 ${item.vendor.location} (${item.vendor.name})</p>
                             </div>
                             <div class="text-right">
-                                <span class="bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded">🕒 Updated</span>
+                                <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full">🕒 Updated</span>
                                 <p class="text-[9px] text-gray-500 mt-0.5">${item.updatedAt}</p>
                             </div>
                         </div>
 
-                        <!-- Collage Image -->
-                        <div class="relative cursor-pointer" onclick="toggleQtyPanel('${index}')">
-                            <img src="${item.imageUrl}" class="w-full h-48 object-cover bg-gray-100" alt="Sabji Collage">
-                            <span class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-full">👆 Touch Photo to Select Qty</span>
-                        </div>
+                        <!-- Image -->
+                        <img src="${item.imageUrl}" class="w-full h-48 object-cover bg-gray-100" alt="Sabji Collage">
 
-                        <!-- Quantity Selector List -->
-                        <div id="qtyPanel_${index}" class="p-3 space-y-2 border-t border-gray-100">
-                            <p class="text-[11px] font-bold text-gray-500 mb-1">Select Sabji & Quantity:</p>
+                        <!-- Item Counter List -->
+                        <div class="p-3 space-y-2 border-t border-gray-100">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Select Sabji & Quantity (+ / -):</p>
                             ${itemsListHtml}
-                            
-                            <button onclick="sendWhatsAppOrder('${item.vendor.phone}', '${item.vendor.shop}')" 
-                                    class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm">
-                                📲 WhatsApp Par List & Order Bhejein
-                            </button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        function toggleQtyPanel(index) {
-            const panel = document.getElementById(`qtyPanel_${index}`);
-            panel.classList.toggle('hidden');
-        }
+        // Handle Quantity Increase / Decrease
+        function adjustQty(phone, shop, item, delta) {
+            // Reset cart if switching to another vendor
+            if (currentCart.phone && currentCart.phone !== phone) {
+                if(!confirm("Aapne doosre sabji wale ka order select kiya hai. Purana cart clear karein?")) return;
+                currentCart = { phone: phone, shop: shop, items: {} };
+            }
 
-        function updateCart(vendorPhone, itemDetails, qty) {
-            if(!orderCart[vendorPhone]) orderCart[vendorPhone] = {};
-            if(qty === "0") {
-                delete orderCart[vendorPhone][itemDetails];
+            currentCart.phone = phone;
+            currentCart.shop = shop;
+
+            let currentVal = currentCart.items[item] || 0;
+            currentVal += delta;
+
+            if (currentVal <= 0) {
+                delete currentCart.items[item];
             } else {
-                orderCart[vendorPhone][itemDetails] = qty;
+                currentCart.items[item] = currentVal;
+            }
+
+            updateStickyBar();
+            renderCards(selectedLocation === "ALL" ? allData : allData.filter(i => i.vendor.location === selectedLocation));
+        }
+
+        // Update Sticky Bottom Preview Bar
+        function updateStickyBar() {
+            const stickyBar = document.getElementById('stickyOrderBar');
+            const totalItems = Object.keys(currentCart.items).length;
+
+            if (totalItems > 0) {
+                stickyBar.classList.remove('hidden');
+                document.getElementById('previewItemCount').innerText = `${totalItems} Sabji Selected (${currentCart.shop})`;
+            } else {
+                stickyBar.classList.add('hidden');
+            }
+            renderPreviewList();
+        }
+
+        // Render Dynamic Preview Modal
+        function renderPreviewList() {
+            const listContainer = document.getElementById('previewList');
+            listContainer.innerHTML = '';
+
+            if (Object.keys(currentCart.items).length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-400 py-4">Koi item select nahi hai.</p>';
+                return;
+            }
+
+            for (let [item, qty] of Object.entries(currentCart.items)) {
+                listContainer.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border">
+                        <span class="font-bold text-gray-700">${item}</span>
+                        <span class="bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-md text-xs">${qty} kg</span>
+                    </div>
+                `;
             }
         }
 
-        function sendWhatsAppOrder(phone, shop) {
-            const items = orderCart[phone];
-            if(!items || Object.keys(items).length === 0) {
-                return alert("Kripya kam se kam ek sabji ki quantity select karein!");
-            }
+        function sendWhatsAppFinal() {
+            if (!currentCart.phone || Object.keys(currentCart.items).length === 0) return;
 
-            let msg = `Namaste ${shop}! Mujhe ye sabjiyan chahiye:%0A%0A`;
-            for (let [veg, qty] of Object.entries(items)) {
-                msg += `• *${veg}:* ${qty}%0A`;
+            let msg = `Namaste ${currentCart.shop}! Mujhe ye sabjiyan chahiye:%0A%0A`;
+            for (let [item, qty] of Object.entries(currentCart.items)) {
+                msg += `• *${item}:* ${qty} kg%0A`;
             }
-            msg += `%0AKripya order confirm karein aur delivery timing batayein.`;
+            msg += `%0AKripya order confirm karein aur delivery timings batayein.`;
 
-            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+            window.open(`https://wa.me/${currentCart.phone}?text=${msg}`, '_blank');
         }
 
         function toggleModal(id) {
@@ -248,7 +335,7 @@
         async function authVendor() {
             const vId = document.getElementById('vId').value;
             if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
-                alert("Demo Mode: Google Apps Script Web App URL daalne ke baad login kaam karega!");
+                alert("Demo Mode: Google Script URL set karne ke baad login hoga.");
                 return;
             }
             const res = await fetch(SCRIPT_URL, {
