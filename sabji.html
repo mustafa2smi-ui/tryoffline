@@ -3,196 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gao Sabji Mandi</title>
-    <!-- Tailwind CSS -->
+    <title>📍 Gao Ki Sabji Mandi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
 </head>
-<body class="bg-slate-100 text-gray-800">
+<body class="bg-slate-100 text-gray-800 pb-16">
 
     <!-- Header -->
-    <header class="bg-green-600 text-white p-4 shadow-lg text-center font-bold text-xl">
-        🥦 Gao Ki Apni Sabji Mandi
+    <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40 flex justify-between items-center">
+        <h1 class="font-bold text-base flex items-center gap-1">🥦 Gao Sabji Mandi</h1>
+        <button onclick="toggleModal('vendorModal')" class="text-xs bg-green-900 border border-green-500 px-3 py-1.5 rounded-lg font-medium">Dukandar Login</button>
     </header>
 
-    <div class="max-w-md mx-auto p-4">
-        
-        <!-- Tab Navigation -->
-        <div class="flex justify-between mb-4 bg-white rounded-lg p-1 shadow">
-            <button onclick="switchTab('customer')" class="flex-1 py-2 font-semibold text-green-700 rounded-lg bg-green-50">Sabji Kharedein</button>
-            <button onclick="switchTab('vendor')" class="flex-1 py-2 font-semibold text-gray-600 rounded-lg">Sabji Wala Login</button>
+    <div class="max-w-md mx-auto p-3">
+
+        <!-- Location Filter -->
+        <div class="mb-3">
+            <label class="text-[11px] font-bold text-gray-600 mb-1 block">📍 Apni Area/Location Select Karein:</label>
+            <select id="locationFilter" onchange="filterData()" class="w-full bg-white border border-gray-300 p-2 rounded-xl text-xs font-bold shadow-sm">
+                <option value="ALL">📍 Sabhi Locations</option>
+            </select>
         </div>
 
-        <!-- 1. CUSTOMER VIEW -->
-        <div id="customerTab" class="block space-y-4">
-            <h2 class="font-bold text-lg text-slate-700">Aaj Ka Taaza Rate</h2>
-            <div id="productList" class="space-y-3">
-                <p class="text-sm text-gray-500">Sabji loading ho rahi hai...</p>
-            </div>
-        </div>
-
-        <!-- 2. VENDOR PANEL (Add/Update Rate) -->
-        <div id="vendorTab" class="hidden space-y-4">
-            
-            <!-- Auth Form -->
-            <div id="authBox" class="bg-white p-4 rounded-xl shadow space-y-3">
-                <h3 class="font-bold">Dukandar Login</h3>
-                <input type="email" id="loginEmail" placeholder="Email" class="w-full border p-2 rounded">
-                <input type="password" id="loginPass" placeholder="Password" class="w-full border p-2 rounded">
-                <button onclick="loginVendor()" class="w-full bg-green-600 text-white py-2 rounded font-bold">Login Karein</button>
-            </div>
-
-            <!-- Vendor Dashboard -->
-            <div id="dashboardBox" class="hidden bg-white p-4 rounded-xl shadow space-y-3">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h3 class="font-bold">Apni Sabji Update Karein</h3>
-                    <button onclick="logout()" class="text-red-500 text-sm">Logout</button>
-                </div>
-                
-                <input type="text" id="vegName" placeholder="Sabji Ka Naam (e.g. Aloo)" class="w-full border p-2 rounded">
-                <input type="number" id="vegRate" placeholder="Rate (₹ per Kg)" class="w-full border p-2 rounded">
-                <input type="file" id="vegImage" accept="image/*" class="w-full text-sm">
-                
-                <button onclick="addOrUpdateProduct()" class="w-full bg-blue-600 text-white py-2 rounded font-bold">Sabji/Rate Save Karein</button>
-            </div>
-
+        <!-- Cards Container -->
+        <div id="feed" class="space-y-4">
+            <p class="text-center text-gray-500 text-xs py-8">Taaza Rates Load Ho Rahe Hain...</p>
         </div>
 
     </div>
 
-    <!-- Application Script -->
+    <!-- Dukandar Login & Upload Modal -->
+    <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-green-700">Dukandar Rate Panel</h3>
+                <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+
+            <!-- Auth -->
+            <div id="loginBox" class="space-y-2">
+                <input type="text" id="vId" placeholder="Vendor ID (e.g. V101)" class="w-full border p-2 rounded-lg text-xs">
+                <button onclick="authVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Verify & Login</button>
+            </div>
+
+            <!-- Upload Panel -->
+            <div id="uploadBox" class="hidden space-y-3">
+                <div class="bg-blue-50 border border-blue-200 p-2 rounded-lg text-[11px] text-blue-800 space-y-1">
+                    <p class="font-bold">💡 Format Tip:</p>
+                    <p>Photo me 3 sabjiyan hain toh aise likhein:</p>
+                    <p class="font-mono text-xs bg-white p-1 rounded border">Aloo (30/kg) / Tamatar (60/kg) / Pyaz (40/kg)</p>
+                </div>
+                
+                <input type="text" id="imgUrl" placeholder="Pinterest Image Link Paste Karein" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="itemRates" placeholder="Sabji (Rate) / Sabji (Rate)" class="w-full border p-2 rounded-lg text-xs">
+                
+                <button onclick="uploadCollage()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">Save / Update Rate</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // REPLACE WITH YOUR FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        // Deployment ke baad apna URL yahan paste karein:
+        const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+        
+        let allData = [];
+        let orderCart = {}; 
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        // DEMO DATA (Jab tak Google Script URL nahi jurta tab tak ye dikhega)
+        const demoData = [
+            {
+                itemId: "P01",
+                vendor: {
+                    name: "Ramesh Kumar",
+                    shop: "Ramesh Fresh Vegetables",
+                    phone: "919876543210",
+                    location: "Main Chowk Mandi"
+                },
+                imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+                itemRates: "Aloo (₹25/kg) / Tamatar (₹40/kg) / Pyaz (₹35/kg)",
+                updatedAt: "Aaj, 08:30 AM"
+            },
+            {
+                itemId: "P02",
+                vendor: {
+                    name: "Suresh Sahu",
+                    shop: "Suresh Sabji Bhandar",
+                    phone: "919876543211",
+                    location: "Station Road Market"
+                },
+                imageUrl: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80",
+                itemRates: "Bhindi (₹50/kg) / Baingan (₹30/kg) / Harimirch (₹80/kg)",
+                updatedAt: "Aaj, 07:15 AM"
+            }
+        ];
 
-        // App State
-        let currentVendor = null;
-        let cart = {};
+        function getDeviceToken() {
+            let token = localStorage.getItem("dev_token");
+            if (!token) {
+                token = "dev_" + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem("dev_token", token);
+            }
+            return token;
+        }
 
-        // Tab Switcher
-        function switchTab(tab) {
-            if(tab === 'customer') {
-                document.getElementById('customerTab').classList.remove('hidden');
-                document.getElementById('vendorTab').classList.add('hidden');
-            } else {
-                document.getElementById('customerTab').classList.add('hidden');
-                document.getElementById('vendorTab').classList.remove('hidden');
+        async function loadData() {
+            // Agar Web App URL default hai toh direct Demo Data load karo
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                allData = demoData;
+                populateLocations();
+                renderCards(allData);
+                return;
+            }
+
+            // Script URL set hone ke baad Google Sheet se Data aayega
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getData`);
+                allData = await res.json();
+                populateLocations();
+                renderCards(allData);
+            } catch(e) {
+                document.getElementById('feed').innerHTML = '<p class="text-center text-red-500 text-xs py-4">Data fetch nahi ho paya. Demo dikhaya ja raha hai.</p>';
+                allData = demoData;
+                populateLocations();
+                renderCards(allData);
             }
         }
 
-        // Auth Monitor
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                currentVendor = user;
-                document.getElementById('authBox').classList.add('hidden');
-                document.getElementById('dashboardBox').classList.remove('hidden');
-            } else {
-                currentVendor = null;
-                document.getElementById('authBox').classList.remove('hidden');
-                document.getElementById('dashboardBox').classList.add('hidden');
-            }
-        });
-
-        // Vendor Auth Logic
-        function loginVendor() {
-            const e = document.getElementById('loginEmail').value;
-            const p = document.getElementById('loginPass').value;
-            auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
-        }
-
-        function logout() { auth.signOut(); }
-
-        // Product Upload Logic (By Vendor)
-        async function addOrUpdateProduct() {
-            const name = document.getElementById('vegName').value;
-            const rate = document.getElementById('vegRate').value;
-            const fileInput = document.getElementById('vegImage');
-            
-            if(!name || !rate) return alert("Sabhi details bharein");
-
-            let imageUrl = "https://via.placeholder.com/150";
-
-            if(fileInput.files[0]) {
-                const file = fileInput.files[0];
-                const storageRef = storage.ref(`vegetables/${Date.now()}_${file.name}`);
-                await storageRef.put(file);
-                imageUrl = await storageRef.getDownloadURL();
-            }
-
-            // Vendor Info Fetch
-            const vendorDoc = await db.collection('vendors').doc(currentVendor.uid).get();
-            const vendorData = vendorDoc.data() || { shopName: "Gao Mandi", phone: "910000000000" };
-
-            await db.collection('products').add({
-                vendorId: currentVendor.uid,
-                vendorName: vendorData.shopName,
-                vendorPhone: vendorData.phone,
-                name: name,
-                price: Number(rate),
-                imageUrl: imageUrl,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        function populateLocations() {
+            const select = document.getElementById('locationFilter');
+            const locations = [...new Set(allData.map(item => item.vendor.location))];
+            select.innerHTML = '<option value="ALL">📍 Sabhi Locations</option>';
+            locations.forEach(loc => {
+                select.innerHTML += `<option value="${loc}">📍 ${loc}</option>`;
             });
-
-            alert("Sabji Successfully Save Ho Gayi!");
-            document.getElementById('vegName').value = '';
-            document.getElementById('vegRate').value = '';
         }
 
-        // Realtime Data Stream for Customers
-        db.collection('products').onSnapshot(snapshot => {
-            const container = document.getElementById('productList');
+        function filterData() {
+            const val = document.getElementById('locationFilter').value;
+            if (val === "ALL") renderCards(allData);
+            else renderCards(allData.filter(i => i.vendor.location === val));
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('feed');
             container.innerHTML = '';
 
-            snapshot.forEach(doc => {
-                const item = doc.data();
-                container.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl shadow flex items-center justify-between">
-                        <img src="${item.imageUrl}" class="w-16 h-16 object-cover rounded-lg">
-                        <div class="flex-1 ml-3">
-                            <h4 class="font-bold text-base">${item.name}</h4>
-                            <p class="text-xs text-gray-500">${item.vendorName || 'Dukan'}</p>
-                            <p class="text-green-700 font-extrabold mt-1">₹${item.price} / kg</p>
+            if(data.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Koi list nahi mili.</p>';
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const itemsArr = item.itemRates.split('/');
+
+                let itemsListHtml = '';
+                itemsArr.forEach((subItem, sIdx) => {
+                    const cleanItem = subItem.trim();
+                    const uniqueId = `item_${index}_${sIdx}`;
+                    
+                    itemsListHtml += `
+                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200 text-xs">
+                            <span class="font-semibold text-gray-700">${cleanItem}</span>
+                            <div class="flex items-center gap-2">
+                                <select id="${uniqueId}" onchange="updateCart('${item.vendor.phone}', '${cleanItem}', this.value)" class="border bg-white rounded p-1 text-[11px] font-bold">
+                                    <option value="0">Qty (0)</option>
+                                    <option value="0.5 kg">500g</option>
+                                    <option value="1 kg">1 kg</option>
+                                    <option value="2 kg">2 kg</option>
+                                    <option value="3 kg">3 kg</option>
+                                    <option value="5 kg">5 kg</option>
+                                </select>
+                            </div>
                         </div>
-                        <button onclick="sendWhatsAppOrder('${item.vendorPhone}', '${item.name}', ${item.price})" 
-                                class="bg-green-500 text-white p-2 rounded-lg text-xs font-bold flex items-center gap-1">
-                            📲 Order
-                        </button>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <!-- Top Header & Last Update -->
+                        <div class="p-2.5 bg-slate-100/70 border-b flex justify-between items-center text-xs">
+                            <div>
+                                <h4 class="font-bold text-gray-800">${item.vendor.shop}</h4>
+                                <p class="text-[10px] text-gray-500">📍 ${item.vendor.location} (${item.vendor.name})</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded">🕒 Updated</span>
+                                <p class="text-[9px] text-gray-500 mt-0.5">${item.updatedAt}</p>
+                            </div>
+                        </div>
+
+                        <!-- Collage Image -->
+                        <div class="relative cursor-pointer" onclick="toggleQtyPanel('${index}')">
+                            <img src="${item.imageUrl}" class="w-full h-48 object-cover bg-gray-100" alt="Sabji Collage">
+                            <span class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-full">👆 Touch Photo to Select Qty</span>
+                        </div>
+
+                        <!-- Quantity Selector List -->
+                        <div id="qtyPanel_${index}" class="p-3 space-y-2 border-t border-gray-100">
+                            <p class="text-[11px] font-bold text-gray-500 mb-1">Select Sabji & Quantity:</p>
+                            ${itemsListHtml}
+                            
+                            <button onclick="sendWhatsAppOrder('${item.vendor.phone}', '${item.vendor.shop}')" 
+                                    class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm">
+                                📲 WhatsApp Par List & Order Bhejein
+                            </button>
+                        </div>
                     </div>
                 `;
             });
-        });
-
-        // Dynamic WhatsApp URL Engine
-        function sendWhatsAppOrder(phone, vegName, price) {
-            const qty = prompt(`${vegName} kitna kg chahiye? (e.g. 1 ya 2):`, "1");
-            if(!qty) return;
-
-            const total = Number(qty) * price;
-            const message = `Namaste! Mujhe aapki dukan se order dena hai:%0A` +
-                            `• *Sabji:* ${vegName}%0A` +
-                            `• *Quantity:* ${qty} kg%0A` +
-                            `• *Total Cost:* ₹${total}%0A%0A` +
-                            `Kripya confirm karein.`;
-
-            const waUrl = `https://wa.me/${phone}?text=${message}`;
-                window.open(waUrl, '_blank');
         }
+
+        function toggleQtyPanel(index) {
+            const panel = document.getElementById(`qtyPanel_${index}`);
+            panel.classList.toggle('hidden');
+        }
+
+        function updateCart(vendorPhone, itemDetails, qty) {
+            if(!orderCart[vendorPhone]) orderCart[vendorPhone] = {};
+            if(qty === "0") {
+                delete orderCart[vendorPhone][itemDetails];
+            } else {
+                orderCart[vendorPhone][itemDetails] = qty;
+            }
+        }
+
+        function sendWhatsAppOrder(phone, shop) {
+            const items = orderCart[phone];
+            if(!items || Object.keys(items).length === 0) {
+                return alert("Kripya kam se kam ek sabji ki quantity select karein!");
+            }
+
+            let msg = `Namaste ${shop}! Mujhe ye sabjiyan chahiye:%0A%0A`;
+            for (let [veg, qty] of Object.entries(items)) {
+                msg += `• *${veg}:* ${qty}%0A`;
+            }
+            msg += `%0AKripya order confirm karein aur delivery timing batayein.`;
+
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        async function authVendor() {
+            const vId = document.getElementById('vId').value;
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Apps Script Web App URL daalne ke baad login kaam karega!");
+                return;
+            }
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "loginCheck", vendorId: vId, deviceToken: getDeviceToken() })
+            });
+            const data = await res.json();
+            if(data.status === "SUCCESS") {
+                document.getElementById('loginBox').classList.add('hidden');
+                document.getElementById('uploadBox').classList.remove('hidden');
+                localStorage.setItem("activeVendor", vId);
+            } else alert(data.msg);
+        }
+
+        async function uploadCollage() {
+            const vId = localStorage.getItem("activeVendor");
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "saveProduct",
+                    vendorId: vId,
+                    imageUrl: document.getElementById('imgUrl').value,
+                    itemRates: document.getElementById('itemRates').value
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            if(data.status === "SUCCESS") location.reload();
+        }
+
+        loadData();
     </script>
 </body>
 </html>
