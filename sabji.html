@@ -11,34 +11,24 @@
     <meta name="author" content="Star Digital Agency">
     <meta name="robots" content="index, follow">
 
-    <!-- Open Graph (OG) / Social Media Meta Tags -->
+    <!-- Social Media Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://yourdomain.com/">
-    <meta property="og:title" content="Gao Ki Sabji Mandi - Aaj Ka Taaza Rate & Direct WhatsApp Order">
+    <meta property="og:title" content="Gao Ki Sabji Mandi - Live Rates & Direct WhatsApp Order">
     <meta property="og:description" content="Gao ke local sabji walon ke live rate card aur collage photo dekhein. 1-Click me WhatsApp par order bhejein.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
-
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gao Ki Sabji Mandi">
-    <meta name="twitter:description" content="Local market ke daily sabji rate aur direct order delivery.">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥦</text></svg>">
 
-    <!-- JSON-LD Structured Data (Schema Markup for Local Business / Marketplace) -->
+    <!-- JSON-LD Structured Data (Schema Markup) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Gao Ki Sabji Mandi",
       "description": "Local village vegetable marketplace for live rate list and WhatsApp ordering.",
-      "url": "https://yourdomain.com",
       "priceRange": "₹",
-      "currenciesAccepted": "INR",
-      "paymentAccepted": "Cash, UPI",
-      "openingHours": "Mo-Su 06:00-21:00"
+      "currenciesAccepted": "INR"
     }
     </script>
 
@@ -49,9 +39,9 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen">
+<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen pb-20">
 
-    <!-- Sticky Header Navigation -->
+    <!-- Header -->
     <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="font-bold text-base flex items-center gap-1 cursor-pointer" onclick="location.reload()">
@@ -69,7 +59,7 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Body -->
     <main class="max-w-md mx-auto p-3 flex-1 w-full">
         <!-- Oval Area Tabs -->
         <div class="mb-4">
@@ -83,7 +73,7 @@
         </div>
     </main>
 
-    <!-- Floating Sticky Order Preview Bar -->
+    <!-- Floating Sticky Order Bar -->
     <div id="stickyOrderBar" class="hidden fixed bottom-4 left-0 right-0 max-w-md mx-auto px-3 z-30">
         <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl flex justify-between items-center border border-slate-700">
             <div>
@@ -94,13 +84,12 @@
         </div>
     </div>
 
-    <!-- Footer Area -->
+    <!-- Footer -->
     <footer class="bg-slate-800 text-gray-400 text-xs py-6 px-4 mt-8 border-t border-slate-700">
         <div class="max-w-md mx-auto space-y-4 text-center">
             <p class="font-bold text-white text-sm">🥦 Gao Ki Apni Sabji Mandi</p>
             <p class="text-[11px]">Local Sabji Walon Ka Digital Bazaar. Direct WhatsApp Delivery.</p>
 
-            <!-- Legal Links -->
             <div class="flex justify-center gap-4 text-[11px] font-semibold text-green-400 pt-2 border-t border-slate-700">
                 <button onclick="toggleModal('privacyModal')" class="hover:underline">Privacy Policy</button>
                 <button onclick="toggleModal('termsModal')" class="hover:underline">Terms of Use</button>
@@ -111,7 +100,7 @@
         </div>
     </footer>
 
-    <!-- MODAL 1: HELP & FAQ MODAL -->
+    <!-- MODAL 1: HELP & FAQ -->
     <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -134,16 +123,11 @@
                     <p class="font-bold text-gray-800">🏪 Sabji Wale Register Kaise Karein?</p>
                     <p class="text-gray-600">Top-right me **Vendor Portal** button daba kar apni Dukan aur Location details submit karein. Owner approval ke baad aap rates upload kar sakte hain.</p>
                 </div>
-
-                <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
-                    <p class="font-bold text-gray-800">💰 Payment Kaise Hogi?</p>
-                    <p class="text-gray-600">Payment direct sabji wale ko delivery ke waqt Cash ya UPI se karein. Portal par koi advance charge nahi lagta.</p>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: ORDER PREVIEW MODAL -->
+    <!-- MODAL 2: ORDER PREVIEW -->
     <div id="orderPreviewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white rounded-t-3xl sm:rounded-2xl p-4 w-full max-w-sm space-y-4 max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center border-b pb-2">
@@ -155,37 +139,39 @@
         </div>
     </div>
 
-    <!-- MODAL 3: VENDOR PORTAL -->
+    <!-- MODAL 3: VENDOR PORTAL (FIXED & COMPLETE) -->
     <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-green-700">Dukandar Panel</h3>
+                <h3 class="font-bold text-sm text-green-700">🏪 Dukandar Panel</h3>
                 <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
 
-            <!-- REGISTRATION FORM -->
-            <div id="regBox" class="hidden space-y-2">
-                <p class="text-xs font-bold text-gray-700">New Vendor Registration:</p>
-                <input type="text" id="regName" placeholder="Aapka Naam" class="w-full border p-2 rounded-lg text-xs">
-                <input type="text" id="regShop" placeholder="Dukan Ka Naam" class="w-full border p-2 rounded-lg text-xs">
+            <!-- REGISTRATION & LOGIN BOX -->
+            <div id="regBox" class="space-y-2">
+                <p class="text-xs font-bold text-gray-700">Dukandar Register / Login Karein:</p>
+                <input type="text" id="regName" placeholder="Aapka Naam (e.g. Ramesh)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regShop" placeholder="Dukan Ka Naam (e.g. Ramesh Veg)" class="w-full border p-2 rounded-lg text-xs">
                 <input type="text" id="regPhone" placeholder="WhatsApp Number (e.g. 919876543210)" class="w-full border p-2 rounded-lg text-xs">
-                <input type="text" id="regLoc" placeholder="Location / Area" class="w-full border p-2 rounded-lg text-xs">
-                <button onclick="registerVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Register & Submit</button>
+                <input type="text" id="regLoc" placeholder="Location / Area (e.g. Main Chowk)" class="w-full border p-2 rounded-lg text-xs">
+                
+                <button onclick="registerVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Register & Submit Details</button>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded-lg font-bold text-xs">🔄 Check My Approval Status</button>
             </div>
 
             <!-- WAITING FOR APPROVAL -->
             <div id="waitBox" class="hidden text-center space-y-3 py-4">
                 <div class="text-3xl">⏳</div>
                 <h4 class="font-bold text-sm text-amber-600">Please Wait... Approval Pending!</h4>
-                <p class="text-[11px] text-gray-500">Aapki details owner ko bhej di gayi hain. Approval milte hi aap rate update kar sakenge.</p>
-                <button onclick="checkApprovalStatus()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">🔄 Check My Approval Status</button>
+                <p class="text-[11px] text-gray-500">Aapki details owner ko bhej di gayi hain. Active hote hi aap rate update kar sakenge.</p>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">🔄 Re-Check Approval Status</button>
             </div>
 
-            <!-- VENDOR DASHBOARD -->
+            <!-- APPROVED VENDOR DASHBOARD -->
             <div id="dashboardBox" class="hidden space-y-3">
                 <div class="flex justify-between items-center bg-green-50 p-2 rounded-xl border border-green-200">
                     <div>
-                        <p class="text-[10px] text-gray-500">Welcome,</p>
+                        <p class="text-[10px] text-gray-500">Welcome Back,</p>
                         <h4 id="vendorWelcomeName" class="font-bold text-xs text-green-800">Vendor</h4>
                     </div>
                     <button onclick="vendorLogout()" class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg">Logout</button>
@@ -208,16 +194,15 @@
         </div>
     </div>
 
-    <!-- MODAL 4: PRIVACY POLICY -->
+    <!-- MODALS: PRIVACY, TERMS, DISCLAIMER -->
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Privacy Policy</h3>
-            <p class="text-gray-600">Hum aapka koi personal location data trace nahi karte. Contact details sirf WhatsApp ordering ke liye use hoti hain.</p>
+            <p class="text-gray-600">Hum aapka koi personal data trace nahi karte. Details sirf direct WhatsApp ordering ke liye use hoti hain.</p>
             <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
         </div>
     </div>
 
-    <!-- MODAL 5: TERMS OF USE -->
     <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Terms of Use</h3>
@@ -226,22 +211,51 @@
         </div>
     </div>
 
-    <!-- MODAL 6: DISCLAIMER -->
     <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Disclaimer</h3>
-            <p class="text-gray-600">Gao Sabji Mandi ek open micro-directory directory hai jo customers ko local sabji walon se jodti hai. Hum online payment collect nahi karte.</p>
+            <p class="text-gray-600">Gao Sabji Mandi ek local web directory hai jo customers ko local sabji walon se jodti hai.</p>
             <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
         </div>
     </div>
 
-    <!-- JavaScript Application Engine -->
+    <!-- JS Application Logic -->
     <script>
+        // REPLACE THIS URL WITH YOUR GOOGLE SCRIPT LINK LATER
         const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
         let allData = [];
         let selectedLocation = "ALL";
         let currentCart = { phone: null, shop: null, items: {} };
         let activeVendorData = null;
+
+        // DEMO DATA (Jab tak Real Google Script URL nahi jurta)
+        const demoData = [
+            {
+                itemId: "P01",
+                vendor: {
+                    name: "Ramesh Kumar",
+                    shop: "Ramesh Fresh Vegetables",
+                    phone: "919876543210",
+                    location: "Main Chowk Mandi"
+                },
+                imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+                itemRates: "Aloo (₹25/kg) / Tamatar (₹40/kg) / Pyaz (₹35/kg)",
+                updatedAt: "Aaj, 08:30 AM"
+            },
+            {
+                itemId: "P02",
+                vendor: {
+                    name: "Suresh Sahu",
+                    shop: "Suresh Sabji Bhandar",
+                    phone: "919876543211",
+                    location: "Station Road"
+                },
+                imageUrl: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80",
+                itemRates: "Bhindi (₹50/kg) / Baingan (₹30/kg) / Harimirch (₹80/kg)",
+                updatedAt: "Aaj, 07:15 AM"
+            }
+        ];
 
         function getDeviceToken() {
             let token = localStorage.getItem("dev_token");
@@ -253,20 +267,38 @@
         }
 
         async function loadData() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+                return;
+            }
+
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getData`);
                 allData = await res.json();
                 renderTabs();
                 renderCards(allData);
-            } catch(e) { console.log("Init load"); }
+            } catch(e) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+            }
         }
 
-        async function openVendorPortal() {
+        function openVendorPortal() {
             toggleModal('vendorModal');
-            checkApprovalStatus();
+            if (!SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                checkApprovalStatus();
+            }
         }
 
         async function checkApprovalStatus() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Apps Script Web App URL daalne ke baad status check hoga.");
+                return;
+            }
+
             const token = getDeviceToken();
             const res = await fetch(SCRIPT_URL, {
                 method: "POST",
@@ -278,9 +310,11 @@
             document.getElementById('waitBox').classList.add('hidden');
             document.getElementById('dashboardBox').classList.add('hidden');
 
-            if (data.status === "NOT_FOUND") document.getElementById('regBox').classList.remove('hidden');
-            else if (data.status === "Denied") document.getElementById('waitBox').classList.remove('hidden');
-            else if (data.status === "Approved") {
+            if (data.status === "NOT_FOUND") {
+                document.getElementById('regBox').classList.remove('hidden');
+            } else if (data.status === "Denied") {
+                document.getElementById('waitBox').classList.remove('hidden');
+            } else if (data.status === "Approved") {
                 activeVendorData = data;
                 document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
                 document.getElementById('dashboardBox').classList.remove('hidden');
@@ -295,6 +329,11 @@
             const loc = document.getElementById('regLoc').value;
 
             if(!name || !shop || !phone || !loc) return alert("Sabhi details bharein!");
+
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Script URL paste karne ke baad registration Google Sheet me save hone lagega!");
+                return;
+            }
 
             const res = await fetch(SCRIPT_URL, {
                 method: "POST",
@@ -341,8 +380,8 @@
         }
 
         function copyShareText(imageUrl, itemRates) {
-            const shopName = activeVendorData.shop || "Gao Sabji Mandi";
-            const location = activeVendorData.location || "Mandi Area";
+            const shopName = (activeVendorData && activeVendorData.shop) || "Gao Sabji Mandi";
+            const location = (activeVendorData && activeVendorData.location) || "Mandi Area";
             const websiteUrl = window.location.href;
 
             const formattedItems = itemRates.split('/').map(i => `• ${i.trim()}`).join('\n');
@@ -433,7 +472,7 @@
                 container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Koi list nahi mili.</p>';
                 return;
             }
-            data.forEach((item, index) => {
+            data.forEach((item) => {
                 const itemsArr = item.itemRates.split('/');
                 let itemsListHtml = '';
                 itemsArr.forEach((subItem) => {
@@ -510,6 +549,8 @@
         }
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        // Start App
         loadData();
     </script>
 </body>
