@@ -3,136 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📍 Gao Ki Sabji Mandi</title>
+    <title>Gao Ki Sabji Mandi | Live Local Vegetable Rates & Direct WhatsApp Order</title>
+
+    <!-- Technical SEO & Meta Tags -->
+    <meta name="description" content="Apne gao aur aas-paas ki mandi ke aaj ke taaza sabji rate dekhein. Local sabji walon se direct WhatsApp par taaza sabji order karein.">
+    <meta name="keywords" content="Gao Sabji Mandi, Local Sabji Rate, Today Vegetable Price, WhatsApp Sabji Order, Fresh Vegetables Online">
+    <meta name="author" content="Star Digital Agency">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph (OG) / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:title" content="Gao Ki Sabji Mandi - Aaj Ka Taaza Rate & Direct WhatsApp Order">
+    <meta property="og:description" content="Gao ke local sabji walon ke live rate card aur collage photo dekhein. 1-Click me WhatsApp par order bhejein.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gao Ki Sabji Mandi">
+    <meta name="twitter:description" content="Local market ke daily sabji rate aur direct order delivery.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥦</text></svg>">
+
+    <!-- JSON-LD Structured Data (Schema Markup for Local Business / Marketplace) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Gao Ki Sabji Mandi",
+      "description": "Local village vegetable marketplace for live rate list and WhatsApp ordering.",
+      "url": "https://yourdomain.com",
+      "priceRange": "₹",
+      "currenciesAccepted": "INR",
+      "paymentAccepted": "Cash, UPI",
+      "openingHours": "Mo-Su 06:00-21:00"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Smooth horizontal scrollbar hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-100 text-gray-800 pb-24">
+<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen">
 
-    <!-- Header -->
-    <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40 flex justify-between items-center">
-        <h1 class="font-bold text-base flex items-center gap-1">🥦 Gao Sabji Mandi</h1>
-        <button onclick="toggleModal('vendorModal')" class="text-xs bg-green-900 border border-green-500 px-3 py-1.5 rounded-full font-medium active:scale-95 transition">Dukandar Login</button>
-    </header>
-
-    <div class="max-w-md mx-auto p-3">
-
-        <!-- Oval Tabs (Location Filter) -->
-        <div class="mb-4">
-            <p class="text-[11px] font-bold text-gray-500 mb-2">📍 Area Select Karein:</p>
-            <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                <!-- Dynamic Oval Pills will load here -->
+    <!-- Sticky Header Navigation -->
+    <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="font-bold text-base flex items-center gap-1 cursor-pointer" onclick="location.reload()">
+                🥦 Gao Sabji Mandi
+            </h1>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="toggleModal('helpModal')" class="text-xs bg-green-800 hover:bg-green-900 border border-green-500 px-2.5 py-1.5 rounded-full font-bold">
+                    ❓ Help
+                </button>
+                <button onclick="openVendorPortal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-300 px-3 py-1.5 rounded-full font-bold shadow-sm">
+                    🏪 Vendor Portal
+                </button>
             </div>
         </div>
+    </header>
 
-        <!-- Cards Container -->
+    <!-- Main Content Area -->
+    <main class="max-w-md mx-auto p-3 flex-1 w-full">
+        <!-- Oval Area Tabs -->
+        <div class="mb-4">
+            <p class="text-[11px] font-bold text-gray-500 mb-2">📍 Area / Location Choose Karein:</p>
+            <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+        </div>
+
+        <!-- Feed Container -->
         <div id="feed" class="space-y-4">
             <p class="text-center text-gray-500 text-xs py-8">Taaza Rates Load Ho Rahe Hain...</p>
         </div>
-
-    </div>
+    </main>
 
     <!-- Floating Sticky Order Preview Bar -->
-    <div id="stickyOrderBar" class="hidden fixed bottom-3 left-0 right-0 max-w-md mx-auto px-3 z-30">
+    <div id="stickyOrderBar" class="hidden fixed bottom-4 left-0 right-0 max-w-md mx-auto px-3 z-30">
         <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl flex justify-between items-center border border-slate-700">
             <div>
                 <p id="previewItemCount" class="text-xs font-bold text-green-400">0 Items Selected</p>
                 <p class="text-[10px] text-gray-400">Tap to review list & send order</p>
             </div>
-            <button onclick="toggleModal('orderPreviewModal')" class="bg-green-600 hover:bg-green-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1 active:scale-95 transition">
-                📋 View Order
-            </button>
+            <button onclick="toggleModal('orderPreviewModal')" class="bg-green-600 text-white font-bold text-xs px-4 py-2 rounded-xl">📋 View Order</button>
         </div>
     </div>
 
-    <!-- Order Preview Modal -->
+    <!-- Footer Area -->
+    <footer class="bg-slate-800 text-gray-400 text-xs py-6 px-4 mt-8 border-t border-slate-700">
+        <div class="max-w-md mx-auto space-y-4 text-center">
+            <p class="font-bold text-white text-sm">🥦 Gao Ki Apni Sabji Mandi</p>
+            <p class="text-[11px]">Local Sabji Walon Ka Digital Bazaar. Direct WhatsApp Delivery.</p>
+
+            <!-- Legal Links -->
+            <div class="flex justify-center gap-4 text-[11px] font-semibold text-green-400 pt-2 border-t border-slate-700">
+                <button onclick="toggleModal('privacyModal')" class="hover:underline">Privacy Policy</button>
+                <button onclick="toggleModal('termsModal')" class="hover:underline">Terms of Use</button>
+                <button onclick="toggleModal('disclaimerModal')" class="hover:underline">Disclaimer</button>
+            </div>
+
+            <p class="text-[10px] text-gray-500 pt-2">© 2026 Gao Sabji Mandi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: HELP & FAQ MODAL -->
+    <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-green-700">❓ Help & FAQs (Madad)</h3>
+                <button onclick="toggleModal('helpModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div class="bg-green-50 p-2.5 rounded-xl border border-green-200">
+                    <p class="font-bold text-green-800 mb-1">🛒 Sabji Order Kaise Karein?</p>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                        <li>Apni Location ka tab select karein.</li>
+                        <li>Sabji card me `+` aur `-` button se kg choose karein.</li>
+                        <li>Niche floating **"View Order"** bar par click karein.</li>
+                        <li>**"WhatsApp Order"** par click karte hi order text send ho jayega.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
+                    <p class="font-bold text-gray-800">🏪 Sabji Wale Register Kaise Karein?</p>
+                    <p class="text-gray-600">Top-right me **Vendor Portal** button daba kar apni Dukan aur Location details submit karein. Owner approval ke baad aap rates upload kar sakte hain.</p>
+                </div>
+
+                <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
+                    <p class="font-bold text-gray-800">💰 Payment Kaise Hogi?</p>
+                    <p class="text-gray-600">Payment direct sabji wale ko delivery ke waqt Cash ya UPI se karein. Portal par koi advance charge nahi lagta.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ORDER PREVIEW MODAL -->
     <div id="orderPreviewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white rounded-t-3xl sm:rounded-2xl p-4 w-full max-w-sm space-y-4 max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-gray-800">📋 Aapka Selected Order</h3>
                 <button onclick="toggleModal('orderPreviewModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
-
-            <!-- Selected Items List -->
-            <div id="previewList" class="space-y-2 overflow-y-auto flex-1 text-xs">
-                <!-- Items injected dynamically -->
-            </div>
-
-            <button id="whatsappSendBtn" onclick="sendWhatsAppFinal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg">
-                📲 WhatsApp Par List Bhejein
-            </button>
+            <div id="previewList" class="space-y-2 overflow-y-auto flex-1 text-xs"></div>
+            <button onclick="sendWhatsAppFinal()" class="w-full bg-green-600 text-white font-bold text-xs py-3 rounded-xl shadow-lg">📲 WhatsApp Par List Bhejein</button>
         </div>
     </div>
 
-    <!-- Dukandar Login & Upload Modal -->
+    <!-- MODAL 3: VENDOR PORTAL -->
     <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-green-700">Dukandar Rate Panel</h3>
+                <h3 class="font-bold text-sm text-green-700">Dukandar Panel</h3>
                 <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
 
-            <!-- Auth -->
-            <div id="loginBox" class="space-y-2">
-                <input type="text" id="vId" placeholder="Vendor ID (e.g. V101)" class="w-full border p-2 rounded-lg text-xs">
-                <button onclick="authVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Verify & Login</button>
+            <!-- REGISTRATION FORM -->
+            <div id="regBox" class="hidden space-y-2">
+                <p class="text-xs font-bold text-gray-700">New Vendor Registration:</p>
+                <input type="text" id="regName" placeholder="Aapka Naam" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regShop" placeholder="Dukan Ka Naam" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regPhone" placeholder="WhatsApp Number (e.g. 919876543210)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regLoc" placeholder="Location / Area" class="w-full border p-2 rounded-lg text-xs">
+                <button onclick="registerVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Register & Submit</button>
             </div>
 
-            <!-- Upload Panel -->
-            <div id="uploadBox" class="hidden space-y-3">
-                <div class="bg-blue-50 border border-blue-200 p-2 rounded-lg text-[11px] text-blue-800 space-y-1">
-                    <p class="font-bold">💡 Format Tip (3-4 Sabji Best):</p>
-                    <p class="font-mono text-xs bg-white p-1 rounded border">Aloo (30/kg) / Tamatar (60/kg) / Pyaz (40/kg)</p>
+            <!-- WAITING FOR APPROVAL -->
+            <div id="waitBox" class="hidden text-center space-y-3 py-4">
+                <div class="text-3xl">⏳</div>
+                <h4 class="font-bold text-sm text-amber-600">Please Wait... Approval Pending!</h4>
+                <p class="text-[11px] text-gray-500">Aapki details owner ko bhej di gayi hain. Approval milte hi aap rate update kar sakenge.</p>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">🔄 Check My Approval Status</button>
+            </div>
+
+            <!-- VENDOR DASHBOARD -->
+            <div id="dashboardBox" class="hidden space-y-3">
+                <div class="flex justify-between items-center bg-green-50 p-2 rounded-xl border border-green-200">
+                    <div>
+                        <p class="text-[10px] text-gray-500">Welcome,</p>
+                        <h4 id="vendorWelcomeName" class="font-bold text-xs text-green-800">Vendor</h4>
+                    </div>
+                    <button onclick="vendorLogout()" class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg">Logout</button>
                 </div>
-                
-                <input type="text" id="imgUrl" placeholder="Pinterest Image Link Paste Karein" class="w-full border p-2 rounded-lg text-xs">
-                <input type="text" id="itemRates" placeholder="Sabji (Rate) / Sabji (Rate)" class="w-full border p-2 rounded-lg text-xs">
-                
-                <button onclick="uploadCollage()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">Save / Update Rate</button>
+
+                <div class="border p-2.5 rounded-xl space-y-2 bg-slate-50">
+                    <p id="formTitle" class="text-[11px] font-bold text-gray-600">➕ Nayi Sabji / Rate Add Karein:</p>
+                    <input type="hidden" id="editingItemId" value="">
+                    <input type="text" id="imgUrl" placeholder="Pinterest Image Link" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    <input type="text" id="itemRates" placeholder="Format: Aloo (30/kg) / Tamatar (60/kg)" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    <div class="flex gap-2">
+                        <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold text-xs">Cancel</button>
+                        <button onclick="saveOrUpdateProduct()" id="saveBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">Save Rate Card</button>
+                    </div>
+                </div>
+
+                <p class="text-[11px] font-bold text-gray-500">Aapke Updated Rates:</p>
+                <div id="myProductsList" class="space-y-2 max-h-40 overflow-y-auto"></div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL 4: PRIVACY POLICY -->
+    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Privacy Policy</h3>
+            <p class="text-gray-600">Hum aapka koi personal location data trace nahi karte. Contact details sirf WhatsApp ordering ke liye use hoti hain.</p>
+            <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- MODAL 5: TERMS OF USE -->
+    <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Terms of Use</h3>
+            <p class="text-gray-600">Rates local vendors dwara set kiye jate hain. Quality aur delivery timing ke liye local vendor jimmedar honge.</p>
+            <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- MODAL 6: DISCLAIMER -->
+    <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Disclaimer</h3>
+            <p class="text-gray-600">Gao Sabji Mandi ek open micro-directory directory hai jo customers ko local sabji walon se jodti hai. Hum online payment collect nahi karte.</p>
+            <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Engine -->
     <script>
         const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
-        
         let allData = [];
         let selectedLocation = "ALL";
-        
-        // Cart Object Format: { vendorPhone: { vendorShop: "Name", items: { "Aloo (30/kg)": 2 } } }
         let currentCart = { phone: null, shop: null, items: {} };
-
-        // DEMO DATA
-        const demoData = [
-            {
-                itemId: "P01",
-                vendor: {
-                    name: "Ramesh Kumar",
-                    shop: "Ramesh Fresh Vegetables",
-                    phone: "919876543210",
-                    location: "Main Chowk Mandi"
-                },
-                imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
-                itemRates: "Aloo (₹25/kg) / Tamatar (₹40/kg) / Pyaz (₹35/kg)",
-                updatedAt: "Aaj, 08:30 AM"
-            },
-            {
-                itemId: "P02",
-                vendor: {
-                    name: "Suresh Sahu",
-                    shop: "Suresh Sabji Bhandar",
-                    phone: "919876543211",
-                    location: "Station Road"
-                },
-                imageUrl: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80",
-                itemRates: "Bhindi (₹50/kg) / Baingan (₹30/kg) / Harimirch (₹80/kg)",
-                updatedAt: "Aaj, 07:15 AM"
-            }
-        ];
+        let activeVendorData = null;
 
         function getDeviceToken() {
             let token = localStorage.getItem("dev_token");
@@ -144,88 +253,199 @@
         }
 
         async function loadData() {
-            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
-                allData = demoData;
-                renderTabs();
-                renderCards(allData);
-                return;
-            }
-
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getData`);
                 allData = await res.json();
                 renderTabs();
                 renderCards(allData);
-            } catch(e) {
-                allData = demoData;
-                renderTabs();
-                renderCards(allData);
+            } catch(e) { console.log("Init load"); }
+        }
+
+        async function openVendorPortal() {
+            toggleModal('vendorModal');
+            checkApprovalStatus();
+        }
+
+        async function checkApprovalStatus() {
+            const token = getDeviceToken();
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "checkStatus", deviceToken: token })
+            });
+            const data = await res.json();
+
+            document.getElementById('regBox').classList.add('hidden');
+            document.getElementById('waitBox').classList.add('hidden');
+            document.getElementById('dashboardBox').classList.add('hidden');
+
+            if (data.status === "NOT_FOUND") document.getElementById('regBox').classList.remove('hidden');
+            else if (data.status === "Denied") document.getElementById('waitBox').classList.remove('hidden');
+            else if (data.status === "Approved") {
+                activeVendorData = data;
+                document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
+                document.getElementById('dashboardBox').classList.remove('hidden');
+                loadMyProducts();
             }
         }
 
-        // Render Oval Shaped Tabs with Hover & Active States
+        async function registerVendor() {
+            const name = document.getElementById('regName').value;
+            const shop = document.getElementById('regShop').value;
+            const phone = document.getElementById('regPhone').value;
+            const loc = document.getElementById('regLoc').value;
+
+            if(!name || !shop || !phone || !loc) return alert("Sabhi details bharein!");
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "registerVendor", name, shop, phone, location: loc,
+                    deviceToken: getDeviceToken()
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            checkApprovalStatus();
+        }
+
+        async function loadMyProducts() {
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "getMyProducts", vendorId: activeVendorData.vendorId })
+            });
+            const items = await res.json();
+            const container = document.getElementById('myProductsList');
+            container.innerHTML = '';
+
+            if(items.length === 0) {
+                container.innerHTML = '<p class="text-[10px] text-gray-400">Koi rate card add nahi hai.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-2 rounded-xl border text-xs space-y-1">
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-gray-700 truncate max-w-[170px]">${item.itemRates}</p>
+                            <div class="flex gap-1">
+                                <button onclick="editProduct('${item.itemId}', '${item.imageUrl}', '${item.itemRates}')" class="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg font-bold">✏️ Edit</button>
+                                <button onclick="deleteProduct('${item.itemId}')" class="text-red-600 bg-red-50 px-2 py-1 rounded-lg font-bold">🗑️</button>
+                            </div>
+                        </div>
+                        <button onclick="copyShareText('${item.imageUrl}', '${item.itemRates}')" class="w-full bg-green-50 border border-green-300 text-green-700 font-bold py-1 rounded-lg text-[10px]">
+                            📋 Copy Share Text + Photo Link
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function copyShareText(imageUrl, itemRates) {
+            const shopName = activeVendorData.shop || "Gao Sabji Mandi";
+            const location = activeVendorData.location || "Mandi Area";
+            const websiteUrl = window.location.href;
+
+            const formattedItems = itemRates.split('/').map(i => `• ${i.trim()}`).join('\n');
+            const shareMsg = `🥦 *${shopName}*\n📍 Location: ${location}\n\n🛒 *Aaj Ka Taaza Sabji Rate:*\n${formattedItems}\n\n📸 *Sabji Photo Link:*\n👇\n${imageUrl}\n\n✨ *Saaf-Sutri sabjiyan uchit daam par.* Direct order ke liye link kholein:\n👇\n${websiteUrl}`;
+
+            navigator.clipboard.writeText(shareMsg).then(() => {
+                alert("✅ Share Message Copy Ho Gaya!\n\nAb WhatsApp Status ya Group me Paste kar dein.");
+            });
+        }
+
+        async function saveOrUpdateProduct() {
+            const itemId = document.getElementById('editingItemId').value;
+            const imgUrl = document.getElementById('imgUrl').value;
+            const itemRates = document.getElementById('itemRates').value;
+
+            if(!imgUrl || !itemRates) return alert("Photo URL aur Rates dono bharein!");
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "saveProduct",
+                    vendorId: activeVendorData.vendorId, itemId, imageUrl: imgUrl, itemRates
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            cancelEdit();
+            loadMyProducts();
+            loadData();
+        }
+
+        function editProduct(itemId, imgUrl, itemRates) {
+            document.getElementById('editingItemId').value = itemId;
+            document.getElementById('imgUrl').value = imgUrl;
+            document.getElementById('itemRates').value = itemRates;
+            document.getElementById('formTitle').innerText = "✏️ Rate Card Edit Karein:";
+            document.getElementById('saveBtn').innerText = "Update Rate Card";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editingItemId').value = '';
+            document.getElementById('imgUrl').value = '';
+            document.getElementById('itemRates').value = '';
+            document.getElementById('formTitle').innerText = "➕ Nayi Sabji / Rate Add Karein:";
+            document.getElementById('saveBtn').innerText = "Save Rate Card";
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        async function deleteProduct(itemId) {
+            if(!confirm("Delete karna chahte hain?")) return;
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "deleteProduct", vendorId: activeVendorData.vendorId, itemId })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            loadMyProducts();
+            loadData();
+        }
+
+        function vendorLogout() {
+            activeVendorData = null;
+            toggleModal('vendorModal');
+        }
+
         function renderTabs() {
             const container = document.getElementById('locationTabs');
             const locations = ["ALL", ...new Set(allData.map(item => item.vendor.location))];
-            
             container.innerHTML = '';
             locations.forEach(loc => {
                 const isSelected = selectedLocation === loc;
-                const label = loc === "ALL" ? "📍 Sabhi Areas" : `📍 ${loc}`;
-                
-                const activeClasses = isSelected 
-                    ? "bg-green-700 text-white border-green-700 shadow-md scale-105" 
-                    : "bg-white text-gray-600 border-gray-200 hover:bg-green-50 hover:text-green-700 hover:border-green-300";
-
-                container.innerHTML += `
-                    <button onclick="selectLocation('${loc}')" 
-                            class="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all duration-200 ease-in-out cursor-pointer ${activeClasses}">
-                        ${label}
-                    </button>
-                `;
+                const activeClasses = isSelected ? "bg-green-700 text-white border-green-700" : "bg-white text-gray-600 border-gray-200";
+                container.innerHTML += `<button onclick="selectLocation('${loc}')" class="px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${loc === "ALL" ? "📍 Sabhi Areas" : `📍 ${loc}`}</button>`;
             });
         }
 
         function selectLocation(loc) {
             selectedLocation = loc;
             renderTabs();
-            if (loc === "ALL") renderCards(allData);
-            else renderCards(allData.filter(i => i.vendor.location === loc));
+            renderCards(loc === "ALL" ? allData : allData.filter(i => i.vendor.location === loc));
         }
 
         function renderCards(data) {
             const container = document.getElementById('feed');
             container.innerHTML = '';
-
             if(data.length === 0) {
                 container.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Koi list nahi mili.</p>';
                 return;
             }
-
             data.forEach((item, index) => {
                 const itemsArr = item.itemRates.split('/');
-
                 let itemsListHtml = '';
-                itemsArr.forEach((subItem, sIdx) => {
+                itemsArr.forEach((subItem) => {
                     const cleanItem = subItem.trim();
-                    const qtyKey = `${item.vendor.phone}_${cleanItem}`;
                     const currentQty = (currentCart.items && currentCart.items[cleanItem]) || 0;
-
                     itemsListHtml += `
-                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+                        <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border text-xs">
                             <span class="font-semibold text-gray-700">${cleanItem}</span>
-                            
-                            <!-- Oval Plus/Minus Counter -->
-                            <div class="flex items-center bg-white border border-gray-300 rounded-full p-0.5 shadow-sm">
-                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', -1)" 
-                                        class="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-600 font-bold flex items-center justify-center text-xs active:scale-95 transition">
-                                    -
-                                </button>
-                                <span class="w-8 text-center font-bold text-[11px] text-green-700" id="qty_${index}_${sIdx}">${currentQty} kg</span>
-                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', 1)" 
-                                        class="w-6 h-6 rounded-full bg-green-100 hover:bg-green-600 hover:text-white font-bold flex items-center justify-center text-xs text-green-800 active:scale-95 transition">
-                                    +
-                                </button>
+                            <div class="flex items-center bg-white border rounded-full p-0.5 shadow-sm">
+                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', -1)" class="w-6 h-6 rounded-full bg-gray-100 font-bold text-xs">-</button>
+                                <span class="w-8 text-center font-bold text-[11px] text-green-700">${currentQty} kg</span>
+                                <button onclick="adjustQty('${item.vendor.phone}', '${item.vendor.shop}', '${cleanItem}', 1)" class="w-6 h-6 rounded-full bg-green-100 text-green-800 font-bold text-xs">+</button>
                             </div>
                         </div>
                     `;
@@ -233,139 +453,63 @@
 
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <!-- Header -->
                         <div class="p-2.5 bg-slate-100/70 border-b flex justify-between items-center text-xs">
                             <div>
                                 <h4 class="font-bold text-gray-800">${item.vendor.shop}</h4>
                                 <p class="text-[10px] text-gray-500">📍 ${item.vendor.location} (${item.vendor.name})</p>
                             </div>
-                            <div class="text-right">
-                                <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full">🕒 Updated</span>
-                                <p class="text-[9px] text-gray-500 mt-0.5">${item.updatedAt}</p>
-                            </div>
+                            <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full">🕒 ${item.updatedAt}</span>
                         </div>
-
-                        <!-- Image -->
-                        <img src="${item.imageUrl}" class="w-full h-48 object-cover bg-gray-100" alt="Sabji Collage">
-
-                        <!-- Item Counter List -->
-                        <div class="p-3 space-y-2 border-t border-gray-100">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Select Sabji & Quantity (+ / -):</p>
-                            ${itemsListHtml}
-                        </div>
+                        <img src="${item.imageUrl}" class="w-full h-48 object-cover bg-gray-100">
+                        <div class="p-3 space-y-2">${itemsListHtml}</div>
                     </div>
                 `;
             });
         }
 
-        // Handle Quantity Increase / Decrease
         function adjustQty(phone, shop, item, delta) {
-            // Reset cart if switching to another vendor
             if (currentCart.phone && currentCart.phone !== phone) {
-                if(!confirm("Aapne doosre sabji wale ka order select kiya hai. Purana cart clear karein?")) return;
-                currentCart = { phone: phone, shop: shop, items: {} };
+                if(!confirm("Doosre sabji wale ka order chuna hai. Clear karein?")) return;
+                currentCart = { phone, shop, items: {} };
             }
-
             currentCart.phone = phone;
             currentCart.shop = shop;
-
             let currentVal = currentCart.items[item] || 0;
             currentVal += delta;
-
-            if (currentVal <= 0) {
-                delete currentCart.items[item];
-            } else {
-                currentCart.items[item] = currentVal;
-            }
-
+            if (currentVal <= 0) delete currentCart.items[item];
+            else currentCart.items[item] = currentVal;
             updateStickyBar();
             renderCards(selectedLocation === "ALL" ? allData : allData.filter(i => i.vendor.location === selectedLocation));
         }
 
-        // Update Sticky Bottom Preview Bar
         function updateStickyBar() {
-            const stickyBar = document.getElementById('stickyOrderBar');
             const totalItems = Object.keys(currentCart.items).length;
-
             if (totalItems > 0) {
-                stickyBar.classList.remove('hidden');
+                document.getElementById('stickyOrderBar').classList.remove('hidden');
                 document.getElementById('previewItemCount').innerText = `${totalItems} Sabji Selected (${currentCart.shop})`;
             } else {
-                stickyBar.classList.add('hidden');
+                document.getElementById('stickyOrderBar').classList.add('hidden');
             }
             renderPreviewList();
         }
 
-        // Render Dynamic Preview Modal
         function renderPreviewList() {
             const listContainer = document.getElementById('previewList');
             listContainer.innerHTML = '';
-
-            if (Object.keys(currentCart.items).length === 0) {
-                listContainer.innerHTML = '<p class="text-center text-gray-400 py-4">Koi item select nahi hai.</p>';
-                return;
-            }
-
             for (let [item, qty] of Object.entries(currentCart.items)) {
-                listContainer.innerHTML += `
-                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border">
-                        <span class="font-bold text-gray-700">${item}</span>
-                        <span class="bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-md text-xs">${qty} kg</span>
-                    </div>
-                `;
+                listContainer.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border"><span class="font-bold text-gray-700">${item}</span><span class="bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-md text-xs">${qty} kg</span></div>`;
             }
         }
 
         function sendWhatsAppFinal() {
-            if (!currentCart.phone || Object.keys(currentCart.items).length === 0) return;
-
+            if (!currentCart.phone) return;
             let msg = `Namaste ${currentCart.shop}! Mujhe ye sabjiyan chahiye:%0A%0A`;
-            for (let [item, qty] of Object.entries(currentCart.items)) {
-                msg += `• *${item}:* ${qty} kg%0A`;
-            }
-            msg += `%0AKripya order confirm karein aur delivery timings batayein.`;
-
+            for (let [item, qty] of Object.entries(currentCart.items)) { msg += `• *${item}:* ${qty} kg%0A`; }
+            msg += `%0AKripya order confirm karein.`;
             window.open(`https://wa.me/${currentCart.phone}?text=${msg}`, '_blank');
         }
 
-        function toggleModal(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
-
-        async function authVendor() {
-            const vId = document.getElementById('vId').value;
-            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
-                alert("Demo Mode: Google Script URL set karne ke baad login hoga.");
-                return;
-            }
-            const res = await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "loginCheck", vendorId: vId, deviceToken: getDeviceToken() })
-            });
-            const data = await res.json();
-            if(data.status === "SUCCESS") {
-                document.getElementById('loginBox').classList.add('hidden');
-                document.getElementById('uploadBox').classList.remove('hidden');
-                localStorage.setItem("activeVendor", vId);
-            } else alert(data.msg);
-        }
-
-        async function uploadCollage() {
-            const vId = localStorage.getItem("activeVendor");
-            const res = await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({
-                    action: "saveProduct",
-                    vendorId: vId,
-                    imageUrl: document.getElementById('imgUrl').value,
-                    itemRates: document.getElementById('itemRates').value
-                })
-            });
-            const data = await res.json();
-            alert(data.msg);
-            if(data.status === "SUCCESS") location.reload();
-        }
-
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         loadData();
     </script>
 </body>
