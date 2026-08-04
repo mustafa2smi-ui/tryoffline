@@ -11,7 +11,7 @@
     <meta name="author" content="Star Digital Agency">
     <meta name="robots" content="index, follow">
 
-    <!-- Social Media Meta Tags -->
+    <!-- Social Media Meta Tags (OG Graph) -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Gao Ki Sabji Mandi - Live Rates & Direct WhatsApp Order">
     <meta property="og:description" content="Gao ke local sabji walon ke live rate card aur collage photo dekhein. 1-Click me WhatsApp par order bhejein.">
@@ -20,18 +20,6 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥦</text></svg>">
 
-    <!-- JSON-LD Structured Data (Schema Markup) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "Gao Ki Sabji Mandi",
-      "description": "Local village vegetable marketplace for live rate list and WhatsApp ordering.",
-      "priceRange": "₹",
-      "currenciesAccepted": "INR"
-    }
-    </script>
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -39,9 +27,9 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen pb-20">
+<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen pb-24">
 
-    <!-- Header -->
+    <!-- Sticky Top Header -->
     <header class="bg-green-700 text-white p-3 shadow-md sticky top-0 z-40">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="font-bold text-base flex items-center gap-1 cursor-pointer" onclick="location.reload()">
@@ -49,8 +37,8 @@
             </h1>
             
             <div class="flex items-center gap-2">
-                <button onclick="toggleModal('helpModal')" class="text-xs bg-green-800 hover:bg-green-900 border border-green-500 px-2.5 py-1.5 rounded-full font-bold">
-                    ❓ Help
+                <button onclick="shareWebsite()" class="text-xs bg-green-800 hover:bg-green-900 border border-green-500 px-2.5 py-1.5 rounded-full font-bold flex items-center gap-1">
+                    📢 Share
                 </button>
                 <button onclick="openVendorPortal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-300 px-3 py-1.5 rounded-full font-bold shadow-sm">
                     🏪 Vendor Portal
@@ -63,7 +51,7 @@
     <main class="max-w-md mx-auto p-3 flex-1 w-full">
         <!-- Oval Area Tabs -->
         <div class="mb-4">
-            <p class="text-[11px] font-bold text-gray-500 mb-2">📍 Area / Location Choose Karein:</p>
+            <p class="text-[11px] font-bold text-gray-500 mb-2">📍 Area Choose Karein:</p>
             <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
         </div>
 
@@ -74,7 +62,7 @@
     </main>
 
     <!-- Floating Sticky Order Bar -->
-    <div id="stickyOrderBar" class="hidden fixed bottom-4 left-0 right-0 max-w-md mx-auto px-3 z-30">
+    <div id="stickyOrderBar" class="hidden fixed bottom-12 left-0 right-0 max-w-md mx-auto px-3 z-30">
         <div class="bg-slate-900 text-white p-3 rounded-2xl shadow-xl flex justify-between items-center border border-slate-700">
             <div>
                 <p id="previewItemCount" class="text-xs font-bold text-green-400">0 Items Selected</p>
@@ -84,54 +72,42 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-800 text-gray-400 text-xs py-6 px-4 mt-8 border-t border-slate-700">
-        <div class="max-w-md mx-auto space-y-4 text-center">
-            <p class="font-bold text-white text-sm">🥦 Gao Ki Apni Sabji Mandi</p>
-            <p class="text-[11px]">Local Sabji Walon Ka Digital Bazaar. Direct WhatsApp Delivery.</p>
-
-            <div class="flex justify-center gap-4 text-[11px] font-semibold text-green-400 pt-2 border-t border-slate-700">
-                <button onclick="toggleModal('privacyModal')" class="hover:underline">Privacy Policy</button>
-                <button onclick="toggleModal('termsModal')" class="hover:underline">Terms of Use</button>
-                <button onclick="toggleModal('disclaimerModal')" class="hover:underline">Disclaimer</button>
-            </div>
-
-            <p class="text-[10px] text-gray-500 pt-2">© 2026 Gao Sabji Mandi. All rights reserved.</p>
+    <!-- Sticky Bottom Footer Navigation Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-900 text-gray-300 text-[11px] py-2.5 px-3 border-t border-slate-700 z-40">
+        <div class="max-w-md mx-auto flex justify-around items-center font-semibold text-green-400">
+            <button onclick="toggleModal('helpModal')" class="hover:text-white">❓ Help</button>
+            <button onclick="toggleModal('privacyModal')" class="hover:text-white">Privacy</button>
+            <button onclick="toggleModal('termsModal')" class="hover:text-white">Terms</button>
+            <button onclick="toggleModal('disclaimerModal')" class="hover:text-white">Disclaimer</button>
+            <button onclick="shareWebsite()" class="bg-green-700 text-white px-2.5 py-0.5 rounded-full text-[10px]">📢 Share App</button>
         </div>
     </footer>
 
-    <!-- MODAL 1: HELP & FAQ -->
+    <!-- MODAL: HELP & FAQ -->
     <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-green-700">❓ Help & FAQs (Madad)</h3>
+                <h3 class="font-bold text-sm text-green-700">❓ Help & FAQs</h3>
                 <button onclick="toggleModal('helpModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
-
             <div class="space-y-3 text-xs">
                 <div class="bg-green-50 p-2.5 rounded-xl border border-green-200">
-                    <p class="font-bold text-green-800 mb-1">🛒 Sabji Order Kaise Karein?</p>
+                    <p class="font-bold text-green-800 mb-1">🛒 Order Kaise Karein?</p>
                     <ol class="list-decimal list-inside space-y-1 text-gray-700">
-                        <li>Apni Location ka tab select karein.</li>
-                        <li>Sabji card me `+` aur `-` button se kg choose karein.</li>
-                        <li>Niche floating **"View Order"** bar par click karein.</li>
-                        <li>**"WhatsApp Order"** par click karte hi order text send ho jayega.</li>
+                        <li>Location select karein.</li>
+                        <li>`+` aur `-` se quantity chunien.</li>
+                        <li>Floating **"View Order"** bar se WhatsApp order bhej dein.</li>
                     </ol>
-                </div>
-
-                <div class="bg-slate-50 p-2.5 rounded-xl border space-y-1">
-                    <p class="font-bold text-gray-800">🏪 Sabji Wale Register Kaise Karein?</p>
-                    <p class="text-gray-600">Top-right me **Vendor Portal** button daba kar apni Dukan aur Location details submit karein. Owner approval ke baad aap rates upload kar sakte hain.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: ORDER PREVIEW -->
+    <!-- MODAL: ORDER PREVIEW -->
     <div id="orderPreviewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white rounded-t-3xl sm:rounded-2xl p-4 w-full max-w-sm space-y-4 max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-gray-800">📋 Aapka Selected Order</h3>
+                <h3 class="font-bold text-sm text-gray-800">📋 Selected Order List</h3>
                 <button onclick="toggleModal('orderPreviewModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
             <div id="previewList" class="space-y-2 overflow-y-auto flex-1 text-xs"></div>
@@ -139,7 +115,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: VENDOR PORTAL (FIXED & COMPLETE) -->
+    <!-- MODAL: VENDOR PORTAL -->
     <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -147,12 +123,12 @@
                 <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
 
-            <!-- REGISTRATION & LOGIN BOX -->
+            <!-- REGISTRATION & LOGIN BOX WITH 10 DIGIT VALIDATION -->
             <div id="regBox" class="space-y-2">
                 <p class="text-xs font-bold text-gray-700">Dukandar Register / Login Karein:</p>
                 <input type="text" id="regName" placeholder="Aapka Naam (e.g. Ramesh)" class="w-full border p-2 rounded-lg text-xs">
                 <input type="text" id="regShop" placeholder="Dukan Ka Naam (e.g. Ramesh Veg)" class="w-full border p-2 rounded-lg text-xs">
-                <input type="text" id="regPhone" placeholder="WhatsApp Number (e.g. 919876543210)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="tel" id="regPhone" maxlength="10" placeholder="10-Digit WhatsApp Number" class="w-full border p-2 rounded-lg text-xs">
                 <input type="text" id="regLoc" placeholder="Location / Area (e.g. Main Chowk)" class="w-full border p-2 rounded-lg text-xs">
                 
                 <button onclick="registerVendor()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs">Register & Submit Details</button>
@@ -167,7 +143,7 @@
                 <button onclick="checkApprovalStatus()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold text-xs">🔄 Re-Check Approval Status</button>
             </div>
 
-            <!-- APPROVED VENDOR DASHBOARD -->
+            <!-- APPROVED DASHBOARD -->
             <div id="dashboardBox" class="hidden space-y-3">
                 <div class="flex justify-between items-center bg-green-50 p-2 rounded-xl border border-green-200">
                     <div>
@@ -194,9 +170,9 @@
         </div>
     </div>
 
-    <!-- MODALS: PRIVACY, TERMS, DISCLAIMER -->
+    <!-- MODALS: LEGAL PAGES -->
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Privacy Policy</h3>
             <p class="text-gray-600">Hum aapka koi personal data trace nahi karte. Details sirf direct WhatsApp ordering ke liye use hoti hain.</p>
             <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
@@ -204,7 +180,7 @@
     </div>
 
     <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Terms of Use</h3>
             <p class="text-gray-600">Rates local vendors dwara set kiye jate hain. Quality aur delivery timing ke liye local vendor jimmedar honge.</p>
             <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
@@ -212,7 +188,7 @@
     </div>
 
     <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 max-h-[80vh] overflow-y-auto text-xs">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Disclaimer</h3>
             <p class="text-gray-600">Gao Sabji Mandi ek local web directory hai jo customers ko local sabji walon se jodti hai.</p>
             <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
@@ -221,7 +197,6 @@
 
     <!-- JS Application Logic -->
     <script>
-        // REPLACE THIS URL WITH YOUR GOOGLE SCRIPT LINK LATER
         const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
 
         let allData = [];
@@ -229,28 +204,17 @@
         let currentCart = { phone: null, shop: null, items: {} };
         let activeVendorData = null;
 
-        // DEMO DATA (Jab tak Real Google Script URL nahi jurta)
         const demoData = [
             {
                 itemId: "P01",
-                vendor: {
-                    name: "Ramesh Kumar",
-                    shop: "Ramesh Fresh Vegetables",
-                    phone: "919876543210",
-                    location: "Main Chowk Mandi"
-                },
+                vendor: { name: "Ramesh Kumar", shop: "Ramesh Fresh Vegetables", phone: "9876543210", location: "Main Chowk Mandi" },
                 imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
                 itemRates: "Aloo (₹25/kg) / Tamatar (₹40/kg) / Pyaz (₹35/kg)",
                 updatedAt: "Aaj, 08:30 AM"
             },
             {
                 itemId: "P02",
-                vendor: {
-                    name: "Suresh Sahu",
-                    shop: "Suresh Sabji Bhandar",
-                    phone: "919876543211",
-                    location: "Station Road"
-                },
+                vendor: { name: "Suresh Sahu", shop: "Suresh Sabji Bhandar", phone: "9876543211", location: "Station Road" },
                 imageUrl: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80",
                 itemRates: "Bhindi (₹50/kg) / Baingan (₹30/kg) / Harimirch (₹80/kg)",
                 updatedAt: "Aaj, 07:15 AM"
@@ -286,6 +250,23 @@
             }
         }
 
+        // Web Share Engine (Shares Meta Data, Description & Website Link)
+        function shareWebsite() {
+            const shareData = {
+                title: '🥦 Gao Ki Sabji Mandi',
+                text: 'Apne gao ke local sabji walon ke live rates dekhein aur 1-Click me direct WhatsApp order karein! 👇',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`).then(() => {
+                    alert("✅ App Share Link Copy Ho Gaya!\n\nAb WhatsApp Status par Paste kar dein.");
+                });
+            }
+        }
+
         function openVendorPortal() {
             toggleModal('vendorModal');
             if (!SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
@@ -310,11 +291,9 @@
             document.getElementById('waitBox').classList.add('hidden');
             document.getElementById('dashboardBox').classList.add('hidden');
 
-            if (data.status === "NOT_FOUND") {
-                document.getElementById('regBox').classList.remove('hidden');
-            } else if (data.status === "Denied") {
-                document.getElementById('waitBox').classList.remove('hidden');
-            } else if (data.status === "Approved") {
+            if (data.status === "NOT_FOUND") document.getElementById('regBox').classList.remove('hidden');
+            else if (data.status === "Denied") document.getElementById('waitBox').classList.remove('hidden');
+            else if (data.status === "Approved") {
                 activeVendorData = data;
                 document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
                 document.getElementById('dashboardBox').classList.remove('hidden');
@@ -328,7 +307,13 @@
             const phone = document.getElementById('regPhone').value;
             const loc = document.getElementById('regLoc').value;
 
-            if(!name || !shop || !phone || !loc) return alert("Sabhi details bharein!");
+            // 10-Digit Mobile Number Validation Logic
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if(!phoneRegex.test(phone)) {
+                return alert("Kripya sahi 10-digit mobile number enter karein (e.g. 9876543210)!");
+            }
+
+            if(!name || !shop || !loc) return alert("Sabhi details bharein!");
 
             if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
                 alert("Demo Mode: Google Script URL paste karne ke baad registration Google Sheet me save hone lagega!");
@@ -338,7 +323,7 @@
             const res = await fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify({
-                    action: "registerVendor", name, shop, phone, location: loc,
+                    action: "registerVendor", name, shop, phone: "91" + phone, location: loc,
                     deviceToken: getDeviceToken()
                 })
             });
@@ -550,7 +535,6 @@
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         
-        // Start App
         loadData();
     </script>
 </body>
