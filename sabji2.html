@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apna Gao Digital Directory | Local Services, Shops & Doctors</title>
+    <title>Apna Gao Digital Directory | Local Services, Shops & Ads</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Gao aur town ki sabhi services - Auto, JCB, Doctor, Electrician, Sabji, CSC Center, Room Rent direct contact aur WhatsApp.">
-    <meta name="keywords" content="Local Village Directory, Local Services, Auto Booking, Plumber, Doctor Contact, Sabji Mandi">
+    <meta name="description" content="Gao aur town ki sabhi services - Auto, JCB, Doctor, Electrician, Sabji, CSC Center, Offers aur Ads.">
+    <meta name="keywords" content="Local Village Directory, Local Services, Auto Booking, Doctor Contact, Offers">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph Tags -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Apna Gao Digital Directory">
-    <meta property="og:description" content="Local dukan aur mistriyon ki list. Direct Call & WhatsApp contact.">
+    <meta property="og:description" content="Local dukan aur mistriyon ki list & daily offers.">
     <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
@@ -68,6 +68,29 @@
         <div id="feed" class="space-y-3">
             <p class="text-center text-gray-500 text-xs py-8">Directory Loading...</p>
         </div>
+
+        <!-- SPECIAL OFFER ADVERTISEMENT CAROUSEL BOX (FOOTER KE UPAR) -->
+        <div class="pt-4 pb-2">
+            <div class="flex justify-between items-center mb-1.5 px-1">
+                <span class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider flex items-center gap-1">🔥 Special Offers & Viral Ads</span>
+                <span class="text-[9px] text-gray-400 font-semibold">Auto Slide ⏳</span>
+            </div>
+
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 border-2 border-amber-300 shadow-md p-1">
+                <!-- Ad Slider Container -->
+                <div id="adSlider" class="flex transition-transform duration-700 ease-in-out">
+                    <!-- Dynamic or Demo Ad Cards Will Render Here -->
+                </div>
+
+                <!-- Slider Indicators / Dots -->
+                <div id="sliderDots" class="flex justify-center gap-1.5 pt-2 pb-1">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="w-2 h-2 rounded-full bg-amber-200"></span>
+                    <span class="w-2 h-2 rounded-full bg-amber-200"></span>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Sticky Bottom Footer Navigation -->
@@ -85,18 +108,14 @@
     <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-indigo-700">❓ Help & Pinterest Photo Guide</h3>
+                <h3 class="font-bold text-sm text-indigo-700">❓ Help & Offer Ad Guide</h3>
                 <button onclick="toggleModal('helpModal')" class="text-gray-400 font-bold text-sm">✕</button>
             </div>
             
             <div class="space-y-3 text-xs">
-                <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl space-y-1">
-                    <p class="font-bold text-indigo-900">📌 Pinterest Photo Link Kaise Upload Karein?</p>
-                    <ol class="list-decimal list-inside space-y-1 text-gray-700 text-[11px]">
-                        <li>Pinterest app par apni dukan/service ka poster upload karein.</li>
-                        <li><b>Share</b> button par click karke <b>Copy Link</b> dabaayein.</li>
-                        <li>Is directory me Vendor Portal me link paste kar dein.</li>
-                    </ol>
+                <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl space-y-1">
+                    <p class="font-bold text-amber-900">📢 Apna Offer / Ad Banner Kaise Lagayein?</p>
+                    <p class="text-gray-700 text-[11px]">Niche Offer Box me **"Click Now to Display Your Special Offer Advertisement"** button par click karein. Gmail khulne par apni Dukan ka offer banner photo bhej dein. Owner use verify karke live kar dega.</p>
                 </div>
             </div>
         </div>
@@ -140,12 +159,10 @@
                     <button onclick="vendorLogout()" class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg">Logout</button>
                 </div>
 
-                <!-- ADD / EDIT SERVICE FORM -->
                 <div class="border p-2.5 rounded-xl space-y-2 bg-slate-50">
                     <p id="formTitle" class="text-[11px] font-bold text-gray-600">➕ Service Card Add Karein (Max 3 Allowed):</p>
                     <input type="hidden" id="editingItemId" value="">
                     
-                    <!-- Predefined Category Select -->
                     <select id="catSelect" onchange="handleCategoryChange()" class="w-full border p-2 rounded-lg text-xs bg-white font-bold text-gray-700">
                         <option value="Auto Booking">🛺 Auto Booking</option>
                         <option value="Marriage/Tour Vehicle">🚘 Vehicle (Marriage/Tour/JCB/Tractor)</option>
@@ -154,7 +171,7 @@
                         <option value="Hotels / Resto">🏨 Hotels & Fast Food</option>
                         <option value="General Shop">🛒 Grocery / Hardware / Fancy Shop</option>
                         <option value="Bus Ticket Counter">🚌 Bus Ticket Counter</option>
-                        <option value="Photocopy / CSC">printer Photocopy & CSC Center</option>
+                        <option value="Photocopy / CSC">🖨️ Photocopy & CSC Center</option>
                         <option value="Vegetables & Fruits">🥦 Fruits & Vegetables</option>
                         <option value="Mills / Factory">🏭 Mill (Rice/Oil/Flour) & Factory</option>
                         <option value="Room Rent / Real Estate">🏠 Room Rent & Real Estate</option>
@@ -171,7 +188,7 @@
                     <input type="text" id="customCat" placeholder="Apna Profession Likhein" class="hidden w-full border p-2 rounded-lg text-xs bg-white">
                     <input type="text" id="serviceTitle" placeholder="Service Title (e.g. 24x7 Emergency Plumber)" class="w-full border p-2 rounded-lg text-xs bg-white">
                     <input type="text" id="imgUrl" placeholder="Pinterest Image Link" class="w-full border p-2 rounded-lg text-xs bg-white">
-                    <textarea id="serviceDetails" placeholder="Service ki details (e.g. Har tarah ke pipe fit aur repair kiye jate hain)" class="w-full border p-2 rounded-lg text-xs bg-white h-14"></textarea>
+                    <textarea id="serviceDetails" placeholder="Service details" class="w-full border p-2 rounded-lg text-xs bg-white h-14"></textarea>
                     
                     <div class="flex gap-2">
                         <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold text-xs">Cancel</button>
@@ -189,7 +206,7 @@
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Privacy Policy</h3>
-            <p class="text-gray-600">Hum aapka koi personal location data trace nahi karte. Contact details direct customer connection ke liye hain.</p>
+            <p class="text-gray-600">Details direct customer connection ke liye hain.</p>
             <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
         </div>
     </div>
@@ -197,7 +214,7 @@
     <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Terms of Use</h3>
-            <p class="text-gray-600">Directory listings local vendors dwara set kiye jate hain. Service quality aur pricing ke liye vendor zimmedar hain.</p>
+            <p class="text-gray-600">Directory listings local vendors dwara set kiye jate hain.</p>
             <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
         </div>
     </div>
@@ -205,7 +222,7 @@
     <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Disclaimer</h3>
-            <p class="text-gray-600">Apna Gao Directory ek local web directory platform hai. Hum middleman commission nahi lete.</p>
+            <p class="text-gray-600">Apna Gao Directory ek local web directory platform hai.</p>
             <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
         </div>
     </div>
@@ -213,13 +230,16 @@
     <!-- JS Application Engine -->
     <script>
         const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+        const OWNER_GMAIL = "youremail@gmail.com"; // AAPKA GMAIL ID YAHAN DAALEIN
 
         let allData = [];
         let selectedCategory = "ALL";
         let selectedLocation = "ALL";
         let activeVendorData = null;
+        let currentSlideIndex = 0;
+        let slideTimer = null;
 
-        // RICH DEMO DATA (5 Alag Categories + Multitalented User 'Suresh Sahu' in 3 Categories)
+        // RICH DEMO DATA
         const demoData = [
             {
                 itemId: "L01",
@@ -247,33 +267,6 @@
                 details: "Ghar ki plumbing, borwell repair aur bathroom fitting ke expert mistri.",
                 vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
                 updatedAt: "04/08/2026"
-            },
-            {
-                itemId: "L04",
-                category: "Auto Booking",
-                title: "Suresh 24x7 Auto Booking Service",
-                imageUrl: "https://images.unsplash.com/photo-1596838132731-3301c3fd431b?auto=format&fit=crop&w=600&q=80",
-                details: "Station, Hospital aur Aas-Paas ke gaon ke liye emergency auto booking.",
-                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
-                updatedAt: "04/08/2026"
-            },
-            {
-                itemId: "L05",
-                category: "Medical Clinics",
-                title: "Gupta Ayurvedic & Medical Clinic",
-                imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80",
-                details: "Samanya bimariyon ka ilaj aur sabhi ayurvedic dawaiyan uplabdh hain.",
-                vendor: { name: "Dr. A.K. Gupta", shop: "Gupta Clinic", phone: "919876543212", location: "Bus Stand Chowk" },
-                updatedAt: "04/08/2026"
-            },
-            {
-                itemId: "L06",
-                category: "Coaching / School",
-                title: "Prakash Physics & Math Classes",
-                imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
-                details: "Class 8th se 12th tak ke bachhon ke liye special coaching classes.",
-                vendor: { name: "Prakash Sir", shop: "Prakash Classes", phone: "919876543213", location: "College Road" },
-                updatedAt: "04/08/2026"
             }
         ];
 
@@ -291,6 +284,7 @@
                 allData = demoData;
                 renderTabs();
                 renderCards(allData);
+                renderAdCarousel([]);
                 return;
             }
 
@@ -298,18 +292,115 @@
                 const res = await fetch(`${SCRIPT_URL}?action=getData`);
                 allData = await res.json();
                 renderTabs();
-                renderCards(allData);
+                renderCards(allData.filter(i => i.category !== "ADVERTISEMENT"));
+                renderAdCarousel(allData.filter(i => i.category === "ADVERTISEMENT"));
             } catch(e) {
                 allData = demoData;
                 renderTabs();
                 renderCards(allData);
+                renderAdCarousel([]);
             }
+        }
+
+        // ADVERTISMENT CAROUSEL ENGINE (3 CARDS + AUTO SLIDE + GMAIL / WHATSAPP REDIRECT)
+        function renderAdCarousel(adList) {
+            const sliderContainer = document.getElementById('adSlider');
+            const dotsContainer = document.getElementById('sliderDots');
+            sliderContainer.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            // Agar Owner ne Google Sheet me real Ads nahi daale hain, toh DEFAULT 3 CARDS dikhenge:
+            let cardsToRender = adList;
+            if (!adList || adList.length === 0) {
+                cardsToRender = [
+                    { type: 'DEFAULT', text: "📢 Click Now to Display Your Special Offer Advertisement (Card 1)" },
+                    { type: 'DEFAULT', text: "🎉 Festival Offer / Discount Viral Karein Apne Gao Me (Card 2)" },
+                    { type: 'DEFAULT', text: "📞 Direct Customer Connection - Click Here to Email Us (Card 3)" }
+                ];
+            }
+
+            cardsToRender.forEach((ad, index) => {
+                // Card Wrapper
+                const cardDiv = document.createElement('div');
+                cardDiv.className = "w-full shrink-0 px-1";
+
+                if (ad.type === 'DEFAULT') {
+                    // Default Light Color Oval Offer Card with Gmail Link
+                    cardDiv.innerHTML = `
+                        <div onclick="openGmailForAd()" class="cursor-pointer bg-white/90 hover:bg-white border border-amber-200 p-3 rounded-2xl flex items-center justify-between text-left shadow-sm active:scale-95 transition">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🎁</span>
+                                <div>
+                                    <p class="font-bold text-xs text-amber-900 leading-tight">${ad.text}</p>
+                                    <p class="text-[10px] text-amber-600 mt-0.5">📩 Tap to Email Image to Owner</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-500 text-white font-bold text-[10px] px-2.5 py-1 rounded-full whitespace-nowrap">Email Ad</span>
+                        </div>
+                    `;
+                } else {
+                    // Real Approved Ad Card with WhatsApp Direct Redirection
+                    cardDiv.innerHTML = `
+                        <div onclick="openAdWhatsApp('${ad.vendor.phone}', '${ad.title}')" class="cursor-pointer bg-white border border-amber-300 rounded-2xl overflow-hidden shadow-sm active:scale-95 transition">
+                            <div class="relative">
+                                <img src="${ad.imageUrl}" class="w-full h-28 object-cover" alt="Offer Ad">
+                                <span class="absolute top-1.5 left-1.5 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">SPECIAL OFFER</span>
+                            </div>
+                            <div class="p-2 flex justify-between items-center bg-amber-50/50">
+                                <div class="truncate pr-2">
+                                    <h5 class="font-bold text-xs text-gray-800 truncate">${ad.title}</h5>
+                                    <p class="text-[10px] text-gray-500 truncate">${ad.details}</p>
+                                </div>
+                                <button class="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap">📲 Claim Offer</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                sliderContainer.appendChild(cardDiv);
+
+                // Indicator Dots
+                dotsContainer.innerHTML += `<span class="w-2 h-2 rounded-full ${index === 0 ? 'bg-amber-500' : 'bg-amber-200'} transition-all"></span>`;
+            });
+
+            startAutoSlide(cardsToRender.length);
+        }
+
+        // Auto Slider Animation Engine
+        function startAutoSlide(totalSlides) {
+            if (slideTimer) clearInterval(slideTimer);
+            if (totalSlides <= 1) return;
+
+            currentSlideIndex = 0;
+            slideTimer = setInterval(() => {
+                currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+                const slider = document.getElementById('adSlider');
+                slider.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+
+                // Update Dots
+                const dots = document.getElementById('sliderDots').children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].className = `w-2 h-2 rounded-full ${i === currentSlideIndex ? 'bg-amber-500' : 'bg-amber-200'} transition-all`;
+                }
+            }, 3500); // Swipes every 3.5 seconds
+        }
+
+        // Action 1: Open Gmail App to send banner image
+        function openGmailForAd() {
+            const subject = encodeURIComponent("Special Offer Advertisement Banner Request");
+            const body = encodeURIComponent("Namaste! Mujhe apne dukan/service ka Special Offer Ad Banner lagwana hai.\n\nMeine banner image attach kar di hai. Kripya details aur pricing batayein.");
+            window.location.href = `mailto:${OWNER_GMAIL}?subject=${subject}&body=${body}`;
+        }
+
+        // Action 2: Open WhatsApp Chat when clicking Real Ad Banner
+        function openAdWhatsApp(phone, offerTitle) {
+            const msg = `Namaste! Meine Apna Gao App par aapka special offer *"${offerTitle}"* dekha.%0A%0AMujhe ye offer claim karna hai, details batayein!`;
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
 
         function shareWebsite() {
             const shareData = {
                 title: '🏪 Apna Gao Digital Directory',
-                text: 'Apne gao ke sabhi mistri, dukan, doctor aur vehicles ke direct contact number dekhein! 👇',
+                text: 'Apne gao ke sabhi mistri, dukan, doctor aur offers dekhein! 👇',
                 url: window.location.href
             };
             if (navigator.share) { navigator.share(shareData).catch(() => {}); }
@@ -328,9 +419,8 @@
         }
 
         function renderTabs() {
-            // Categories Tab
             const catContainer = document.getElementById('categoryTabs');
-            const categories = ["ALL", ...new Set(allData.map(item => item.category))];
+            const categories = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.category))];
             catContainer.innerHTML = '';
             categories.forEach(cat => {
                 const isSelected = selectedCategory === cat;
@@ -338,9 +428,8 @@
                 catContainer.innerHTML += `<button onclick="selectCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${cat === "ALL" ? "✨ Sabhi Categories" : cat}</button>`;
             });
 
-            // Locations Tab
             const locContainer = document.getElementById('locationTabs');
-            const locations = ["ALL", ...new Set(allData.map(item => item.vendor.location))];
+            const locations = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.vendor.location))];
             locContainer.innerHTML = '';
             locations.forEach(loc => {
                 const isSelected = selectedLocation === loc;
@@ -354,7 +443,7 @@
 
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = allData;
+            let filtered = allData.filter(i => i.category !== "ADVERTISEMENT");
 
             if (selectedCategory !== "ALL") filtered = filtered.filter(i => i.category === selectedCategory);
             if (selectedLocation !== "ALL") filtered = filtered.filter(i => i.vendor.location === selectedLocation);
@@ -382,7 +471,6 @@
             data.forEach((item) => {
                 container.innerHTML += `
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <!-- Top Header -->
                         <div class="p-2.5 bg-slate-50 border-b flex justify-between items-center text-xs">
                             <div>
                                 <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${item.category}</span>
@@ -391,14 +479,9 @@
                             </div>
                             <span class="text-[9px] text-gray-400">🕒 ${item.updatedAt}</span>
                         </div>
-
-                        <!-- Image -->
                         <img src="${item.imageUrl}" class="w-full h-44 object-cover bg-gray-100" alt="Service Photo">
-
-                        <!-- Details & Action Buttons -->
                         <div class="p-3 space-y-2.5">
                             <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
-                            
                             <div class="flex gap-2 pt-1 border-t">
                                 <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
                                     📞 Call Now
