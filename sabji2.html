@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apna Gao Digital Directory | Local Services, Shops & Doctors</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Gao aur town ki sabhi services - Auto, JCB, Doctor, Electrician, Sabji, CSC Center, Room Rent direct contact aur WhatsApp.">
+    <meta name="keywords" content="Local Village Directory, Local Services, Auto Booking, Plumber, Doctor Contact, Sabji Mandi">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Apna Gao Digital Directory">
+    <meta property="og:description" content="Local dukan aur mistriyon ki list. Direct Call & WhatsApp contact.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen pb-20">
+
+    <!-- Sticky Header -->
+    <header class="bg-indigo-700 text-white p-3 shadow-md sticky top-0 z-40">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="font-bold text-base flex items-center gap-1 cursor-pointer" onclick="location.reload()">
+                🏪 Apna Gao Directory
+            </h1>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="shareWebsite()" class="text-xs bg-indigo-800 hover:bg-indigo-900 border border-indigo-400 px-2.5 py-1.5 rounded-full font-bold">
+                    📢 Share
+                </button>
+                <button onclick="openVendorPortal()" class="text-xs bg-amber-400 hover:bg-amber-500 text-slate-900 border border-amber-300 px-3 py-1.5 rounded-full font-bold shadow-sm">
+                    💼 Vendor Portal
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto p-3 flex-1 w-full space-y-3">
+
+        <!-- Search Bar -->
+        <div class="relative">
+            <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="🔍 Service, Name ya Dukan khojein..." 
+                   class="w-full bg-white border border-gray-300 pl-3 pr-8 py-2 rounded-xl text-xs font-semibold shadow-sm focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <!-- Category Oval Pills Bar -->
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Select Category:</p>
+            <div id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+        </div>
+
+        <!-- Location Oval Pills Bar -->
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Select Location:</p>
+            <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+        </div>
+
+        <!-- Directory Feed Cards -->
+        <div id="feed" class="space-y-3">
+            <p class="text-center text-gray-500 text-xs py-8">Directory Loading...</p>
+        </div>
+    </main>
+
+    <!-- Sticky Bottom Footer Navigation -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-900 text-gray-300 text-[11px] py-2 px-3 border-t border-slate-700 z-40">
+        <div class="max-w-md mx-auto flex justify-around items-center font-semibold text-indigo-300">
+            <button onclick="toggleModal('helpModal')" class="hover:text-white">❓ Help</button>
+            <button onclick="toggleModal('privacyModal')" class="hover:text-white">Privacy</button>
+            <button onclick="toggleModal('termsModal')" class="hover:text-white">Terms</button>
+            <button onclick="toggleModal('disclaimerModal')" class="hover:text-white">Disclaimer</button>
+            <button onclick="shareWebsite()" class="bg-indigo-600 text-white px-2.5 py-0.5 rounded-full text-[10px]">📢 Share App</button>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: HELP & PINTEREST GUIDE -->
+    <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-700">❓ Help & Pinterest Photo Guide</h3>
+                <button onclick="toggleModal('helpModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl space-y-1">
+                    <p class="font-bold text-indigo-900">📌 Pinterest Photo Link Kaise Upload Karein?</p>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700 text-[11px]">
+                        <li>Pinterest app par apni dukan/service ka poster upload karein.</li>
+                        <li><b>Share</b> button par click karke <b>Copy Link</b> dabaayein.</li>
+                        <li>Is directory me Vendor Portal me link paste kar dein.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: VENDOR PORTAL -->
+    <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-700">💼 Vendor Portal</h3>
+                <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+
+            <!-- REGISTRATION & LOGIN BOX -->
+            <div id="regBox" class="space-y-2">
+                <p class="text-xs font-bold text-gray-700">Business / Service Master Registration:</p>
+                <input type="text" id="regName" placeholder="Aapka Naam (e.g. Ramesh Sahu)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regShop" placeholder="Dukan / Service Title (e.g. Ramesh Auto Service)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="tel" id="regPhone" maxlength="10" placeholder="10-Digit Mobile / WhatsApp Number" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regLoc" placeholder="Location / Area (e.g. Main Chowk)" class="w-full border p-2 rounded-lg text-xs">
+                
+                <button onclick="registerVendor()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs">Register Details</button>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded-lg font-bold text-xs">🔄 Check Approval Status</button>
+            </div>
+
+            <!-- WAITING FOR APPROVAL -->
+            <div id="waitBox" class="hidden text-center space-y-3 py-4">
+                <div class="text-3xl">⏳</div>
+                <h4 class="font-bold text-sm text-amber-600">Please Wait... Approval Pending!</h4>
+                <p class="text-[11px] text-gray-500">Aapki details owner ko bhej di gayi hain. Active hote hi aap service add kar payenge.</p>
+                <button onclick="checkApprovalStatus()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs">🔄 Re-Check Approval Status</button>
+            </div>
+
+            <!-- APPROVED VENDOR DASHBOARD -->
+            <div id="dashboardBox" class="hidden space-y-3">
+                <div class="flex justify-between items-center bg-indigo-50 p-2 rounded-xl border border-indigo-200">
+                    <div>
+                        <p class="text-[10px] text-gray-500">Welcome Back,</p>
+                        <h4 id="vendorWelcomeName" class="font-bold text-xs text-indigo-800">Vendor</h4>
+                    </div>
+                    <button onclick="vendorLogout()" class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg">Logout</button>
+                </div>
+
+                <!-- ADD / EDIT SERVICE FORM -->
+                <div class="border p-2.5 rounded-xl space-y-2 bg-slate-50">
+                    <p id="formTitle" class="text-[11px] font-bold text-gray-600">➕ Service Card Add Karein (Max 3 Allowed):</p>
+                    <input type="hidden" id="editingItemId" value="">
+                    
+                    <!-- Predefined Category Select -->
+                    <select id="catSelect" onchange="handleCategoryChange()" class="w-full border p-2 rounded-lg text-xs bg-white font-bold text-gray-700">
+                        <option value="Auto Booking">🛺 Auto Booking</option>
+                        <option value="Marriage/Tour Vehicle">🚘 Vehicle (Marriage/Tour/JCB/Tractor)</option>
+                        <option value="Medical Clinics">🩺 Medical Clinic / Ayurvedic</option>
+                        <option value="Cake / Sweets">🍰 Cake & Bakery Shops</option>
+                        <option value="Hotels / Resto">🏨 Hotels & Fast Food</option>
+                        <option value="General Shop">🛒 Grocery / Hardware / Fancy Shop</option>
+                        <option value="Bus Ticket Counter">🚌 Bus Ticket Counter</option>
+                        <option value="Photocopy / CSC">printer Photocopy & CSC Center</option>
+                        <option value="Vegetables & Fruits">🥦 Fruits & Vegetables</option>
+                        <option value="Mills / Factory">🏭 Mill (Rice/Oil/Flour) & Factory</option>
+                        <option value="Room Rent / Real Estate">🏠 Room Rent & Real Estate</option>
+                        <option value="Mehandi Services">💅 Mehandi Services</option>
+                        <option value="Coaching / School">📚 Coaching Center & Teachers</option>
+                        <option value="Plumber & Electrician">🔌 Electrician, Plumber & Mestri</option>
+                        <option value="Repairing Services">🛠️ Repairing (AC/Fridge/Cooler)</option>
+                        <option value="Painter & Welder">🎨 Painter, Welder & Builder</option>
+                        <option value="Tailor & Design">✂️ Tailor & Architecture</option>
+                        <option value="Legal & Tax Expert">⚖️ Advocate & GST/Tax Expert</option>
+                        <option value="OTHER">✨ Other (Custom Profession)</option>
+                    </select>
+
+                    <input type="text" id="customCat" placeholder="Apna Profession Likhein" class="hidden w-full border p-2 rounded-lg text-xs bg-white">
+                    <input type="text" id="serviceTitle" placeholder="Service Title (e.g. 24x7 Emergency Plumber)" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    <input type="text" id="imgUrl" placeholder="Pinterest Image Link" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    <textarea id="serviceDetails" placeholder="Service ki details (e.g. Har tarah ke pipe fit aur repair kiye jate hain)" class="w-full border p-2 rounded-lg text-xs bg-white h-14"></textarea>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold text-xs">Cancel</button>
+                        <button onclick="saveOrUpdateProduct()" id="saveBtn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs">Save Service Card</button>
+                    </div>
+                </div>
+
+                <p class="text-[11px] font-bold text-gray-500">Aapki Active Services (Manage):</p>
+                <div id="myProductsList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS: LEGAL PAGES -->
+    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Privacy Policy</h3>
+            <p class="text-gray-600">Hum aapka koi personal location data trace nahi karte. Contact details direct customer connection ke liye hain.</p>
+            <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Terms of Use</h3>
+            <p class="text-gray-600">Directory listings local vendors dwara set kiye jate hain. Service quality aur pricing ke liye vendor zimmedar hain.</p>
+            <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1">Disclaimer</h3>
+            <p class="text-gray-600">Apna Gao Directory ek local web directory platform hai. Hum middleman commission nahi lete.</p>
+            <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2">Close</button>
+        </div>
+    </div>
+
+    <!-- JS Application Engine -->
+    <script>
+        const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+        let allData = [];
+        let selectedCategory = "ALL";
+        let selectedLocation = "ALL";
+        let activeVendorData = null;
+
+        // RICH DEMO DATA (5 Alag Categories + Multitalented User 'Suresh Sahu' in 3 Categories)
+        const demoData = [
+            {
+                itemId: "L01",
+                category: "Vegetables & Fruits",
+                title: "Ramesh Fresh Sabji Bhandar",
+                imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+                details: "Har prakaar ki taaza sabjiyan aur fal uplabdh hain. Direct WhatsApp order karein.",
+                vendor: { name: "Ramesh Kumar", shop: "Ramesh Veg", phone: "919876543210", location: "Main Chowk Mandi" },
+                updatedAt: "04/08/2026"
+            },
+            {
+                itemId: "L02",
+                category: "Marriage/Tour Vehicle",
+                title: "Suresh JCB & Tractor Service",
+                imageUrl: "https://images.unsplash.com/photo-1579412690850-bd41cd0af397?auto=format&fit=crop&w=600&q=80",
+                details: "Khudai, mitti bharai aur kheton ki jutai ke liye Tractor aur JCB rent par uplabdh.",
+                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
+                updatedAt: "04/08/2026"
+            },
+            {
+                itemId: "L03",
+                category: "Plumber & Electrician",
+                title: "Suresh Expert Plumbing Service",
+                imageUrl: "https://images.unsplash.com/photo-1505798577917-a65157d3320a?auto=format&fit=crop&w=600&q=80",
+                details: "Ghar ki plumbing, borwell repair aur bathroom fitting ke expert mistri.",
+                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
+                updatedAt: "04/08/2026"
+            },
+            {
+                itemId: "L04",
+                category: "Auto Booking",
+                title: "Suresh 24x7 Auto Booking Service",
+                imageUrl: "https://images.unsplash.com/photo-1596838132731-3301c3fd431b?auto=format&fit=crop&w=600&q=80",
+                details: "Station, Hospital aur Aas-Paas ke gaon ke liye emergency auto booking.",
+                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
+                updatedAt: "04/08/2026"
+            },
+            {
+                itemId: "L05",
+                category: "Medical Clinics",
+                title: "Gupta Ayurvedic & Medical Clinic",
+                imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80",
+                details: "Samanya bimariyon ka ilaj aur sabhi ayurvedic dawaiyan uplabdh hain.",
+                vendor: { name: "Dr. A.K. Gupta", shop: "Gupta Clinic", phone: "919876543212", location: "Bus Stand Chowk" },
+                updatedAt: "04/08/2026"
+            },
+            {
+                itemId: "L06",
+                category: "Coaching / School",
+                title: "Prakash Physics & Math Classes",
+                imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+                details: "Class 8th se 12th tak ke bachhon ke liye special coaching classes.",
+                vendor: { name: "Prakash Sir", shop: "Prakash Classes", phone: "919876543213", location: "College Road" },
+                updatedAt: "04/08/2026"
+            }
+        ];
+
+        function getDeviceToken() {
+            let token = localStorage.getItem("dev_token");
+            if (!token) {
+                token = "dev_" + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem("dev_token", token);
+            }
+            return token;
+        }
+
+        async function loadData() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getData`);
+                allData = await res.json();
+                renderTabs();
+                renderCards(allData);
+            } catch(e) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+            }
+        }
+
+        function shareWebsite() {
+            const shareData = {
+                title: '🏪 Apna Gao Digital Directory',
+                text: 'Apne gao ke sabhi mistri, dukan, doctor aur vehicles ke direct contact number dekhein! 👇',
+                url: window.location.href
+            };
+            if (navigator.share) { navigator.share(shareData).catch(() => {}); }
+            else {
+                navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`).then(() => {
+                    alert("✅ App Share Link Copy Ho Gaya!\n\nAb WhatsApp Status par Paste kar dein.");
+                });
+            }
+        }
+
+        function handleCategoryChange() {
+            const val = document.getElementById('catSelect').value;
+            const customBox = document.getElementById('customCat');
+            if(val === "OTHER") customBox.classList.remove('hidden');
+            else customBox.classList.add('hidden');
+        }
+
+        function renderTabs() {
+            // Categories Tab
+            const catContainer = document.getElementById('categoryTabs');
+            const categories = ["ALL", ...new Set(allData.map(item => item.category))];
+            catContainer.innerHTML = '';
+            categories.forEach(cat => {
+                const isSelected = selectedCategory === cat;
+                const activeClasses = isSelected ? "bg-indigo-700 text-white border-indigo-700" : "bg-white text-gray-600 border-gray-200";
+                catContainer.innerHTML += `<button onclick="selectCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${cat === "ALL" ? "✨ Sabhi Categories" : cat}</button>`;
+            });
+
+            // Locations Tab
+            const locContainer = document.getElementById('locationTabs');
+            const locations = ["ALL", ...new Set(allData.map(item => item.vendor.location))];
+            locContainer.innerHTML = '';
+            locations.forEach(loc => {
+                const isSelected = selectedLocation === loc;
+                const activeClasses = isSelected ? "bg-emerald-700 text-white border-emerald-700" : "bg-white text-gray-600 border-gray-200";
+                locContainer.innerHTML += `<button onclick="selectLocation('${loc}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${loc === "ALL" ? "📍 Sabhi Locations" : `📍 ${loc}`}</button>`;
+            });
+        }
+
+        function selectCategory(cat) { selectedCategory = cat; renderTabs(); applyFilters(); }
+        function selectLocation(loc) { selectedLocation = loc; renderTabs(); applyFilters(); }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = allData;
+
+            if (selectedCategory !== "ALL") filtered = filtered.filter(i => i.category === selectedCategory);
+            if (selectedLocation !== "ALL") filtered = filtered.filter(i => i.vendor.location === selectedLocation);
+            
+            if (query.trim() !== "") {
+                filtered = filtered.filter(i => 
+                    i.title.toLowerCase().includes(query) || 
+                    i.details.toLowerCase().includes(query) || 
+                    i.category.toLowerCase().includes(query) ||
+                    i.vendor.name.toLowerCase().includes(query)
+                );
+            }
+            renderCards(filtered);
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('feed');
+            container.innerHTML = '';
+
+            if(data.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Koi service nahi mili.</p>';
+                return;
+            }
+
+            data.forEach((item) => {
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <!-- Top Header -->
+                        <div class="p-2.5 bg-slate-50 border-b flex justify-between items-center text-xs">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${item.category}</span>
+                                <h4 class="font-bold text-gray-800 mt-1">${item.title}</h4>
+                                <p class="text-[10px] text-gray-500">📍 ${item.vendor.location} (${item.vendor.name})</p>
+                            </div>
+                            <span class="text-[9px] text-gray-400">🕒 ${item.updatedAt}</span>
+                        </div>
+
+                        <!-- Image -->
+                        <img src="${item.imageUrl}" class="w-full h-44 object-cover bg-gray-100" alt="Service Photo">
+
+                        <!-- Details & Action Buttons -->
+                        <div class="p-3 space-y-2.5">
+                            <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
+                            
+                            <div class="flex gap-2 pt-1 border-t">
+                                <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
+                                    📞 Call Now
+                                </a>
+                                <button onclick="contactWhatsApp('${item.vendor.phone}', '${item.title}', '${item.category}')" 
+                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
+                                    💬 WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function contactWhatsApp(phone, title, category) {
+            const msg = `Namaste! Maine Apna Gao Directory par aapka *${title}* (${category}) card dekha.%0A%0AMujhe details chahiye. Kripya reply karein.`;
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+
+        function openVendorPortal() {
+            toggleModal('vendorModal');
+            if (!SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) { checkApprovalStatus(); }
+        }
+
+        async function checkApprovalStatus() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Apps Script Web App URL daalne ke baad status check hoga.");
+                return;
+            }
+            const token = getDeviceToken();
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "checkStatus", deviceToken: token })
+            });
+            const data = await res.json();
+
+            document.getElementById('regBox').classList.add('hidden');
+            document.getElementById('waitBox').classList.add('hidden');
+            document.getElementById('dashboardBox').classList.add('hidden');
+
+            if (data.status === "NOT_FOUND") document.getElementById('regBox').classList.remove('hidden');
+            else if (data.status === "Denied") document.getElementById('waitBox').classList.remove('hidden');
+            else if (data.status === "Approved") {
+                activeVendorData = data;
+                document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
+                document.getElementById('dashboardBox').classList.remove('hidden');
+                loadMyProducts();
+            }
+        }
+
+        async function registerVendor() {
+            const name = document.getElementById('regName').value;
+            const shop = document.getElementById('regShop').value;
+            const phone = document.getElementById('regPhone').value;
+            const loc = document.getElementById('regLoc').value;
+
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if(!phoneRegex.test(phone)) return alert("Kripya sahi 10-digit mobile number enter karein!");
+            if(!name || !shop || !loc) return alert("Sabhi details bharein!");
+
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Script URL paste karne ke baad registration save hoga!");
+                return;
+            }
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "registerVendor", name, shop, phone: "91" + phone, location: loc,
+                    deviceToken: getDeviceToken()
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            checkApprovalStatus();
+        }
+
+        async function loadMyProducts() {
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "getMyProducts", vendorId: activeVendorData.vendorId })
+            });
+            const items = await res.json();
+            const container = document.getElementById('myProductsList');
+            container.innerHTML = '';
+
+            if(items.length === 0) {
+                container.innerHTML = '<p class="text-[10px] text-gray-400">Koi service card add nahi hai.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-2 rounded-xl border text-xs space-y-1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">${item.category}</span>
+                                <p class="font-bold text-gray-700 truncate max-w-[170px] mt-0.5">${item.title}</p>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editProduct('${item.itemId}', '${item.category}', '${item.title}', '${item.imageUrl}', '${item.details}')" class="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg font-bold">✏️ Edit</button>
+                                <button onclick="deleteProduct('${item.itemId}')" class="text-red-600 bg-red-50 px-2 py-1 rounded-lg font-bold">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function saveOrUpdateProduct() {
+            const itemId = document.getElementById('editingItemId').value;
+            let category = document.getElementById('catSelect').value;
+            if(category === "OTHER") category = document.getElementById('customCat').value;
+            
+            const title = document.getElementById('serviceTitle').value;
+            const imgUrl = document.getElementById('imgUrl').value;
+            const details = document.getElementById('serviceDetails').value;
+
+            if(!category || !title || !imgUrl) return alert("Category, Title aur Image URL bharein!");
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "saveProduct",
+                    vendorId: activeVendorData.vendorId, itemId, category, title, imageUrl: imgUrl, details
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            cancelEdit();
+            loadMyProducts();
+            loadData();
+        }
+
+        function editProduct(itemId, category, title, imgUrl, details) {
+            document.getElementById('editingItemId').value = itemId;
+            document.getElementById('catSelect').value = category;
+            document.getElementById('serviceTitle').value = title;
+            document.getElementById('imgUrl').value = imgUrl;
+            document.getElementById('serviceDetails').value = details;
+            document.getElementById('formTitle').innerText = "✏️ Service Card Edit Karein:";
+            document.getElementById('saveBtn').innerText = "Update Service";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editingItemId').value = '';
+            document.getElementById('serviceTitle').value = '';
+            document.getElementById('imgUrl').value = '';
+            document.getElementById('serviceDetails').value = '';
+            document.getElementById('formTitle').innerText = "➕ Service Card Add Karein (Max 3 Allowed):";
+            document.getElementById('saveBtn').innerText = "Save Service Card";
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        async function deleteProduct(itemId) {
+            if(!confirm("Delete karna chahte hain?")) return;
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "deleteProduct", vendorId: activeVendorData.vendorId, itemId })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            loadMyProducts();
+            loadData();
+        }
+
+        function vendorLogout() { activeVendorData = null; toggleModal('vendorModal'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        loadData();
+    </script>
+</body>
+</html>
