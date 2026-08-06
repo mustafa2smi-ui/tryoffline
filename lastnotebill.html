@@ -1427,42 +1427,56 @@
         });
       }
 */
-      /* ---------- 🖨️ MULTI-LANGUAGE PRINT LOCK INTERCEPTOR (FREEZE-PROOF) ---------- */
-async function printBill() {
-  // 🎯 Safely DOM se Print Mode Select Select Dropdown Element read karein
+      
+/* ---------- 🖨️ GLOBAL FREEZE-PROOF THERMAL PRINT ENGINE ---------- */
+window.printBill = async function() {
   const printModeDropdown = document.getElementById("printModeSelect");
   const currentPrintMode = printModeDropdown ? printModeDropdown.value : 'ENG';
 
-  // 🔒 Sirf 'MULTI' Mode chunne par hi Subscription Check Hoga! (ENG & COMP 100% FREE)
+  // 🔒 Sirf 'MULTI' Mode par Subscription Check hoga
   if (currentPrintMode === 'MULTI') {
     let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
     if (!userLicence.isVerified) {
-      window.openPrintPaywall(); // Paywall Square Modal Open
-      return; // Print Rok Do
+      if (typeof window.openPrintPaywall === "function") {
+        window.openPrintPaywall();
+      } else {
+        alert("Pro Multi-Language feature unlocked nahi hai!");
+      }
+      return;
     }
   }
 
-  // 📝 Items Extract Engine
+  const container = document.getElementById("container");
+  if (!container) return alert("Row container nahi mila!");
+
   let validRows = [];
   let subtotalCalc = 0;
+
   [...container.children].forEach(row => {
-    const itemText = row.querySelector(".input").textContent.trim();
-    const itemTotal = row.querySelector(".result").textContent.trim();
-    if(itemText) {
+    const inputEl = row.querySelector(".input");
+    const resEl = row.querySelector(".result");
+    const itemText = inputEl ? inputEl.textContent.trim() : "";
+    const itemTotal = resEl ? resEl.textContent.trim() : "";
+
+    if (itemText) {
       validRows.push({ text: itemText, total: itemTotal });
       subtotalCalc += parseFloat(itemTotal.replace(/,/g, '')) || 0;
     }
   });
 
   if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
-  
-  // Desktop Computer A4 Print Direct Open
+
+  // Desktop Computer A4 Print Mode
   if (currentPrintMode === 'COMP') {
-    executeComputerBrowserPrint();
+    if (typeof executeComputerBrowserPrint === "function") {
+      executeComputerBrowserPrint();
+    } else {
+      window.print();
+    }
     return;
   }
 
-  // Bluetooth Thermal Print Execution
+  // Bluetooth Thermal Printing Engine
   try {
     if (!printerDevice) {
       printerDevice = await navigator.bluetooth.requestDevice({
@@ -1470,31 +1484,32 @@ async function printBill() {
         optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
       });
     }
+
     const server = await printerDevice.gatt.connect();
     const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
     const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
 
-    const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
-    const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
+    const shopTitle = document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : 'Notebook Bill';
+    const cName = document.getElementById('custNameInput') ? document.getElementById('custNameInput').textContent.trim() : "Cash Customer";
+    const dateText = document.getElementById("date") ? document.getElementById("date").textContent : "";
+    const timeText = document.getElementById("time") ? document.getElementById("time").textContent : "";
+    const totalText = document.getElementById("total") ? document.getElementById("total").textContent : "₹0";
 
     let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
-    esc += '\x1B\x61\x00Date: ' + dateEl.textContent + ' ' + timeEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+    esc += '\x1B\x61\x00Date: ' + dateText + ' ' + timeText + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
     esc += 'S.No Item                 Amount\n';
     esc += '--------------------------------\n';
-    
+
     for (let i = 0; i < validRows.length; i++) {
       let rowItem = validRows[i];
-      let finalPrintName = "";
+      let finalPrintName = rowItem.text;
 
-      if (currentPrintMode === 'MULTI') {
-        finalPrintName = rowItem.text;
-      } else {
+      if (currentPrintMode !== 'MULTI') {
         let rawLineText = rowItem.text;
         if (/[^\x00-\x7F]/.test(rawLineText)) {
           let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
           let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
-          
-          if(wordsPart) {
+          if (wordsPart && typeof autoTranslateText === "function") {
             let translatedWords = await autoTranslateText(wordsPart);
             rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
           }
@@ -1505,7 +1520,6 @@ async function printBill() {
       let sNo = (i + 1).toString().padEnd(3, ' ');
       let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
       let amtStr = cleanAmt.padStart(9, ' ');
-      
       let maxNameWidth = 32 - sNo.length - amtStr.length;
 
       if (finalPrintName.length <= maxNameWidth) {
@@ -1522,13 +1536,13 @@ async function printBill() {
         }
       }
     }
-    
+
     esc += "--------------------------------\n";
     esc += `Subtotal: Rs. ${subtotalCalc.toFixed(2)}\n`;
 
     const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
     const percentVal = parseFloat(document.getElementById("percentVal") ? document.getElementById("percentVal").value : 0) || 0;
-    
+
     if (percentVal > 0) {
       let adjAmt = (subtotalCalc * percentVal) / 100;
       if (percentType === "DISC") {
@@ -1538,12 +1552,12 @@ async function printBill() {
       }
     }
 
-    let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
+    let finalCleanTotal = totalText.replace(/[₹रु]/g, 'Rs.');
     esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
-    
+
     let encoder = new TextEncoder("utf-8");
     if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
-    
+
     const data = encoder.encode(esc);
     const chunkSize = 100;
     for (let i = 0; i < data.length; i += chunkSize) {
@@ -1555,7 +1569,9 @@ async function printBill() {
     alert("Print Error: " + error.message);
     printerDevice = null;
   }
-}
+};
+
+  
 
       function renderBillsHistoryList(searchFilter = "") {
         if (!dbBillsHistoryList) return;
