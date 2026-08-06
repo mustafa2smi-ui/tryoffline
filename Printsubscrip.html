@@ -191,14 +191,6 @@
       </div>
       <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
     </div>
-<!-- 📤 EXPORT & 📥 IMPORT BUTTONS -->
-<div style="display: flex; gap: 4px;">
-  <button id="exportBtn" onclick="exportAppData()" class="btn sq-btn" style="background:#8e44ad; border-color:#9b59b6; color:#fff;" title="Export Backup Data">📤 Data</button>
-  <button id="importBtn" onclick="triggerImportFileInput()" class="btn sq-btn" style="background:#2980b9; border-color:#3498db; color:#fff;" title="Import Backup Data">📥 Data</button>
-</div>
-
-<!-- Hidden File Input For Importing Backup -->
-<input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAppData(event)">
 
     <!-- MAIN SCOLLABLE NOTEBOOK SHEET -->
     <div id="paper" class="paper">
