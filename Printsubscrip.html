@@ -208,6 +208,14 @@
       </div>
 
       <div class="row-list" id="container"></div>
+<!-- 📤 EXPORT & 📥 IMPORT BUTTONS -->
+<div style="display: flex; gap: 4px;">
+  <button id="exportBtn" onclick="exportAppData()" class="btn sq-btn" style="background:#8e44ad; border-color:#9b59b6; color:#fff;" title="Export Backup Data">📤 Data</button>
+  <button id="importBtn" onclick="triggerImportFileInput()" class="btn sq-btn" style="background:#2980b9; border-color:#3498db; color:#fff;" title="Import Backup Data">📥 Data</button>
+</div>
+
+<!-- Hidden File Input For Importing Backup -->
+<input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAppData(event)">
 
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
@@ -239,6 +247,7 @@
         </div>
 
         <div style="display: flex; gap: 4px;">
+          <button id="undoBtn" class="btn sq-btn" style="background:#e67e22; border-color:#d35400; color:#fff; display:none;" title="Restore Last Action / Bill">↩️</button>
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
           <button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>
           <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
@@ -249,6 +258,7 @@
     </div>
 
   </div>
+
 
   <script>
     /* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE ---------- */
@@ -310,6 +320,7 @@
         token: ""
       };
 
+let undoHistoryState = null; // Purane state ka memory backup
       let html5QrCode = null;
       let isScannerRunning = false;
       let lastScannedCode = "";
@@ -1119,6 +1130,112 @@
           printBill();
         });
       }
+/* ==========================================================================
+   🔥 PRO MAX ENGINE: SMART UNDO & CRASH RECOVERY SYSTEM
+   ========================================================================== */
+
+
+// 1. Current State Snapshot Capture (Bill Clear hone se pehle ya badalhne se pehle)
+function saveCurrentSnapshot() {
+  const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
+  let items = [];
+  
+  const container = document.getElementById("container");
+  if (container) {
+    [...container.children].forEach(row => {
+      const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+      if (val) items.push(val);
+    });
+  }
+
+  // Save snapshot to memory and browser safety storage
+  undoHistoryState = {
+    custName: custName,
+    items: items,
+    timestamp: new Date().getTime()
+  };
+
+  // Show Undo Button on UI
+  const undoBtn = document.getElementById("undoBtn");
+  if (undoBtn) undoBtn.style.display = "flex";
+
+  // Persistent Auto-Draft Backup (Crash / Call protection)
+  localStorage.setItem("notebook_bill_autodraft", JSON.stringify(undoHistoryState));
+}
+
+// 2. Perform Smart Undo Restore (Wapas Data Recover Karna)
+function executeSmartUndo() {
+  let stateToRestore = undoHistoryState;
+
+  // Memory khali ho toh LocalStorage ka backup uthao (In case page reload ho gaya ho)
+  if (!stateToRestore) {
+    stateToRestore = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
+  }
+
+  if (!stateToRestore || (!stateToRestore.items.length && !stateToRestore.custName)) {
+    return alert("Koi Undo backup data available nahi hai!");
+  }
+
+  // Customer Name Restore
+  const custInput = document.getElementById("custNameInput");
+  if (custInput) custInput.textContent = stateToRestore.custName;
+
+  // Container Clear karke Purani Rows Re-build karein
+  const container = document.getElementById("container");
+  if (container) {
+    container.innerHTML = "";
+    if (stateToRestore.items.length > 0) {
+      stateToRestore.items.forEach((itemText, idx) => {
+        container.appendChild(makeRow(idx, itemText));
+      });
+    } else {
+      container.appendChild(makeRow(0));
+    }
+  }
+
+  // Calculations Re-render karein
+  if (typeof render === "function") render();
+  if (typeof updateSL === "function") updateSL();
+
+  // Hide Undo Button after successful restore
+  const undoBtn = document.getElementById("undoBtn");
+  if (undoBtn) undoBtn.style.display = "none";
+  undoHistoryState = null;
+
+  alert("🎉 Bill data successfully restored!");
+}
+
+// 3. Clear Button Modify (Clear dabate hi Snapshot save hoga)
+const clearBtn = document.getElementById("clearBtn");
+if (clearBtn) {
+  clearBtn.addEventListener("click", function(e) {
+    // Pehle backup lo
+    saveCurrentSnapshot();
+    
+    // Original Clear Action Perform Karo
+    const container = document.getElementById("container");
+    if (container) container.innerHTML = "";
+    const custInput = document.getElementById("custNameInput");
+    if (custInput) custInput.textContent = "";
+    container.appendChild(makeRow(0));
+    if (typeof render === "function") render();
+  });
+}
+
+// 4. Bind Undo Button Click Event
+document.addEventListener("DOMContentLoaded", function() {
+  const undoBtn = document.getElementById("undoBtn");
+  if (undoBtn) {
+    undoBtn.addEventListener("click", executeSmartUndo);
+  }
+
+  // Auto Restore Draft on Emergency Page Crash Reload
+  const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
+  if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
+    const undoBtn = document.getElementById("undoBtn");
+    if (undoBtn) undoBtn.style.display = "flex";
+  }
+});
 
       function renderBillsHistoryList() {
         dbBillsHistoryList.innerHTML = "";
