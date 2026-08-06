@@ -22,6 +22,15 @@
       --green-patch: #e8f8f5; 
       --green-text: #117a65;
       --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); 
+      --font-base: 15px;
+    }
+
+    /* DARK THEME OVERRIDES */
+    body.dark-mode {
+      --paper: #2c3e50;
+      --ink: #ecf0f1;
+      --muted: #bdc3c7;
+      --line: #34495e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,8 +49,10 @@
 
     .brand-header { background: var(--gradient-head); padding: 6px 8px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }
     .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 4px 7px; font-size: 12px; font-weight: 800; cursor: pointer; height: 26px; }
+    .settings-trigger-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 0 8px; font-size: 15px; cursor: pointer; height: 28px; display: flex; align-items: center; justify-content: center; }
     
+    .back-to-bill-btn { display: none; background: #e74c3c; color: #fff; border: none; border-radius: 4px; padding: 0 10px; font-size: 12px; font-weight: bold; cursor: pointer; height: 28px; align-items: center; justify-content: center; }
+
     .scanner-section { background: #000; padding: 8px; display: none; flex-direction: column; align-items: center; flex-shrink: 0; }
     #reader { width: 100%; max-width: 420px; background: #000; border-radius: 8px; overflow: hidden; }
     .scanner-controls-bar { width: 100%; max-width: 420px; display: flex; justify-content: space-between; padding: 6px 0; gap: 10px; }
@@ -74,13 +85,13 @@
 
     .input {
       width: 100%; border: none; outline: none; background: transparent;
-      color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 2px 0; line-height: 1.3;
+      color: var(--ink); font-family: inherit; font-size: var(--font-base); font-weight: 600; padding: 2px 0; line-height: 1.3;
       word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap;
     }
 
     .result {
       min-width: 80px; max-width: 100px; text-align: right; color: var(--accent);
-      font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-weight: 700; font-size: var(--font-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
     .total-val {
@@ -114,7 +125,7 @@
     .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 1px; }
 
     .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
-    .sq-btn { width: 40px; height: 40px; font-size: 18px; }
+    .sq-btn { width: 44px; height: 42px; font-size: 18px; }
     .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 3px; height: 26px; font-weight: 600; outline: none; cursor: pointer; font-size: 11px; }
     .mode-banner { background: #1abc9c; color: white; text-align: center; font-size: 10px; font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; }
     .mode-banner.entry { background: #3498db; }
@@ -126,6 +137,29 @@
     .bill-history-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
+
+    /* ⚙️ SETTINGS DRAWER OVERLAY STYLES */
+    .settings-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); z-index: 999999; justify-content: center; align-items: center;
+      padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px);
+    }
+    .settings-modal-box {
+      background: #1a252f; border: 2px solid var(--line); border-radius: 8px; width: 100%;
+      max-width: 380px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); color: #fff;
+      max-height: 90vh; overflow-y: auto; font-family: inherit;
+    }
+    .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 12px; }
+    .settings-title { font-size: 16px; font-weight: 800; color: #1abc9c; display: flex; align-items: center; gap: 6px; }
+    .settings-close-btn { background: none; border: none; color: #e74c3c; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .settings-menu-list { display: flex; flex-direction: column; gap: 8px; }
+    .settings-item-btn {
+      background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 10px 12px;
+      border-radius: 6px; font-size: 13px; font-weight: 600; text-align: left; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .settings-item-btn:active { background: #34495e; }
+    .settings-section-lbl { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-top: 8px; margin-bottom: 2px; }
 
     @media (max-width: 600px) {
       body { padding: 0; }
@@ -150,9 +184,81 @@
       <p style="margin: 0 0 20px 0; color: #576574; font-size: 14px; line-height: 1.5; font-weight: 500;">
         Thermal printing aur billing features ko unlock karne ke liye aapko Pro Subscription plan lena hoga.
       </p>
-      <div style="display: flex; gap: 10px; justify-content: center;">
+      <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 12px;">
         <button onclick="closePrintPaywall()" style="flex: 1; height: 44px; background: #c8d6e5; color: #2c3e50; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer;">Not Now</button>
         <button onclick="goToSubscriptionPage()" style="flex: 1.2; height: 44px; background: #10ac84; color: #ffffff; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.15);">Get Subscription 🚀</button>
+      </div>
+      <div style="font-size: 11px; color: #95a5a6;">
+        <a href="javascript:void(0)" onclick="openLegalModal('privacy')" style="color: #3498db; text-decoration: none;">Privacy Policy</a> | 
+        <a href="javascript:void(0)" onclick="openLegalModal('terms')" style="color: #3498db; text-decoration: none;">Terms of Use</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⚙️ PRO SETTINGS DRAWER MODAL -->
+  <div id="settingsModal" class="settings-modal-overlay">
+    <div class="settings-modal-box">
+      <div class="settings-header">
+        <div class="settings-title">⚙️ Control Center</div>
+        <button onclick="closeSettingsModal()" class="settings-close-btn">✖</button>
+      </div>
+
+      <div class="settings-menu-list">
+        <div class="settings-section-lbl">Navigation & Ledgers</div>
+        <button class="settings-item-btn" onclick="navToEntryMode()">
+          <span>🖋️ Product Database Entry Mode</span> ➔
+        </button>
+        <button class="settings-item-btn" onclick="navToSavedBills()">
+          <span>📜 Saved Bills History</span> ➔
+        </button>
+
+        <div class="settings-section-lbl">Backup & Export</div>
+        <button class="settings-item-btn" onclick="exportAppData(); closeSettingsModal();">
+          <span>📤 Backup Data (.json)</span> ⬇️
+        </button>
+        <button class="settings-item-btn" onclick="triggerImportFileInput(); closeSettingsModal();">
+          <span>📥 Restore Data (.json)</span> ⬆️
+        </button>
+        <button class="settings-item-btn" onclick="exportCSVData(); closeSettingsModal();">
+          <span>📊 Export Ledger CSV</span> 📁
+        </button>
+
+        <div class="settings-section-lbl">Preferences & Appearance</div>
+        <button class="settings-item-btn" onclick="toggleDarkMode()">
+          <span>🎨 Theme Mode</span> <span id="themeLblText">🌙 Dark / ☀️ Light</span>
+        </button>
+        <div class="settings-item-btn" style="cursor: default;">
+          <span>🔤 Font Size Adjustment</span>
+          <select id="fontSizeSelect" onchange="changeAppFontSize(this.value)" style="background:#1a252f; color:#fff; border:1px solid var(--line); border-radius:4px; padding:2px 6px;">
+            <option value="13px">Small</option>
+            <option value="15px" selected>Normal</option>
+            <option value="17px">Large</option>
+          </select>
+        </div>
+
+        <div class="settings-section-lbl">App Info & Legal</div>
+        <button class="settings-item-btn" onclick="shareAppText(); closeSettingsModal();">
+          <span>📤 Share Application</span> 🔗
+        </button>
+        <button class="settings-item-btn" onclick="openLegalModal('help'); closeSettingsModal();">
+          <span>⁉️ Help & User Guide</span> ❓
+        </button>
+        <button class="settings-item-btn" onclick="openLegalModal('privacy'); closeSettingsModal();">
+          <span>🔒 Privacy Policy & Terms</span> 📄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 LEGAL & HELP MODAL -->
+  <div id="legalModal" class="settings-modal-overlay">
+    <div class="settings-modal-box">
+      <div class="settings-header">
+        <div id="legalModalTitle" class="settings-title">📄 Information</div>
+        <button onclick="closeLegalModal()" class="settings-close-btn">✖</button>
+      </div>
+      <div id="legalModalBody" style="font-size: 13px; line-height: 1.6; color: #dcdde1; max-height: 60vh; overflow-y: auto;">
+        <!-- Dynamic Content injected via JS -->
       </div>
     </div>
   </div>
@@ -161,9 +267,9 @@
     
     <div class="brand-header">
       <div class="controls">
-        <div style="display: flex; gap: 4px;">
-          <button id="entryModeBtn" class="mode-toggle-btn" style="background:#3498db; color:#fff;">🖋️ E</button>
-          <button id="billModeBtn" class="mode-toggle-btn" style="background:#1abc9c; color:#fff;">💵 B</button>
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <button id="btnSettingsOpen" onclick="openSettingsModal()" class="settings-trigger-btn" title="Open Settings">⚙️</button>
+          <button id="btnBackToBill" onclick="navToBillMode()" class="back-to-bill-btn">← Back</button>
         </div>
         
         <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.5); color: #fff; font-size: 16px; font-weight: 800; text-align: center; width: 35%; outline: none;" placeholder="Shop Name" value="Notebook Bill">
@@ -199,8 +305,6 @@
       
       <div style="display: flex; gap: 6px; margin-top: 4px;">
         <button id="dbSaveBtn" class="btn" style="flex:2; padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff;">Save to Database</button>
-        <button id="exportBtn" onclick="exportAppData()" class="btn" style="flex:1; padding: 8px; font-size: 12px; background:#8e44ad; border-color:#9b59b6; color:#fff;" title="Export Backup Data">📤 Backup</button>
-        <button id="importBtn" onclick="triggerImportFileInput()" class="btn" style="flex:1; padding: 8px; font-size: 12px; background:#2980b9; border-color:#3498db; color:#fff;" title="Import Backup Data">📥 Restore</button>
       </div>
       <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAppData(event)">
     </div>
@@ -277,6 +381,7 @@
         </div>
       </div>
 
+      <!-- CLEAN COMPACT ACTION CONTROL BAR -->
       <div class="controls" style="margin-top: 2px;">
         <div class="operator-bar" style="flex: 1;">
           <button class="op-btn" data-op="+">+</button>
@@ -288,10 +393,8 @@
         <div style="display: flex; gap: 4px;">
           <button id="undoBtn" class="btn sq-btn" style="background:#e67e22; border-color:#d35400; color:#fff; display:none;" title="Restore Last Action / Bill">↩️</button>
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
+          <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾</button>
           <button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>
-          <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
-          <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
-          <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
         </div>
       </div>
     </div>
@@ -327,6 +430,95 @@
       }
     };
 
+    /* ---------- ⚙️ SETTINGS DRAWER MODAL CONTROLLERS ---------- */
+    window.openSettingsModal = function() {
+      const m = document.getElementById("settingsModal");
+      if (m) m.style.display = "flex";
+    };
+
+    window.closeSettingsModal = function() {
+      const m = document.getElementById("settingsModal");
+      if (m) m.style.display = "none";
+    };
+
+    window.navToEntryMode = function() {
+      closeSettingsModal();
+      toggleViewMode('entry');
+      document.getElementById("btnBackToBill").style.display = "flex";
+    };
+
+    window.navToSavedBills = function() {
+      closeSettingsModal();
+      toggleViewMode('entry');
+      document.getElementById("btnBackToBill").style.display = "flex";
+      // Scroll to history list
+      const hList = document.getElementById("dbBillsHistoryList");
+      if (hList) hList.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.navToBillMode = function() {
+      toggleViewMode('bill');
+      document.getElementById("btnBackToBill").style.display = "none";
+    };
+
+    window.toggleDarkMode = function() {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("notebook_theme_mode", isDark ? "dark" : "light");
+    };
+
+    window.changeAppFontSize = function(sizeVal) {
+      document.documentElement.style.setProperty('--font-base', sizeVal);
+      localStorage.setItem("notebook_font_size", sizeVal);
+    };
+
+    /* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
+    window.openLegalModal = function(type) {
+      const modal = document.getElementById("legalModal");
+      const title = document.getElementById("legalModalTitle");
+      const body = document.getElementById("legalModalBody");
+      
+      if (type === 'privacy') {
+        title.innerHTML = "🔒 Privacy & Security Policy";
+        body.innerHTML = `
+          <p><b>Notebook Bill Pro</b> respect karta hai aapki privacy ko.</p><br>
+          <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai. Hum ise kisi third-party server par store nahi karte.</p><br>
+          <p><b>Security:</b> Aapka transaction history fully offline secure hai. Google Apps Script aur Device Token Verification sirf Pro License Auth verification ke liye upyog hota hai.</p>
+        `;
+      } else if (type === 'terms') {
+        title.innerHTML = "📄 Terms of Service";
+        body.innerHTML = `
+          <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing aur billing engine ka upyog kar sakta hai.</p><br>
+          <p>2. <b>Device Binding:</b> 1 Pro License sirf registered device/account ke sath bound hota hai.</p><br>
+          <p>3. <b>Data Integrity:</b> Local Data backup ki zimmedari user ki hai (Export Backup Feature ka istemal karein).</p>
+        `;
+      } else {
+        title.innerHTML = "⁉️ User Guide & Help";
+        body.innerHTML = `
+          <p><b>Quick Shortcuts:</b></p>
+          <ul>
+            <li><b>Item Add:</b> Name and Price likhein (e.g. <i>Sugar 50</i>) aur Enter dabayein.</li>
+            <li><b>Calculation:</b> Math expression likhein (e.g. <i>Tea 45+45+50</i>).</li>
+            <li><b>Barcode Scan:</b> Header mein 📷 Icon daba kar scan karein.</li>
+            <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
+          </ul><br>
+          <p><b>Support Contact:</b> Support/Reactivation ke liye support@webmy.in par message karein.</p>
+        `;
+      }
+      if (modal) modal.style.display = "flex";
+    };
+
+    window.closeLegalModal = function() {
+      const modal = document.getElementById("legalModal");
+      if (modal) modal.style.display = "none";
+    };
+
+    window.shareAppText = function() {
+      const shareData = { title: "Notebook Bill Pro", text: "Pro Smart Digital Ledger & Thermal Billing Engine App", url: window.location.href };
+      if (navigator.share) navigator.share(shareData);
+      else alert("App Link Copied: " + window.location.href);
+    };
+
     /* ---------- 📤 / 📥 EXPORT & IMPORT BACKUP ENGINE ---------- */
     window.exportAppData = function() {
       try {
@@ -354,6 +546,11 @@
 
         alert("🎉 Backup file (.json) successfully export ho gayi hai!");
       } catch (err) { alert("Export Failed: " + err.message); }
+    };
+
+    window.exportCSVData = function() {
+      const csvBtn = document.getElementById("csvBtn");
+      if (csvBtn) csvBtn.click();
     };
 
     window.triggerImportFileInput = function() {
@@ -410,12 +607,6 @@
       const localSaveBtn = document.getElementById("localSaveBtn");
       const clearBtn = document.getElementById("clearBtn");
       const printBtn = document.getElementById("printBtn");
-      const shareBtn = document.getElementById("shareBtn");
-      const entryModeBtn = document.getElementById("entryModeBtn");
-      const billModeBtn = document.getElementById("billModeBtn");
-      const modeStatus = document.getElementById("modeStatus");
-      
-      const printModeSelect = document.getElementById("printModeSelect");
       const dbEntryPanel = document.getElementById("dbEntryPanel");
       const dbSaveBtn = document.getElementById("dbSaveBtn");
       const dbListContainer = document.getElementById("dbListContainer");
@@ -425,6 +616,8 @@
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
       const csvBtn = document.getElementById("csvBtn");
+      const printModeSelect = document.getElementById("printModeSelect");
+      const modeStatus = document.getElementById("modeStatus");
 
       let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || { isVerified: false, email: "", token: "" };
       let undoHistoryState = null;
@@ -446,6 +639,16 @@
         { code: "102", name: "Shakkar", price: 45 },
         { code: "103", name: "Chawal", price: 60 }
       ];
+
+      // Saved Theme & Font Preference restore
+      const savedTheme = localStorage.getItem("notebook_theme_mode");
+      if (savedTheme === "dark") document.body.classList.add("dark-mode");
+      const savedFont = localStorage.getItem("notebook_font_size");
+      if (savedFont) {
+        document.documentElement.style.setProperty('--font-base', savedFont);
+        const fSelect = document.getElementById("fontSizeSelect");
+        if (fSelect) fSelect.value = savedFont;
+      }
 
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
@@ -555,7 +758,7 @@
             const lastInput = container.lastChild.querySelector(".input");
             if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
           } else {
-            toggleViewMode('bill');
+            navToBillMode();
             setTimeout(() => {
               const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
               container.appendChild(newRow); updateSL(); render();
@@ -567,7 +770,7 @@
           document.getElementById('btnResumeCamUI').focus();
         } else {
           if (confirm(`Barcode '${code}' database mein nahi mila! Naya product add karein?`)) {
-            toggleViewMode('entry');
+            navToEntryMode();
             document.getElementById('dbCode').value = code;
             document.getElementById('dbName').focus();
           } else { resumeHardwareScanning(); }
@@ -608,6 +811,7 @@
         }
         render();
       }
+      window.toggleViewMode = toggleViewMode;
 
       function setCaretToEnd(el){
         const range = document.createRange();
@@ -954,19 +1158,12 @@
           totalWordsBox.style.display = "none";
         }
       }
+      window.render = render;
 
-      // Instant live render trigger when typing in % input box or changing select
       const percentValEl = document.getElementById("percentVal");
-      if (percentValEl) {
-        percentValEl.addEventListener("input", render);
-      }
+      if (percentValEl) percentValEl.addEventListener("input", render);
       const percentTypeEl = document.getElementById("percentType");
-      if (percentTypeEl) {
-        percentTypeEl.addEventListener("change", render);
-      }
-
-      entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
-      billModeBtn.addEventListener("click", () => toggleViewMode('bill'));
+      if (percentTypeEl) percentTypeEl.addEventListener("change", render);
 
       function scrollToActiveInput(element) {
         if (!element) return;
@@ -1026,27 +1223,6 @@
 
         localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
-      });
-
-      shareBtn.addEventListener("click", async () => {
-        let itemsListText = "";
-        const lines = [...container.children].slice(0, 20);
-        lines.forEach((row, index) => {
-          const itemText = row.querySelector(".input").textContent.trim();
-          const itemTotal = row.querySelector(".result").textContent.trim();
-          if(itemText) { itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`; }
-        });
-        if([...container.children].length > 20) { itemsListText += "...and more products listed.\n"; }
-
-        const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
-        const customerName = document.getElementById("custNameInput").textContent.trim() || 'N/A';
-        const payloadMessage = `*${shopTitle}*\nCust: ${customerName}\n---------------------\n${itemsListText}---------------------\n*Total bill: ${totalBox.textContent}*\n\n`;
-
-        if (navigator.share) {
-          try { await navigator.share({ title: shopTitle, text: payloadMessage, url: window.location.href }); } catch (err) { console.log(err); }
-        } else {
-          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`); alert("Bill ki details copy ho gayi hain!");
-        }
       });
 
       csvBtn.addEventListener("click", function() {
@@ -1313,7 +1489,7 @@
             document.getElementById("custNameInput").textContent = bill.custName;
             container.innerHTML = "";
             bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
-            toggleViewMode('bill'); render(); saveLiveDraft();
+            navToBillMode(); render(); saveLiveDraft();
           });
 
           const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
