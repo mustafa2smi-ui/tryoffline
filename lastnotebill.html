@@ -25,7 +25,6 @@
       --font-base: 15px;
     }
 
-    /* DARK THEME OVERRIDES */
     body.dark-mode {
       --paper: #2c3e50;
       --ink: #ecf0f1;
@@ -86,7 +85,7 @@
     .input {
       width: 100%; border: none; outline: none; background: transparent;
       color: var(--ink); font-family: inherit; font-size: var(--font-base); font-weight: 600; padding: 2px 0; line-height: 1.3;
-      word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap;
+      word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap; min-height: 24px;
     }
 
     .result {
@@ -138,7 +137,6 @@
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
 
-    /* ⚙️ SETTINGS DRAWER OVERLAY STYLES */
     .settings-modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.7); z-index: 999999; justify-content: center; align-items: center;
@@ -258,7 +256,6 @@
         <button onclick="closeLegalModal()" class="settings-close-btn">✖</button>
       </div>
       <div id="legalModalBody" style="font-size: 13px; line-height: 1.6; color: #dcdde1; max-height: 60vh; overflow-y: auto;">
-        <!-- Dynamic Content injected via JS -->
       </div>
     </div>
   </div>
@@ -332,7 +329,6 @@
         
         <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
         
-        <!-- 🔍 CUSTOMER WISE BILL FILTER & SEARCH ENGINE -->
         <div style="background: #2c3e50; padding: 8px; border-radius: 6px; margin: 8px 0; border: 1px solid var(--line);">
           <div style="display: flex; gap: 6px;">
             <input type="text" id="custSearchInput" oninput="filterBillsByCustomer()" placeholder="🔍 Customer name se bill khojein..." style="flex: 1; height: 34px; background: #1a252f; border: 1px solid var(--line); color: #fff; padding: 0 10px; border-radius: 4px; font-size: 12px; outline: none;">
@@ -351,7 +347,6 @@
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
-      <!-- 📊 DETAILED FINANCIAL SUMMARY BREAKDOWN BOARD -->
       <div class="total-board">
         <div class="total-row">
           <span class="total-lbl">Subtotal:</span>
@@ -368,20 +363,18 @@
         <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
       </div>
 
-      <!-- 📊 DYNAMIC PERCENTAGE (% DISCOUNT / TAX) PANEL -->
       <div style="background: #1a252f; padding: 4px 8px; border-radius: 4px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 6px;">
         <span style="color: var(--muted); font-size: 11px; font-weight: bold;">Adjustment (%):</span>
         <div style="display: flex; gap: 4px; flex: 1; justify-content: flex-end;">
-          <select id="percentType" onchange="render()" style="background: #2c3e50; color: #fff; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; padding: 2px;">
+          <select id="percentType" style="background: #2c3e50; color: #fff; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; padding: 2px;">
             <option value="DISC">Discount (-)</option>
             <option value="TAX">Tax (+)</option>
           </select>
-          <input type="number" id="percentVal" oninput="render()" placeholder="0" min="0" max="100" style="width: 50px; background: #2c3e50; border: 1px solid var(--line); color: #fff; text-align: center; border-radius: 3px; font-size: 12px; outline: none;">
+          <input type="number" id="percentVal" placeholder="0" min="0" max="100" style="width: 50px; background: #2c3e50; border: 1px solid var(--line); color: #fff; text-align: center; border-radius: 3px; font-size: 12px; outline: none;">
           <span style="color: #fff; font-size: 12px; align-self: center;">%</span>
         </div>
       </div>
 
-      <!-- CLEAN COMPACT ACTION CONTROL BAR -->
       <div class="controls" style="margin-top: 2px;">
         <div class="operator-bar" style="flex: 1;">
           <button class="op-btn" data-op="+">+</button>
@@ -443,22 +436,24 @@
 
     window.navToEntryMode = function() {
       closeSettingsModal();
-      toggleViewMode('entry');
-      document.getElementById("btnBackToBill").style.display = "flex";
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "flex";
     };
 
     window.navToSavedBills = function() {
       closeSettingsModal();
-      toggleViewMode('entry');
-      document.getElementById("btnBackToBill").style.display = "flex";
-      // Scroll to history list
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "flex";
       const hList = document.getElementById("dbBillsHistoryList");
       if (hList) hList.scrollIntoView({ behavior: 'smooth' });
     };
 
     window.navToBillMode = function() {
-      toggleViewMode('bill');
-      document.getElementById("btnBackToBill").style.display = "none";
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('bill');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "none";
     };
 
     window.toggleDarkMode = function() {
@@ -482,15 +477,15 @@
         title.innerHTML = "🔒 Privacy & Security Policy";
         body.innerHTML = `
           <p><b>Notebook Bill Pro</b> respect karta hai aapki privacy ko.</p><br>
-          <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai. Hum ise kisi third-party server par store nahi karte.</p><br>
-          <p><b>Security:</b> Aapka transaction history fully offline secure hai. Google Apps Script aur Device Token Verification sirf Pro License Auth verification ke liye upyog hota hai.</p>
+          <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai.</p><br>
+          <p><b>Security:</b> Transaction history fully offline secure hai. License Auth verification ke alawa koi data transfer nahi hota.</p>
         `;
       } else if (type === 'terms') {
         title.innerHTML = "📄 Terms of Service";
         body.innerHTML = `
-          <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing aur billing engine ka upyog kar sakta hai.</p><br>
-          <p>2. <b>Device Binding:</b> 1 Pro License sirf registered device/account ke sath bound hota hai.</p><br>
-          <p>3. <b>Data Integrity:</b> Local Data backup ki zimmedari user ki hai (Export Backup Feature ka istemal karein).</p>
+          <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing engine ka upyog kar sakta hai.</p><br>
+          <p>2. <b>Device Binding:</b> 1 Pro License registered account ke sath bound rehta hai.</p><br>
+          <p>3. <b>Data Backup:</b> Export Backup Feature ka regular istemal karein.</p>
         `;
       } else {
         title.innerHTML = "⁉️ User Guide & Help";
@@ -502,7 +497,7 @@
             <li><b>Barcode Scan:</b> Header mein 📷 Icon daba kar scan karein.</li>
             <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
           </ul><br>
-          <p><b>Support Contact:</b> Support/Reactivation ke liye support@webmy.in par message karein.</p>
+          <p><b>Support Contact:</b> Reactivation ke liye support@webmy.in par message karein.</p>
         `;
       }
       if (modal) modal.style.display = "flex";
@@ -549,8 +544,7 @@
     };
 
     window.exportCSVData = function() {
-      const csvBtn = document.getElementById("csvBtn");
-      if (csvBtn) csvBtn.click();
+      if (typeof window.executeCSVExport === "function") window.executeCSVExport();
     };
 
     window.triggerImportFileInput = function() {
@@ -586,12 +580,12 @@
     /* ---------- 🔍 CUSTOMER WISE FILTER FUNCTIONS ---------- */
     window.filterBillsByCustomer = function() {
       const query = document.getElementById("custSearchInput") ? document.getElementById("custSearchInput").value.trim().toLowerCase() : "";
-      renderBillsHistoryList(query);
+      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList(query);
     };
 
     window.clearCustSearch = function() {
       if (document.getElementById("custSearchInput")) document.getElementById("custSearchInput").value = "";
-      renderBillsHistoryList();
+      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList();
     };
 
     (function(){
@@ -615,7 +609,6 @@
       const bottomDashboard = document.getElementById("bottomDashboard");
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
-      const csvBtn = document.getElementById("csvBtn");
       const printModeSelect = document.getElementById("printModeSelect");
       const modeStatus = document.getElementById("modeStatus");
 
@@ -640,7 +633,6 @@
         { code: "103", name: "Chawal", price: 60 }
       ];
 
-      // Saved Theme & Font Preference restore
       const savedTheme = localStorage.getItem("notebook_theme_mode");
       if (savedTheme === "dark") document.body.classList.add("dark-mode");
       const savedFont = localStorage.getItem("notebook_font_size");
@@ -656,7 +648,6 @@
         });
       }
 
-      /* ---------- 💾 PERSISTENCE & UNDO SYSTEM ---------- */
       function saveLiveDraft() {
         const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
         let items = [];
@@ -758,7 +749,7 @@
             const lastInput = container.lastChild.querySelector(".input");
             if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
           } else {
-            navToBillMode();
+            window.navToBillMode();
             setTimeout(() => {
               const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
               container.appendChild(newRow); updateSL(); render();
@@ -770,7 +761,7 @@
           document.getElementById('btnResumeCamUI').focus();
         } else {
           if (confirm(`Barcode '${code}' database mein nahi mila! Naya product add karein?`)) {
-            navToEntryMode();
+            window.navToEntryMode();
             document.getElementById('dbCode').value = code;
             document.getElementById('dbName').focus();
           } else { resumeHardwareScanning(); }
@@ -964,7 +955,6 @@
         } else { alert("Fill all required fields: code, name & price!"); }
       });
 
-      /* ---------- Row Factory Engine ---------- */
       function makeRow(i, text=""){
         const row = document.createElement("div"); row.className = "row";
         const rowMain = document.createElement("div"); rowMain.className = "row-main";
@@ -975,8 +965,8 @@
         
         input.contentEditable = true;
         input.setAttribute("enterkeyhint", "next");
-        input.setAttribute("autocorrect", "on");
-        input.setAttribute("autocomplete", "on"); 
+        input.setAttribute("autocorrect", "off");
+        input.setAttribute("autocomplete", "off"); 
         input.setAttribute("spellcheck", "false");
         input.textContent = text;
 
@@ -1060,7 +1050,6 @@
         [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
       }
 
-      /* ---------- 📊 RENDER WITH DETAILED SUMMARY & INSTANT % UPDATE ---------- */
       function render(){
         let subtotal = 0;
 
@@ -1118,7 +1107,6 @@
           } else { resBox.style.display = "none"; }
         });
 
-        // 🎯 PERCENTAGE MATH & DETAILED SUMMARY BREAKDOWN
         const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
         const percentValInput = document.getElementById("percentVal");
         const percentVal = parseFloat(percentValInput ? percentValInput.value : 0) || 0;
@@ -1225,7 +1213,7 @@
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
       });
 
-      csvBtn.addEventListener("click", function() {
+      window.executeCSVExport = function() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Serial No,Item Description,Amount (INR)\n";
         [...container.children].forEach((row, idx) => {
@@ -1238,7 +1226,7 @@
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri); link.setAttribute("download", `ledger_report.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      });
+      };
 
       async function autoTranslateText(text) {
         if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
@@ -1308,7 +1296,6 @@
         printWindow.document.close();
       }
 
-      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH FINANCIAL BREAKDOWN ---------- */
       async function printBill() {
         let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
         if (!userLicence.isVerified) {
@@ -1436,7 +1423,6 @@
         });
       }
 
-      /* ---------- 📜 CUSTOMER-WISE HISTORY LIST RENDER ---------- */
       function renderBillsHistoryList(searchFilter = "") {
         if (!dbBillsHistoryList) return;
         dbBillsHistoryList.innerHTML = "";
@@ -1489,7 +1475,7 @@
             document.getElementById("custNameInput").textContent = bill.custName;
             container.innerHTML = "";
             bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
-            navToBillMode(); render(); saveLiveDraft();
+            window.navToBillMode(); render(); saveLiveDraft();
           });
 
           const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
@@ -1522,7 +1508,6 @@
         container.appendChild(makeRow(0)); render();
       });
 
-      // App Startup Initializers
       restoreLiveDraftOnLoad();
       const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
       if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
