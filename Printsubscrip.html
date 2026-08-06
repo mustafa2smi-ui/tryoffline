@@ -71,12 +71,68 @@
     .row-main { display: flex; align-items: center; width: 100%; }
     .sl { width: 15px; color: var(--muted); font-weight: 700; font-size: 12px; }
     .input-wrapper { flex: 1; position: relative; padding-left: 5px; }
-    
-    .input {
+   /* 1. Item Calculation Input Field Fix (Lambi calculation ko screen ke andar hi rakhega) */
+.input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 2px 0;
+  line-height: 1.3;
+  /* 🛡️ Screen overflow prevention rules */
+  word-break: break-all;      /* Lambi calculation ko next line mein break karega */
+  overflow-wrap: anywhere;    /* Extra safety wrap */
+  white-space: pre-wrap;       /* Line breaks aur text ko Screen boundaries ke andar rakhega */
+}
+
+/* 2. Individual Item Result Column Fix */
+.result {
+  min-width: 80px;            /* Fixed minimum space for amount */
+  max-width: 100px;           /* Boundary limit */
+  text-align: right;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+  /* 🛡️ Overflow prevention */
+  overflow: hidden;
+  text-overflow: ellipsis;    /* Agar zyada bada number ho toh boundary mein fit karega */
+  white-space: nowrap;
+}
+
+/* 3. Bottom Dashboard Grand Total Amount Box Fix */
+.total-val {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--accent);
+  /* 🛡️ Prevent total value from stretching the board */
+  max-width: 60%;             /* Total board width limit */
+  text-align: right;
+  word-break: break-all;      /* Agar total 10 digit se upar ho toh layout cut hone nahi dega */
+}
+
+/* 4. Main Notebook Sheet Border Boundary Security */
+.paper {
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;         /* 🛑 Strictly stops horizontal screen cutting */
+  position: relative;
+  border-left: 6px solid #e74c3c;
+  max-width: 100%;            /* Screen width boundary lock */
+  box-sizing: border-box;
+}
+
+    /*.input {
       width: 100%; border: none; outline: none; background: transparent;
       color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 2px 0; line-height: 1.3;
-    }
-    .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }
+    }*/
+   /* .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }*/
     .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 0px 4px; border-radius: 3px; margin-top: 1px; align-self: flex-start; margin-left: 18px; }
     .code-patch.visible { display: inline-block; }
 
@@ -101,7 +157,7 @@
     .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
     .total-row { display: flex; justify-content: space-between; align-items: center; }
     .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
-    .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
+   /* .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }*/
     .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px; }
 
     .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
@@ -191,7 +247,28 @@
       </div>
       <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
     </div>
+<!-- 🔍 CUSTOMER WISE BILL FILTER & SEARCH ENGINE --
+<div style="background: #2c3e50; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--line);">
+  <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+    <input type="text" id="custSearchInput" oninput="filterBillsByCustomer()" placeholder="🔍 Customer name se bill khojein..." style="flex: 1; height: 38px; background: #1a252f; border: 1px solid var(--line); color: #fff; padding: 0 10px; border-radius: 4px; font-size: 13px; outline: none;">
+    <button onclick="clearCustSearch()" style="background: #e74c3c; color: white; border: none; padding: 0 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;">Reset</button>
+  </div>
+  
+  <!-- Dynamic Customer Total Summary --
+  <div id="custSummaryBox" style="display: none; background: #1a252f; padding: 8px 10px; border-radius: 4px; border-left: 4px solid #1abc9c; font-size: 12px; color: #dcdde1;">
+    Total Bills Found: <b id="custBillCount" style="color:#1abc9c;">0</b> | Total Purchase: <b id="custTotalAmount" style="color:#e67e22;">₹0</b>
+  </div>
+</div>
+-->
+    <!-- 📤 EXPORT & 📥 IMPORT BUTTONS --
+<div style="display: flex; gap: 4px;">
+  <button id="exportBtn" onclick="exportAppData()" class="btn sq-btn" style="background:#8e44ad; border-color:#9b59b6; color:#fff;" title="Export Backup Data">📤 Data</button>
+  <button id="importBtn" onclick="triggerImportFileInput()" class="btn sq-btn" style="background:#2980b9; border-color:#3498db; color:#fff;" title="Import Backup Data">📥 Data</button>
+</div>
 
+<!-- Hidden File Input For Importing Backup --
+<input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAppData(event)">
+-->
     <!-- MAIN SCOLLABLE NOTEBOOK SHEET -->
     <div id="paper" class="paper">
       <div class="paper-header">
@@ -237,7 +314,23 @@
           <button class="op-btn" data-op="*">×</button>
           <button class="op-btn" data-op="/">÷</button>
         </div>
+<!-- 📊 DYNAMIC PERCENTAGE (% DISCOUNT / TAX) PANEL --
+<div style="background: #1a252f; padding: 6px 10px; border-radius: 4px; border-top: 1px solid var(--line); margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+  <span style="color: var(--muted); font-size: 11px; font-weight: bold;">Adjustment (%):</span>
+  
+  <div style="display: flex; gap: 4px; flex: 1; justify-content: flex-end;">
+    <!-- Mode Selector: Discount (-) or Tax (+) --
+    <select id="percentType" onchange="render()" style="background: #2c3e50; color: #fff; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; padding: 2px;">
+      <option value="DISC">Discount (-)</option>
+      <option value="TAX">Tax (+)</option>
+    </select>
 
+    <!-- Percent Value Input --
+    <input type="number" id="percentVal" oninput="render()" placeholder="0" min="0" max="100" style="width: 50px; background: #2c3e50; border: 1px solid var(--line); color: #fff; text-align: center; border-radius: 3px; font-size: 12px; outline: none;">
+    <span style="color: #fff; font-size: 12px; align-self: center;">%</span>
+  </div>
+</div>
+-->
         <div style="display: flex; gap: 4px;">
           <button id="undoBtn" class="btn sq-btn" style="background:#e67e22; border-color:#d35400; color:#fff; display:none;" title="Restore Last Action / Bill">↩️</button>
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
@@ -312,7 +405,7 @@
         token: ""
       };
 
-let undoHistoryState = null; // Purane state ka memory backup
+/*let undoHistoryState = null; // Purane state ka memory backup*/
       let html5QrCode = null;
       let isScannerRunning = false;
       let lastScannedCode = "";
@@ -767,7 +860,95 @@ let undoHistoryState = null; // Purane state ka memory backup
       function updateSL(){
         [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
       }
+      /* ==========================================================================
+   🔥 PRO MAX ENGINE: PERCENTAGE DISCOUNT & TAX CALCULATION
+   ========================================================================== *
 
+// 1. Updated Render Function with % Math
+function render() {
+  let subtotal = 0;
+
+  // Row Items ka Subtotal Calculate Karein
+  [...container.children].forEach(row => {
+    const inputEl = row.querySelector(".input");
+    const text = inputEl ? inputEl.textContent.trim() : "";
+    const resBox = row.querySelector(".result");
+    
+    let val = 0;
+
+    if (currentMode === 'bill') {
+      const words = text.split(/\s+/);
+      let exprPart = words.length > 1 ? words.slice(1).join(' ') : text;
+      
+      let cleaned = exprPart
+        .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
+        .replace(/[₹$€£]/g, '')
+        .trim();
+      
+      cleaned = cleaned.replace(/\s*([+\-/^])\s/g, '$1');
+      const tokens = cleaned.split(/\s+/);
+      let calcExpr = '';
+      
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        if (/[+\-/^]/.test(tokens[i]) && /[0-9]/.test(tokens[i])) {
+          calcExpr = tokens[i];
+          break;
+        }
+      }
+      
+      if (!calcExpr) {
+        for (let i = tokens.length - 1; i >= 0; i--) {
+          if (/^[0-9.]+$/.test(tokens[i])) {
+            calcExpr = tokens[i];
+            break;
+          }
+        }
+      }
+      
+      if (calcExpr && /[0-9]/.test(calcExpr)) {
+        val = evalExpr(calcExpr);
+      }
+      
+      resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+      subtotal += val;
+      resBox.style.display = "block";
+    } else {
+      resBox.style.display = "none";
+    }
+  });
+
+  // 🎯 PERCENTAGE MATH CALCULATION
+  const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
+  const percentVal = parseFloat(document.getElementById("percentVal") ? document.getElementById("percentVal").value : 0) || 0;
+
+  let adjustmentAmount = (subtotal * percentVal) / 100;
+  let finalGrandTotal = subtotal;
+
+  if (percentVal > 0) {
+    if (percentType === "DISC") {
+      finalGrandTotal = subtotal - adjustmentAmount;
+    } else if (percentType === "TAX") {
+      finalGrandTotal = subtotal + adjustmentAmount;
+    }
+  }
+
+  // Final Total Ensure Float 2 Decimals Clean Format
+  finalGrandTotal = Math.max(0, finalGrandTotal);
+
+  const formattedTotal = "₹" + finalGrandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  const formattedWords = "In Words: " + totalInWords(finalGrandTotal);
+
+  if (currentMode === 'bill') {
+    totalBox.textContent = formattedTotal;
+    totalWordsBox.textContent = formattedWords;
+    totalWordsBox.style.display = "block"; 
+  } else {
+    totalBox.textContent = "----";
+    totalWordsBox.style.display = "none";
+  }
+}
+
+*/
       function render(){
         let grand = 0;
 
@@ -1124,7 +1305,7 @@ let undoHistoryState = null; // Purane state ka memory backup
       }
 /* ==========================================================================
    🔥 PRO MAX ENGINE: SMART UNDO & CRASH RECOVERY SYSTEM
-   ========================================================================== */
+   ========================================================================== *
 
 
 // 1. Current State Snapshot Capture (Bill Clear hone se pehle ya badalhne se pehle)
@@ -1228,7 +1409,310 @@ document.addEventListener("DOMContentLoaded", function() {
     if (undoBtn) undoBtn.style.display = "flex";
   }
 });
+*/
+      /* ==========================================================================
+   🔥 PRO MAX ENGINE: DATA IMPORT & EXPORT (BACKUP & RESTORE)
+   ========================================================================== *
 
+// 📤 1. EXPORT APP DATA (Backup File Download)
+function exportAppData() {
+  try {
+    // Collect all local database records
+    const backupData = {
+      app: "NotebookBillPro",
+      version: "ProMax",
+      exportDate: new Date().toLocaleString('en-IN'),
+      ledger_db_v3: JSON.parse(localStorage.getItem("ledger_db_v3")) || [],
+      notebook_invoice_history: JSON.parse(localStorage.getItem("notebook_invoice_history")) || [],
+      shopName: document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : "Notebook Bill"
+    };
+
+    if (backupData.ledger_db_v3.length === 0 && backupData.notebook_invoice_history.length === 0) {
+      return alert("Export karne ke liye koi saved data nahi mila!");
+    }
+
+    // Convert Object to Readable JSON File
+    const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+    const downloadAnchor = document.createElement("a");
+    
+    // File Name with Date
+    const today = new Date().toISOString().slice(0, 10);
+    downloadAnchor.setAttribute("href", jsonString);
+    downloadAnchor.setAttribute("download", `notebook_bill_backup_${today}.json`);
+    
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+
+    alert("🎉 Backup file (.json) successfully export ho gayi hai!");
+  } catch (err) {
+    alert("Export Failed: " + err.message);
+  }
+}
+
+// 📥 2. TRIGGER FILE INPUT (Import Button Click)
+function triggerImportFileInput() {
+  const fileInput = document.getElementById("importFileInput");
+  if (fileInput) fileInput.click();
+}
+
+// 📥 3. IMPORT APP DATA (Restore Backup File)
+function importAppData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      // Simple Validation Check
+      if (!importedData.ledger_db_v3 && !importedData.notebook_invoice_history) {
+        return alert("❌ Invalid Backup File! Yeh Notebook Bill ka valid backup nahi hai.");
+      }
+
+      if (confirm("🚨 Warning: Backup import karne se aapka current product list aur bill history update ho jayegi. Kya aap aage badhna chahte hain?")) {
+        
+        // Save imported data to localStorage
+        if (importedData.ledger_db_v3) {
+          localStorage.setItem("ledger_db_v3", JSON.stringify(importedData.ledger_db_v3));
+        }
+        if (importedData.notebook_invoice_history) {
+          localStorage.setItem("notebook_invoice_history", JSON.stringify(importedData.notebook_invoice_history));
+        }
+        if (importedData.shopName && document.getElementById("shopNameInput")) {
+          document.getElementById("shopNameInput").value = importedData.shopName;
+        }
+
+        alert("🎉 Data Restore Successful! Page Reload ho raha hai...");
+        location.reload(); // Refresh page to update all lists
+      }
+    } catch (err) {
+      alert("❌ Import Error: Invalid JSON File structure.");
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+     */
+      /* ==========================================================================
+   🔥 PRO MAX ENGINE: CUSTOMER-WISE BILLING & FILTERING
+   ========================================================================== *
+
+// 1. Customer Wise Search & Filter Function
+function filterBillsByCustomer() {
+  const query = document.getElementById("custSearchInput") ? document.getElementById("custSearchInput").value.trim().toLowerCase() : "";
+  renderBillsHistoryList(query);
+}
+
+// 2. Clear Search Filter
+function clearCustSearch() {
+  if (document.getElementById("custSearchInput")) {
+    document.getElementById("custSearchInput").value = "";
+  }
+  renderBillsHistoryList();
+}
+
+// 3. Upgraded Customer-Wise History Rendering
+function renderBillsHistoryList(searchFilter = "") {
+  const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
+  const summaryBox = document.getElementById("custSummaryBox");
+  if (!dbBillsHistoryList) return;
+
+  dbBillsHistoryList.innerHTML = "";
+
+  if (savedBillsHistory.length === 0) {
+    dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
+    if (summaryBox) summaryBox.style.display = "none";
+    return;
+  }
+
+  let filteredBills = [...savedBillsHistory];
+
+  // Agar search input mein name type kiya hai toh filter karein
+  if (searchFilter) {
+    filteredBills = filteredBills.filter(bill => 
+      (bill.custName && bill.custName.toLowerCase().includes(searchFilter)) ||
+      (bill.billCode && bill.billCode.toLowerCase().includes(searchFilter))
+    );
+  }
+
+  // Calculate Customer Total Summary
+  if (searchFilter && filteredBills.length > 0) {
+    let grandTotalCust = 0;
+    filteredBills.forEach(b => {
+      let numericTotal = parseFloat(b.total.replace(/[₹,]/g, '')) || 0;
+      grandTotalCust += numericTotal;
+    });
+
+    if (summaryBox) {
+      summaryBox.style.display = "block";
+      document.getElementById("custBillCount").textContent = filteredBills.length;
+      document.getElementById("custTotalAmount").textContent = "₹" + grandTotalCust.toLocaleString('en-IN');
+    }
+  } else {
+    if (summaryBox) summaryBox.style.display = "none";
+  }
+
+  if (filteredBills.length === 0) {
+    dbBillsHistoryList.innerHTML = `<div style='font-size:13px; color:#e74c3c; text-align:center; padding:15px;'>'${searchFilter}' ke naam par koi bill nahi mila.</div>`;
+    return;
+  }
+
+  // Render History Rows (Latest First)
+  [...filteredBills].reverse().forEach((bill) => {
+    // Find original index for safe deletion
+    const actualIdx = savedBillsHistory.findIndex(b => b.billCode === bill.billCode);
+
+    const bRow = document.createElement("div"); 
+    bRow.className = "bill-history-row";
+
+    const details = document.createElement("div"); 
+    details.className = "bill-meta-details";
+    details.innerHTML = `👤 <b>${bill.custName || 'Unknown Cust'}</b> <span>Code: ${bill.billCode} | Date: ${bill.date || ''} | Total: <b style="color:#e67e22;">${bill.total}</b></span>`;
+
+    const actions = document.createElement("div"); 
+    actions.className = "db-item-actions";
+
+    // Edit / Load Bill
+    const editBtn = document.createElement("button"); 
+    editBtn.className = "db-action-btn"; 
+    editBtn.innerHTML = "✏️";
+    editBtn.title = "Load Bill to Sheet";
+    editBtn.addEventListener("click", () => {
+      if (document.getElementById("custNameInput")) {
+        document.getElementById("custNameInput").textContent = bill.custName;
+      }
+      const container = document.getElementById("container");
+      if (container) {
+        container.innerHTML = "";
+        bill.items.forEach((itemText, rIdx) => { 
+          container.appendChild(makeRow(rIdx, itemText)); 
+        });
+      }
+      if (typeof toggleViewMode === "function") toggleViewMode('bill'); 
+      if (typeof render === "function") render();
+    });
+
+    // Delete Bill
+    const deleteBtn = document.createElement("button"); 
+    deleteBtn.className = "db-action-btn"; 
+    deleteBtn.innerHTML = "❌";
+    deleteBtn.title = "Delete Bill";
+    deleteBtn.addEventListener("click", () => {
+      if (confirm(`Kya aap "${bill.custName}" ka bill (${bill.billCode}) delete karna chahte hain?`)) {
+        if (actualIdx !== -1) {
+          savedBillsHistory.splice(actualIdx, 1);
+          localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); 
+          renderBillsHistoryList(searchFilter);
+        }
+      }
+    });
+
+    actions.appendChild(editBtn); 
+    actions.appendChild(deleteBtn); 
+    bRow.appendChild(details); 
+    bRow.appendChild(actions); 
+    dbBillsHistoryList.appendChild(bRow);
+  });
+}
+
+      */
+      /* ==========================================================================
+   🔥 PRO MAX ENGINE: LIVE AUTO-DRAFT PERSISTENCE (BACK-BUTTON & REOPEN PROTECTION)
+   ========================================================================== *
+
+// 1. Live Background Auto-Save (Jab bhi user type karega, bill save hota rahega)
+function saveLiveDraft() {
+  const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
+  let items = [];
+  
+  const container = document.getElementById("container");
+  if (container) {
+    [...container.children].forEach(row => {
+      const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+      if (val) items.push(val);
+    });
+  }
+
+  // Sirf tabhi save karein jab kuch likha ho
+  if (items.length > 0 || custName.trim() !== "") {
+    const draftData = {
+      custName: custName,
+      items: items,
+      timestamp: new Date().getTime()
+    };
+    localStorage.setItem("notebook_live_draft", JSON.stringify(draftData));
+  }
+}
+
+// 2. Page Khulte hi Last Bill Auto-Load Karna
+function restoreLiveDraftOnLoad() {
+  const savedDraft = JSON.parse(localStorage.getItem("notebook_live_draft"));
+  
+  if (savedDraft && savedDraft.items && savedDraft.items.length > 0) {
+    // Customer Name Restore
+    const custInput = document.getElementById("custNameInput");
+    if (custInput && savedDraft.custName) {
+      custInput.textContent = savedDraft.custName;
+    }
+
+    // Rows Rebuild
+    const container = document.getElementById("container");
+    if (container) {
+      container.innerHTML = "";
+      savedDraft.items.forEach((itemText, idx) => {
+        container.appendChild(makeRow(idx, itemText));
+      });
+    }
+
+    // Calculations Update
+    if (typeof render === "function") render();
+    if (typeof updateSL === "function") updateSL();
+  }
+}
+
+// 3. Event Listeners (Typing par auto-save trigger karne ke liye)
+document.addEventListener("DOMContentLoaded", function() {
+  // App open hote hi pichhla bill wapas laao
+  restoreLiveDraftOnLoad();
+
+  // Container par input event suno (jab bhi user bill me likhega)
+  const container = document.getElementById("container");
+  if (container) {
+    container.addEventListener("input", function() {
+      saveLiveDraft();
+    });
+  }
+
+  // Customer name change hone par bhi save ho
+  const custInput = document.getElementById("custNameInput");
+  if (custInput) {
+    custInput.addEventListener("input", function() {
+      saveLiveDraft();
+    });
+  }
+});
+
+// 4. Jab Bill Successfully Save (💾 Data) ya Clear (🗑️) ho jaye, tab draft clear kar do
+const originalLocalSaveBtn = document.getElementById("localSaveBtn");
+if (originalLocalSaveBtn) {
+  originalLocalSaveBtn.addEventListener("click", function() {
+    // Jab user bill save kar le, toh live draft hata sakte hain (optional)
+    // localStorage.removeItem("notebook_live_draft"); 
+  });
+}
+
+const mainClearBtn = document.getElementById("clearBtn");
+if (mainClearBtn) {
+  mainClearBtn.addEventListener("click", function() {
+    // Jab user khud clear dabaye, tab live draft delete kar do
+    localStorage.removeItem("notebook_live_draft");
+  });
+}
+
+      */
       function renderBillsHistoryList() {
         dbBillsHistoryList.innerHTML = "";
         if(savedBillsHistory.length === 0) {
