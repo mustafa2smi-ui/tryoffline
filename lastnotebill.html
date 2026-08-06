@@ -1295,14 +1295,18 @@
         printWindow.document.write(htmlContent);
         printWindow.document.close();
       }
+/* ---------- 🖨️ MULTI-LANGUAGE PRINT LOCK INTERCEPTOR ---------- */
 
       async function printBill() {
+        const currentPrintMode = printModeSelect.value;
+        // 🔒 Sirf MULTI Print Mode par License Lock chalega! (ENG & COMP Free hain)
+  if (currentPrintMode === 'MULTI') {
         let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
         if (!userLicence.isVerified) {
           window.openPrintPaywall();
           return;
         }
-
+  }
         let validRows = [];
         let subtotalCalc = 0;
         [...container.children].forEach(row => {
