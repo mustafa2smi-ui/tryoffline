@@ -1664,6 +1664,22 @@ async function printBill() {
       }
       render();
     })();
+    /* ---------- 🖨️ SAFE PRINT BUTTON EVENT BINDING ---------- */
+document.addEventListener("DOMContentLoaded", function() {
+  const mainPrintBtn = document.getElementById("printBtn");
+  if (mainPrintBtn) {
+    // Purane kisi block ko overwrite karke direct listener bind karein
+    mainPrintBtn.onclick = function(e) {
+      e.preventDefault();
+      if (typeof printBill === "function") {
+        printBill();
+      } else {
+        alert("Print function ready nahi hai!");
+      }
+    };
+  }
+});
+
   </script>
 </body>
 </html>
