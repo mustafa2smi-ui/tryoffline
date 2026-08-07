@@ -6,24 +6,10 @@
   <title>Notebook Bill - Smart Digital Ledger & Thermal Billing</title>
   <meta name="theme-color" content="#1a252f">
   
-  <!-- SEO & Social Preview Meta Tags -->
-  <meta name="title" content="Notebook Bill - Free Mobile Billing App for Retail Shop | Thermal Printer Ledger">
-  <meta name="description" content="Free mobile billing app for retail shops with Bluetooth thermal receipt generator, digital ledger, and multi-language print support.">
-  <meta name="keywords" content="Digital ledger app for shop, Thermal bill printing software online, Free mobile billing app for retail shop, Khatabook alternative web app, Bluetooth thermal receipt generator">
+  <!-- SEO Meta Tags -->
+  <meta name="title" content="Notebook Bill - Free Mobile Billing App for Retail Shop">
+  <meta name="description" content="Free mobile billing app for retail shops with Bluetooth thermal receipt generator and digital ledger.">
   <meta name="robots" content="index, follow">
-
-  <!-- JSON-LD Schema Markup -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Notebook Bill",
-    "url": "https://www.webmy.in/",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "All",
-    "description": "Smart Digital Ledger & Thermal Billing Engine for small businesses."
-  }
-  </script>
 
   <!-- 🔥 BARCODE SCANNER LIBRARY -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -194,7 +180,7 @@
 </head>
 <body>
 
-  <!-- 🔐 PRO ACTIVATION & PAYWALL MODAL (INLINED AUTH ENGINE) -->
+  <!-- 🔐 PRO ACTIVATION & PAYWALL MODAL -->
   <div id="authLockScreen" class="settings-modal-overlay">
     <div class="settings-modal-box" style="text-align: center;">
       <div style="font-size: 38px; margin-bottom: 8px;">🔒</div>
@@ -433,41 +419,14 @@
       }
     })();
 
-    /* ---------- 🛡️ OFFLINE NETWORK WATCHDOG TOGGLE ---------- */
-    const ENABLE_OFFLINE_INTERCEPTOR = false; 
-
-    (function initOfflineOverlayEngine() {
-      if (!ENABLE_OFFLINE_INTERCEPTOR) return;
-      if (!document.getElementById("offlineOverlay")) {
-        const overlay = document.createElement("div");
-        overlay.id = "offlineOverlay";
-        overlay.style.cssText = `
-          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: rgba(26, 37, 47, 0.92); z-index: 9999999; backdrop-filter: blur(8px);
-          justify-content: center; align-items: center; flex-direction: column; color: #fff;
-          font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; box-sizing: border-box;
-        `;
-        overlay.innerHTML = `
-          <div style="font-size: 50px; margin-bottom: 10px;">📡❌</div>
-          <h2 style="color: #e74c3c; margin-bottom: 8px; font-size: 22px;">Internet Connection Lost</h2>
-          <p style="color: #bdc3c7; font-size: 14px; max-width: 320px; line-height: 1.5; margin-bottom: 20px;">
-            Yeh application secure cloud sync aur license check ke liye active internet connection ki maang karti hai.
-          </p>
-          <button onclick="location.reload()" style="background: #1abc9c; color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer;">Retry Connection 🔄</button>
-        `;
-        document.body.appendChild(overlay);
-      }
-    })();
-
-    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE ---------- */
+    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE WITH 24HR AUTO-SYNC ---------- */
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";
 
     let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
       isVerified: false,
       email: "",
       deviceToken: "",
-      trialStart: null,
-      lastKnownTime: null
+      lastSyncTime: null
     };
 
     function getDeviceToken() {
@@ -478,9 +437,46 @@
       return userLicence.deviceToken;
     }
 
+    // 🔥 24-HOUR AUTO SYNC WITH GOOGLE SHEET (CACHE OVERRIDE ENGINE)
+    async function verifyLiveStatusWithSheet(forceRefresh = false) {
+      let now = new Date().getTime();
+      let twentyFourHours = 24 * 60 * 60 * 1000;
+
+      // Agar Email missing hai toh verification nahi hoga
+      if (!userLicence.email) return false;
+
+      // Check karein ki 24 Hours hue hain ya force refresh triggered hai
+      if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > twentyFourHours) {
+        if (navigator.onLine) {
+          try {
+            let currentToken = getDeviceToken();
+            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}`, {
+              method: 'GET'
+            }).then(r => r.json()).catch(() => null);
+
+            if (res && res.authorized) {
+              userLicence.isVerified = true;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              return true;
+            } else {
+              // 🚨 DENIED DETECTED: Instant Cache Wipeout
+              userLicence.isVerified = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              return false;
+            }
+          } catch (e) { return userLicence.isVerified; }
+        }
+      }
+      return userLicence.isVerified;
+    }
+
     window.openAuthModal = function() {
       const m = document.getElementById("authLockScreen");
       if (m) m.style.display = "flex";
+      const emailInput = document.getElementById("authEmail");
+      if (emailInput && userLicence.email) emailInput.value = userLicence.email;
     };
 
     window.closeAuthModal = function() {
@@ -499,6 +495,7 @@
       try {
         let currentToken = getDeviceToken();
 
+        // 1. Direct Live Status Query First
         let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}`, {
           method: 'GET'
         }).then(r => r.json()).catch(() => null);
@@ -506,15 +503,16 @@
         if (authCheck && authCheck.authorized) {
           userLicence.isVerified = true;
           userLicence.email = emailVal;
-          userLicence.lastKnownTime = new Date().getTime();
+          userLicence.lastSyncTime = new Date().getTime();
           localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
 
-          alert("🎉 Account Active Found! Pro Features Unlocked.");
+          alert("🎉 Status Match: Active! Pro Features Unlocked.");
           closeAuthModal();
           location.reload();
           return;
         }
 
+        // 2. Request OTP if not active
         let res = await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'cors',
@@ -1439,10 +1437,11 @@
         const printModeDropdown = document.getElementById("printModeSelect");
         const currentPrintMode = printModeDropdown ? printModeDropdown.value : 'ENG';
 
-        // 🔒 MULTI Print Mode Lock Check
+        // 🔒 MULTI Print Mode Lock & LIVE status Verification
         if (currentPrintMode === 'MULTI') {
-          let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
-          if (!userLicence.isVerified) {
+          // Force live verification with sheet to bypass local cache
+          let isLiveAuthorized = await verifyLiveStatusWithSheet(true); 
+          if (!isLiveAuthorized) {
             window.openAuthModal();
             return;
           }
@@ -1645,7 +1644,10 @@
         container.appendChild(makeRow(0)); render();
       });
 
+      // App Initialization
       restoreLiveDraftOnLoad();
+      verifyLiveStatusWithSheet(false); // Background 24-Hour Auto-Sync Check
+
       const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
       if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
         const undoBtn = document.getElementById("undoBtn");
