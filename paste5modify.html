@@ -3,9 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Notebook Bill - Pro Activation</title>
+  <title>Notebook Bill - Smart Digital Ledger & Thermal Billing</title>
   <meta name="theme-color" content="#1a252f">
   
+  <!-- SEO & Social Preview Meta Tags -->
+  <meta name="title" content="Notebook Bill - Free Mobile Billing App for Retail Shop | Thermal Printer Ledger">
+  <meta name="description" content="Free mobile billing app for retail shops with Bluetooth thermal receipt generator, digital ledger, and multi-language print support.">
+  <meta name="keywords" content="Digital ledger app for shop, Thermal bill printing software online, Free mobile billing app for retail shop, Khatabook alternative web app, Bluetooth thermal receipt generator">
+  <meta name="robots" content="index, follow">
+
+  <!-- JSON-LD Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Notebook Bill",
+    "url": "https://www.webmy.in/",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "description": "Smart Digital Ledger & Thermal Billing Engine for small businesses."
+  }
+  </script>
+
+  <!-- 🔥 BARCODE SCANNER LIBRARY -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   
   <style>
@@ -21,6 +41,14 @@
       --green-patch: #e8f8f5; 
       --green-text: #117a65;
       --gradient-head: linear-gradient(135deg, #1abc9c, #ec4899); 
+      --font-base: 15px;
+    }
+
+    body.dark-mode {
+      --paper: #2c3e50;
+      --ink: #ecf0f1;
+      --muted: #bdc3c7;
+      --line: #34495e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,8 +67,10 @@
 
     .brand-header { background: var(--gradient-head); padding: 6px 8px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0; }
     .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .mode-toggle-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 4px 7px; font-size: 12px; font-weight: 800; cursor: pointer; height: 26px; }
+    .settings-trigger-btn { background: #34495e; color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 0 8px; font-size: 15px; cursor: pointer; height: 28px; display: flex; align-items: center; justify-content: center; }
     
+    .back-to-bill-btn { display: none; background: #e74c3c; color: #fff; border: none; border-radius: 4px; padding: 0 10px; font-size: 12px; font-weight: bold; cursor: pointer; height: 28px; align-items: center; justify-content: center; }
+
     .scanner-section { background: #000; padding: 8px; display: none; flex-direction: column; align-items: center; flex-shrink: 0; }
     #reader { width: 100%; max-width: 420px; background: #000; border-radius: 8px; overflow: hidden; }
     .scanner-controls-bar { width: 100%; max-width: 420px; display: flex; justify-content: space-between; padding: 6px 0; gap: 10px; }
@@ -57,8 +87,8 @@
 
     .paper { 
       background: var(--paper); display: flex; flex-direction: column; flex: 1; overflow-y: auto; 
-      position: relative; border-left: 6px solid #e74c3c; 
-      -webkit-overflow-scrolling: touch;
+      overflow-x: hidden; position: relative; border-left: 6px solid #e74c3c; 
+      max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch;
     }
     .paper::before { content: ""; position: absolute; top: 0; left: 18px; bottom: 0; width: 1px; background: rgba(231, 76, 60, 0.35); pointer-events: none; z-index: 10; }
     
@@ -73,10 +103,20 @@
 
     .input {
       width: 100%; border: none; outline: none; background: transparent;
-      color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; padding: 2px 0; line-height: 1.3;
+      color: var(--ink); font-family: inherit; font-size: var(--font-base); font-weight: 600; padding: 2px 0; line-height: 1.3;
+      word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap; min-height: 24px;
     }
 
-    .result { width: 75px; text-align: right; color: var(--accent); font-weight: 700; font-size: 15px; }
+    .result {
+      min-width: 80px; max-width: 100px; text-align: right; color: var(--accent);
+      font-weight: 700; font-size: var(--font-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .total-val {
+      font-weight: 800; font-size: 18px; color: var(--accent);
+      max-width: 60%; text-align: right; word-break: break-all;
+    }
+
     .code-patch { display: none; background: var(--green-patch); color: var(--green-text); font-size: 10px; font-weight: 700; font-style: italic; padding: 0px 4px; border-radius: 3px; margin-top: 1px; align-self: flex-start; margin-left: 18px; }
     .code-patch.visible { display: inline-block; }
 
@@ -94,37 +134,57 @@
 
     .bottom-dashboard { 
       background: #111b24; border-radius: 0 0 8px 8px; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4); 
-      padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 1000; 
-      flex-shrink: 0;
-      position: relative;
+      padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; z-index: 1000; 
+      flex-shrink: 0; position: relative;
     }
-    .total-board { background: #1a252f; padding: 6px 10px; border-radius: 4px; border-bottom: 1px solid var(--line); }
-    .total-row { display: flex; justify-content: space-between; align-items: center; }
-    .total-lbl { font-weight: bold; font-size: 13px; color: var(--muted); }
-    .total-val { font-weight: 800; font-size: 20px; color: var(--accent); }
-    .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 2px; }
+    .total-board { background: #1a252f; padding: 5px 8px; border-radius: 4px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .total-lbl { font-weight: bold; color: var(--muted); }
+    .words { font-size: 11px; color: var(--muted); font-style: italic; text-align: right; margin-top: 1px; }
 
     .btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #2c3e50; border: 1px solid #f39c12; border-radius: 4px; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px var(--shadow); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
-    .sq-btn { width: 42px; height: 42px; font-size: 18px; }
+    .sq-btn { width: 44px; height: 42px; font-size: 18px; }
     .price-select { background: #34495e; color: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 3px; height: 26px; font-weight: 600; outline: none; cursor: pointer; font-size: 11px; }
     .mode-banner { background: #1abc9c; color: white; text-align: center; font-size: 10px; font-weight: bold; padding: 2px 0; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; }
     .mode-banner.entry { background: #3498db; }
 
     .operator-bar { display: flex; gap: 4px; justify-content: space-between; }
-    .op-btn { flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line); padding: 10px 0; border-radius: 4px; font-size: 20px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+    .op-btn { flex: 1; background: #34495e; color: #fff; border: 1px solid var(--line); padding: 8px 0; border-radius: 4px; font-size: 18px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
     .op-btn:active { background: var(--line); color: #000; }
 
     .bill-history-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); }
     .bill-meta-details { font-size: 13px; color: var(--ink); font-weight: 600; }
     .bill-meta-details span { color: var(--muted); font-size: 11px; display: block; font-weight: normal; }
 
+    /* OVERLAY MODALS */
+    .settings-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75); z-index: 999999; justify-content: center; align-items: center;
+      padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px);
+    }
+    .settings-modal-box {
+      background: #1a252f; border: 2px solid var(--line); border-radius: 8px; width: 100%;
+      max-width: 380px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); color: #fff;
+      max-height: 90vh; overflow-y: auto; font-family: inherit;
+    }
+    .settings-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 12px; }
+    .settings-title { font-size: 16px; font-weight: 800; color: #1abc9c; display: flex; align-items: center; gap: 6px; }
+    .settings-close-btn { background: none; border: none; color: #e74c3c; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .settings-menu-list { display: flex; flex-direction: column; gap: 8px; }
+    .settings-item-btn {
+      background: #2c3e50; border: 1px solid var(--line); color: #fff; padding: 10px 12px;
+      border-radius: 6px; font-size: 13px; font-weight: 600; text-align: left; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .settings-item-btn:active { background: #34495e; }
+    .settings-section-lbl { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; margin-top: 8px; margin-bottom: 2px; }
+
     @media (max-width: 600px) {
       body { padding: 0; }
       .brand-header { border-radius: 0; }
       .paper { border-radius: 0; }
       .bottom-dashboard {
-        border-radius: 0; 
-        position: flex; bottom: 0; left: 0; width: 100%;
+        border-radius: 0; position: flex; bottom: 0; left: 0; width: 100%;
         padding-bottom: env(safe-area-inset-bottom, 8px);
       }
       .row-list { padding-bottom: 140px; }
@@ -133,41 +193,115 @@
   </style>
 </head>
 <body>
-<!-- 🔐 AUTOMATED ADVANCED PRO+ SUBSCRIPTION ENGINE LOCK OVERLAY PANEL -->
-<div id="authLockScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111b24; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: white;">
-  <div style="background: #1a252f; border: 2px solid var(--line); border-radius: 12px; width: 100%; max-width: 400px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); text-align: center;">
-    <h2 id="authTitle" style="color: #1abc9c; margin-bottom: 10px; font-size: 20px;">🔒 Extended Pro Activation</h2>
-    <p id="authMessage" style="color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.4;">Aapka free guest session complete ho gaya hai. Premium functionality access resume karne ke liye validation setup karein.</p>
-    
-    <div id="emailSection">
-      <input type="email" id="authEmail" style="width: 100%; background: #2c3e50; border: 1px solid var(--line); color: white; padding: 12px; border-radius: 6px; font-size: 15px; text-align: center; outline: none; margin-bottom: 15px;" placeholder="apnadukan@gmail.com">
-      
-      <button id="btnSendRequest" onclick="requestOTP()" class="btn" style="width: 100%; background: linear-gradient(to bottom, #1abc9c, #16a085); border: none; color: white; height: 46px; font-size: 14px; margin-bottom: 15px; font-weight: bold;">Request Pro Activation 🚀</button>
-      
-      <button id="btnInstantVerify" onclick="checkDeviceLockInstant()" class="btn" style="width: 100%; background: #34495e; border: 1px solid var(--line); color: white; height: 40px; font-size: 13px;">Check Current Activation Status 🔄</button>
-    </div>
 
-    <div id="otpSection" style="display: none;">
-      <input type="text" id="authOTP" maxlength="6" style="width: 100%; background: #2c3e50; border: 1px solid var(--line); color: white; padding: 12px; border-radius: 6px; font-size: 18px; font-weight: bold; letter-spacing: 5px; text-align: center; outline: none; margin-bottom: 15px;" placeholder="CCCCCC">
-      <button id="btnVerifyCode" onclick="verifyOTP()" class="btn" style="width: 100%; background: linear-gradient(to bottom, #ec4899, #d946ef); border: none; color: white; height: 45px; font-size: 15px;">Verify Code & Submit Request 📩</button>
+  <!-- 🔐 PRO ACTIVATION & PAYWALL MODAL (INLINED AUTH ENGINE) -->
+  <div id="authLockScreen" class="settings-modal-overlay">
+    <div class="settings-modal-box" style="text-align: center;">
+      <div style="font-size: 38px; margin-bottom: 8px;">🔒</div>
+      <h3 id="authTitle" style="margin: 0 0 10px 0; color: #1abc9c; font-size: 20px; font-weight: 800;">Pro Activation</h3>
+      <p id="authMessage" style="margin: 0 0 20px 0; color: #bdc3c7; font-size: 13px; line-height: 1.5;">
+        Multi-language printing features ko unlock karne ke liye apna Gmail ID enter karke activation status verify karein.
+      </p>
+      
+      <div id="emailSection">
+        <input type="email" id="authEmail" style="width: 100%; background: #2c3e50; border: 1px solid var(--line); color: white; padding: 12px; border-radius: 6px; font-size: 14px; text-align: center; outline: none; margin-bottom: 12px;" placeholder="apnadukan@gmail.com">
+        <button id="btnSendRequest" onclick="requestOTP()" class="btn" style="width: 100%; background: linear-gradient(to bottom, #1abc9c, #16a085); border: none; color: white; height: 42px; font-size: 14px; font-weight: bold; margin-bottom: 10px;">Request Pro Activation 🚀</button>
+      </div>
+
+      <div id="otpSection" style="display: none;">
+        <input type="text" id="authOTP" maxlength="6" style="width: 100%; background: #2c3e50; border: 1px solid var(--line); color: white; padding: 12px; border-radius: 6px; font-size: 18px; font-weight: bold; letter-spacing: 5px; text-align: center; outline: none; margin-bottom: 12px;" placeholder="CCCCCC">
+        <button id="btnVerifyCode" onclick="verifyOTP()" class="btn" style="width: 100%; background: linear-gradient(to bottom, #ec4899, #d946ef); border: none; color: white; height: 42px; font-size: 14px; font-weight: bold;">Verify OTP & Unlock 📩</button>
+      </div>
+
+      <button onclick="closeAuthModal()" style="background: transparent; color: #95a5a6; border: none; font-size: 12px; cursor: pointer; margin-top: 15px; text-decoration: underline;">Cancel / Close</button>
     </div>
   </div>
-</div>
+
+  <!-- ⚙️ PRO SETTINGS DRAWER MODAL -->
+  <div id="settingsModal" class="settings-modal-overlay">
+    <div class="settings-modal-box">
+      <div class="settings-header">
+        <div class="settings-title">⚙️ Control Center</div>
+        <button onclick="closeSettingsModal()" class="settings-close-btn">✖</button>
+      </div>
+
+      <div class="settings-menu-list">
+        <div class="settings-section-lbl">Navigation & Ledgers</div>
+        <button class="settings-item-btn" onclick="navToEntryMode()">
+          <span>🖋️ Product Database Entry Mode</span> ➔
+        </button>
+        <button class="settings-item-btn" onclick="navToSavedBills()">
+          <span>📜 Saved Bills History</span> ➔
+        </button>
+
+        <div class="settings-section-lbl">Account & Subscription</div>
+        <button class="settings-item-btn" onclick="openAuthModal()">
+          <span>🔑 Subscription Status & Auth</span> <span id="authBadgeLbl" style="color:#1abc9c; font-size:11px;">Check</span>
+        </button>
+
+        <div class="settings-section-lbl">Backup & Export</div>
+        <button class="settings-item-btn" onclick="exportAppData(); closeSettingsModal();">
+          <span>📤 Backup Data (.json)</span> ⬇️
+        </button>
+        <button class="settings-item-btn" onclick="triggerImportFileInput(); closeSettingsModal();">
+          <span>📥 Restore Data (.json)</span> ⬆️
+        </button>
+        <button class="settings-item-btn" onclick="exportCSVData(); closeSettingsModal();">
+          <span>📊 Export Ledger CSV</span> 📁
+        </button>
+
+        <div class="settings-section-lbl">Preferences & Appearance</div>
+        <button class="settings-item-btn" onclick="toggleDarkMode()">
+          <span>🎨 Theme Mode</span> <span id="themeLblText">🌙 Dark / ☀️ Light</span>
+        </button>
+        <div class="settings-item-btn" style="cursor: default;">
+          <span>🔤 Font Size Adjustment</span>
+          <select id="fontSizeSelect" onchange="changeAppFontSize(this.value)" style="background:#1a252f; color:#fff; border:1px solid var(--line); border-radius:4px; padding:2px 6px;">
+            <option value="13px">Small</option>
+            <option value="15px" selected>Normal</option>
+            <option value="17px">Large</option>
+          </select>
+        </div>
+
+        <div class="settings-section-lbl">App Info & Legal</div>
+        <button class="settings-item-btn" onclick="shareAppText(); closeSettingsModal();">
+          <span>📤 Share Application</span> 🔗
+        </button>
+        <button class="settings-item-btn" onclick="openLegalModal('help'); closeSettingsModal();">
+          <span>⁉️ Help & User Guide</span> ❓
+        </button>
+        <button class="settings-item-btn" onclick="openLegalModal('privacy'); closeSettingsModal();">
+          <span>🔒 Privacy Policy & Terms</span> 📄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 LEGAL & HELP MODAL -->
+  <div id="legalModal" class="settings-modal-overlay">
+    <div class="settings-modal-box">
+      <div class="settings-header">
+        <div id="legalModalTitle" class="settings-title">📄 Information</div>
+        <button onclick="closeLegalModal()" class="settings-close-btn">✖</button>
+      </div>
+      <div id="legalModalBody" style="font-size: 13px; line-height: 1.6; color: #dcdde1; max-height: 60vh; overflow-y: auto;">
+      </div>
+    </div>
+  </div>
 
   <div class="wrap">
     
     <div class="brand-header">
       <div class="controls">
-        <div style="display: flex; gap: 4px;">
-          <button id="entryModeBtn" class="mode-toggle-btn" style="background:#3498db; color:#fff;">🖋️ E</button>
-          <button id="billModeBtn" class="mode-toggle-btn" style="background:#1abc9c; color:#fff;">💵 B</button>
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <button id="btnSettingsOpen" onclick="openSettingsModal()" class="settings-trigger-btn" title="Open Settings">⚙️</button>
+          <button id="btnBackToBill" onclick="navToBillMode()" class="back-to-bill-btn">← Back</button>
         </div>
         
         <input type="text" id="shopNameInput" style="background: transparent; border: none; border-bottom: 1px dashed rgba(255,255,255,0.5); color: #fff; font-size: 16px; font-weight: 800; text-align: center; width: 35%; outline: none;" placeholder="Shop Name" value="Notebook Bill">
         
         <div style="display: flex; gap: 4px;">
-          <button id="btnCamToggle" class="cam-toggle-btn" title="Toggle Barcode Scanner">📷</button>
-          
+          <button id="btnCamToggle" class="cam-toggle-btn" title="Toggle Barcode Scanner">📷</button>          
           <select id="printModeSelect" class="price-select" style="background: #9b59b6; border-color: #8e44ad; height: 26px; font-size: 11px;">
             <option value="ENG" selected>Print: ENG</option>
             <option value="MULTI">Print: MULTI</option>
@@ -177,6 +311,7 @@
       </div>
     </div>
 
+    <!-- SCANNER SECTION -->
     <div class="scanner-section" id="scannerWrapperZone">
       <div id="reader"></div>
       <div class="scanner-controls-bar">
@@ -185,6 +320,7 @@
       </div>
     </div>
 
+    <!-- ENTRY FORM OVERLAY CONTAINER -->
     <div id="dbEntryPanel" class="db-entry-panel">
       <h4 id="panelTitle">📥 Add Product to Ledger Database</h4>
       <div class="db-grid">
@@ -192,9 +328,14 @@
         <input type="text" id="dbName" class="db-input" placeholder="Product Name">
         <input type="number" id="dbPrice" class="db-input" placeholder="Price (₹)">
       </div>
-      <button id="dbSaveBtn" class="btn" style="padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff; margin-top: 4px;">Save to Database</button>
+      
+      <div style="display: flex; gap: 6px; margin-top: 4px;">
+        <button id="dbSaveBtn" class="btn" style="flex:2; padding: 8px; font-size: 13px; background: #3498db; border-color: #2980b9; color: #fff;">Save to Database</button>
+      </div>
+      <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAppData(event)">
     </div>
 
+    <!-- MAIN SCOLLABLE NOTEBOOK SHEET -->
     <div id="paper" class="paper">
       <div class="paper-header">
         <div id="meta">
@@ -216,19 +357,51 @@
         <div id="dbItemsList" style="margin-bottom: 20px;"></div>
         
         <div class="db-list-header" style="background:#e67e22; color:#fff;">Saved Bills History (Latest First)</div>
+        
+        <div style="background: #2c3e50; padding: 8px; border-radius: 6px; margin: 8px 0; border: 1px solid var(--line);">
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="custSearchInput" oninput="filterBillsByCustomer()" placeholder="🔍 Customer name se bill khojein..." style="flex: 1; height: 34px; background: #1a252f; border: 1px solid var(--line); color: #fff; padding: 0 10px; border-radius: 4px; font-size: 12px; outline: none;">
+            <button onclick="clearCustSearch()" style="background: #e74c3c; color: white; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">Reset</button>
+          </div>
+          <div id="custSummaryBox" style="display: none; background: #1a252f; padding: 6px 8px; border-radius: 4px; border-left: 4px solid #1abc9c; font-size: 11px; color: #dcdde1; margin-top: 6px;">
+            Bills Found: <b id="custBillCount" style="color:#1abc9c;">0</b> | Total Purchase: <b id="custTotalAmount" style="color:#e67e22;">₹0</b>
+          </div>
+        </div>
+
         <div id="dbBillsHistoryList"></div>
       </div>
     </div>
 
+    <!-- COMPACT BOTTOM CONTROL PANEL -->
     <div class="bottom-dashboard" id="bottomDashboard">
       <div id="modeStatus" class="mode-banner">Billing Active</div>
 
       <div class="total-board">
         <div class="total-row">
-          <span class="total-lbl">Total Amount:</span>
+          <span class="total-lbl">Subtotal:</span>
+          <span id="subtotalVal" style="font-weight: 700; color: #fff;">₹0.00</span>
+        </div>
+        <div id="adjustmentRow" class="total-row" style="display: none;">
+          <span id="adjustmentLbl" class="total-lbl" style="color: #e67e22;">Discount (0%):</span>
+          <span id="adjustmentVal" style="font-weight: 700; color: #e67e22;">-₹0.00</span>
+        </div>
+        <div class="total-row" style="border-top: 1px dashed var(--line); padding-top: 3px; margin-top: 2px;">
+          <span class="total-lbl" style="font-size: 14px; color: var(--accent);">Grand Total:</span>
           <span id="total" class="total-val">₹0.00</span>
         </div>
         <div id="totalWords" class="words">In Words: Zero Rupees Only</div>
+      </div>
+
+      <div style="background: #1a252f; padding: 4px 8px; border-radius: 4px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+        <span style="color: var(--muted); font-size: 11px; font-weight: bold;">Adjustment (%):</span>
+        <div style="display: flex; gap: 4px; flex: 1; justify-content: flex-end;">
+          <select id="percentType" style="background: #2c3e50; color: #fff; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; padding: 2px;">
+            <option value="DISC">Discount (-)</option>
+            <option value="TAX">Tax (+)</option>
+          </select>
+          <input type="number" id="percentVal" placeholder="0" min="0" max="100" style="width: 50px; background: #2c3e50; border: 1px solid var(--line); color: #fff; text-align: center; border-radius: 3px; font-size: 12px; outline: none;">
+          <span style="color: #fff; font-size: 12px; align-self: center;">%</span>
+        </div>
       </div>
 
       <div class="controls" style="margin-top: 2px;">
@@ -240,11 +413,10 @@
         </div>
 
         <div style="display: flex; gap: 4px;">
+          <button id="undoBtn" class="btn sq-btn" style="background:#e67e22; border-color:#d35400; color:#fff; display:none;" title="Restore Last Action / Bill">↩️</button>
           <button id="clearBtn" class="btn sq-btn" style="background:var(--danger); color:#fff;" title="Clear All">🗑️</button>
-          <button id="printBtn" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>
-          <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾 Data</button>
-          <button id="shareBtn" class="btn sq-btn" title="Share Items text">📤</button>
-          <button id="csvBtn" class="btn sq-btn" style="background:#f39c12; border-color:#e67e22; color:#fff;" title="Download CSV">📊</button>
+          <button id="localSaveBtn" class="btn sq-btn" style="background:#2ecc71; border-color:#27ae60; color:#fff;" title="Save Bill Data">💾</button>
+          <button id="printBtn" onclick="window.printBill()" class="btn sq-btn" style="background:#9b59b6; border-color:#8e44ad; color:#fff;" title="Print Invoice">🖨️</button>
         </div>
       </div>
     </div>
@@ -252,21 +424,323 @@
   </div>
 
   <script>
+    /* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE ---------- */
+    (function() {
+      let currentToken = new Date().getTime();
+      if (!window.location.href.includes("v_token=")) {
+        let separator = window.location.href.includes("?") ? "&" : "?";
+        window.history.replaceState(null, "", window.location.href + separator + "v_token=" + currentToken);
+      }
+    })();
+
+    /* ---------- 🛡️ OFFLINE NETWORK WATCHDOG TOGGLE ---------- */
+    const ENABLE_OFFLINE_INTERCEPTOR = false; 
+
+    (function initOfflineOverlayEngine() {
+      if (!ENABLE_OFFLINE_INTERCEPTOR) return;
+      if (!document.getElementById("offlineOverlay")) {
+        const overlay = document.createElement("div");
+        overlay.id = "offlineOverlay";
+        overlay.style.cssText = `
+          display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(26, 37, 47, 0.92); z-index: 9999999; backdrop-filter: blur(8px);
+          justify-content: center; align-items: center; flex-direction: column; color: #fff;
+          font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; box-sizing: border-box;
+        `;
+        overlay.innerHTML = `
+          <div style="font-size: 50px; margin-bottom: 10px;">📡❌</div>
+          <h2 style="color: #e74c3c; margin-bottom: 8px; font-size: 22px;">Internet Connection Lost</h2>
+          <p style="color: #bdc3c7; font-size: 14px; max-width: 320px; line-height: 1.5; margin-bottom: 20px;">
+            Yeh application secure cloud sync aur license check ke liye active internet connection ki maang karti hai.
+          </p>
+          <button onclick="location.reload()" style="background: #1abc9c; color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer;">Retry Connection 🔄</button>
+        `;
+        document.body.appendChild(overlay);
+      }
+    })();
+
+    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE ---------- */
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";
+
+    let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+      isVerified: false,
+      email: "",
+      deviceToken: "",
+      trialStart: null,
+      lastKnownTime: null
+    };
+
+    function getDeviceToken() {
+      if (!userLicence.deviceToken) {
+        userLicence.deviceToken = "DEV-" + Math.random().toString(36).substring(2, 15).toUpperCase() + "-" + new Date().getTime().toString().slice(-4);
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+      }
+      return userLicence.deviceToken;
+    }
+
+    window.openAuthModal = function() {
+      const m = document.getElementById("authLockScreen");
+      if (m) m.style.display = "flex";
+    };
+
+    window.closeAuthModal = function() {
+      const m = document.getElementById("authLockScreen");
+      if (m) m.style.display = "none";
+    };
+
+    window.requestOTP = async function() {
+      const authEmail = document.getElementById("authEmail");
+      let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
+      if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+      const reqBtn = document.getElementById("btnSendRequest");
+      if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
+      
+      try {
+        let currentToken = getDeviceToken();
+
+        let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}`, {
+          method: 'GET'
+        }).then(r => r.json()).catch(() => null);
+
+        if (authCheck && authCheck.authorized) {
+          userLicence.isVerified = true;
+          userLicence.email = emailVal;
+          userLicence.lastKnownTime = new Date().getTime();
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+          alert("🎉 Account Active Found! Pro Features Unlocked.");
+          closeAuthModal();
+          location.reload();
+          return;
+        }
+
+        let res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          body: JSON.stringify({ action: 'requestOTP', email: emailVal })
+        }).then(r => r.json());
+
+        if(res.success) {
+          userLicence.email = emailVal;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          document.getElementById("emailSection").style.display = 'none';
+          document.getElementById("otpSection").style.display = 'block';
+          document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
+        } else {
+          alert(res.message || "Approval pending. Please contact admin.");
+        }
+      } catch(e) { 
+        alert("Network Error! Check your internet connection."); 
+      }
+
+      if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+    };
+
+    window.verifyOTP = async function() {
+      const authOTP = document.getElementById("authOTP");
+      let otpVal = authOTP ? authOTP.value.trim() : "";
+      if(!otpVal) return alert('Enter validation token pin code');
+      
+      let currentToken = getDeviceToken();
+      const btn = document.getElementById("btnVerifyCode");
+      if (btn) btn.innerText = "Registering...";
+
+      try {
+        let res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          body: JSON.stringify({ action: 'verifyOTP', email: userLicence.email, otp: otpVal, token: currentToken })
+        }).then(r => r.json());
+
+        if(res.success) {
+          alert("🎉 Request Submitted Successfully!\nAdmin approval queued.");
+          location.reload();
+        } else {
+          alert(res.message);
+        }
+      } catch(e) { alert("Processing error."); }
+      if (btn) btn.innerText = "Verify OTP & Unlock 📩";
+    };
+
+    /* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
+    window.openSettingsModal = function() {
+      const m = document.getElementById("settingsModal");
+      if (m) m.style.display = "flex";
+    };
+
+    window.closeSettingsModal = function() {
+      const m = document.getElementById("settingsModal");
+      if (m) m.style.display = "none";
+    };
+
+    window.navToEntryMode = function() {
+      closeSettingsModal();
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "flex";
+    };
+
+    window.navToSavedBills = function() {
+      closeSettingsModal();
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "flex";
+      const hList = document.getElementById("dbBillsHistoryList");
+      if (hList) hList.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.navToBillMode = function() {
+      if (typeof window.toggleViewMode === "function") window.toggleViewMode('bill');
+      const b = document.getElementById("btnBackToBill");
+      if (b) b.style.display = "none";
+    };
+
+    window.toggleDarkMode = function() {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("notebook_theme_mode", isDark ? "dark" : "light");
+    };
+
+    window.changeAppFontSize = function(sizeVal) {
+      document.documentElement.style.setProperty('--font-base', sizeVal);
+      localStorage.setItem("notebook_font_size", sizeVal);
+    };
+
+    /* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
+    window.openLegalModal = function(type) {
+      const modal = document.getElementById("legalModal");
+      const title = document.getElementById("legalModalTitle");
+      const body = document.getElementById("legalModalBody");
+      
+      if (type === 'privacy') {
+        title.innerHTML = "🔒 Privacy & Security Policy";
+        body.innerHTML = `
+          <p><b>Notebook Bill Pro</b> respect karta hai aapki privacy ko.</p><br>
+          <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai.</p><br>
+          <p><b>Security:</b> Transaction history fully offline secure hai. License Auth verification ke alawa koi data transfer nahi hota.</p>
+        `;
+      } else if (type === 'terms') {
+        title.innerHTML = "📄 Terms of Service";
+        body.innerHTML = `
+          <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing engine ka upyog kar sakta hai.</p><br>
+          <p>2. <b>Device Binding:</b> 1 Pro License registered account ke sath bound rehta hai.</p><br>
+          <p>3. <b>Data Backup:</b> Export Backup Feature ka regular istemal karein.</p>
+        `;
+      } else {
+        title.innerHTML = "⁉️ User Guide & Help";
+        body.innerHTML = `
+          <p><b>Quick Shortcuts:</b></p>
+          <ul>
+            <li><b>Item Add:</b> Name and Price likhein (e.g. <i>Sugar 50</i>) aur Enter dabayein.</li>
+            <li><b>Calculation:</b> Math expression likhein (e.g. <i>Tea 45+45+50</i>).</li>
+            <li><b>Barcode Scan:</b> Header mein 📷 Icon daba kar scan karein.</li>
+            <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
+          </ul><br>
+          <p><b>Support Contact:</b> Support/Reactivation ke liye support@webmy.in par message karein.</p>
+        `;
+      }
+      if (modal) modal.style.display = "flex";
+    };
+
+    window.closeLegalModal = function() {
+      const modal = document.getElementById("legalModal");
+      if (modal) modal.style.display = "none";
+    };
+
+    window.shareAppText = function() {
+      const shareData = { title: "Notebook Bill Pro", text: "Pro Smart Digital Ledger & Thermal Billing Engine App", url: window.location.href };
+      if (navigator.share) navigator.share(shareData);
+      else alert("App Link Copied: " + window.location.href);
+    };
+
+    /* ---------- 📤 / 📥 EXPORT & IMPORT BACKUP ENGINE ---------- */
+    window.exportAppData = function() {
+      try {
+        const backupData = {
+          app: "NotebookBillPro",
+          version: "ProMax",
+          exportDate: new Date().toLocaleString('en-IN'),
+          ledger_db_v3: JSON.parse(localStorage.getItem("ledger_db_v3")) || [],
+          notebook_invoice_history: JSON.parse(localStorage.getItem("notebook_invoice_history")) || [],
+          shopName: document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : "Notebook Bill"
+        };
+
+        if (backupData.ledger_db_v3.length === 0 && backupData.notebook_invoice_history.length === 0) {
+          return alert("Export karne ke liye koi saved data nahi mila!");
+        }
+
+        const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchor = document.createElement("a");
+        const today = new Date().toISOString().slice(0, 10);
+        downloadAnchor.setAttribute("href", jsonString);
+        downloadAnchor.setAttribute("download", `notebook_bill_backup_${today}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        alert("🎉 Backup file (.json) successfully export ho gayi hai!");
+      } catch (err) { alert("Export Failed: " + err.message); }
+    };
+
+    window.exportCSVData = function() {
+      if (typeof window.executeCSVExport === "function") window.executeCSVExport();
+    };
+
+    window.triggerImportFileInput = function() {
+      const fileInput = document.getElementById("importFileInput");
+      if (fileInput) fileInput.click();
+    };
+
+    window.importAppData = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (!importedData.ledger_db_v3 && !importedData.notebook_invoice_history) {
+            return alert("❌ Invalid Backup File!");
+          }
+
+          if (confirm("🚨 Backup import karne se current list update ho jayegi. Continue?")) {
+            if (importedData.ledger_db_v3) localStorage.setItem("ledger_db_v3", JSON.stringify(importedData.ledger_db_v3));
+            if (importedData.notebook_invoice_history) localStorage.setItem("notebook_invoice_history", JSON.stringify(importedData.notebook_invoice_history));
+            if (importedData.shopName && document.getElementById("shopNameInput")) document.getElementById("shopNameInput").value = importedData.shopName;
+
+            alert("🎉 Data Restore Successful!");
+            location.reload();
+          }
+        } catch (err) { alert("❌ Import Error: Invalid JSON File."); }
+      };
+      reader.readAsText(file);
+    };
+
+    /* ---------- 🔍 CUSTOMER WISE FILTER FUNCTIONS ---------- */
+    window.filterBillsByCustomer = function() {
+      const query = document.getElementById("custSearchInput") ? document.getElementById("custSearchInput").value.trim().toLowerCase() : "";
+      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList(query);
+    };
+
+    window.clearCustSearch = function() {
+      if (document.getElementById("custSearchInput")) document.getElementById("custSearchInput").value = "";
+      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList();
+    };
+
     (function(){
       const container = document.getElementById("container");
       const totalBox  = document.getElementById("total");
+      const subtotalValBox = document.getElementById("subtotalVal");
+      const adjustmentRow = document.getElementById("adjustmentRow");
+      const adjustmentLbl = document.getElementById("adjustmentLbl");
+      const adjustmentVal = document.getElementById("adjustmentVal");
       const totalWordsBox = document.getElementById("totalWords");
       const dateEl = document.getElementById("date");
       const timeEl = document.getElementById("time");
       const localSaveBtn = document.getElementById("localSaveBtn");
       const clearBtn = document.getElementById("clearBtn");
       const printBtn = document.getElementById("printBtn");
-      const shareBtn = document.getElementById("shareBtn");
-      const entryModeBtn = document.getElementById("entryModeBtn");
-      const billModeBtn = document.getElementById("billModeBtn");
-      const modeStatus = document.getElementById("modeStatus");
-      
-      const printModeSelect = document.getElementById("printModeSelect");
       const dbEntryPanel = document.getElementById("dbEntryPanel");
       const dbSaveBtn = document.getElementById("dbSaveBtn");
       const dbListContainer = document.getElementById("dbListContainer");
@@ -275,290 +749,10 @@
       const bottomDashboard = document.getElementById("bottomDashboard");
       const custBlock = document.getElementById("custBlock");
       const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
-      const csvBtn = document.getElementById("csvBtn");
+      const printModeSelect = document.getElementById("printModeSelect");
+      const modeStatus = document.getElementById("modeStatus");
 
-      /* ==========================================================================
-         🔒 REVOLUTIONARY AUTOMATIC DEVICE-TOKEN WHITELISTING ENGINE
-         ========================================================================== */
-      const authLockScreen = document.getElementById("authLockScreen");
-      const authEmail = document.getElementById("authEmail");
-      const authOTP = document.getElementById("authOTP");
-      const emailSection = document.getElementById("emailSection");
-      const otpSection = document.getElementById("otpSection");
-      const authTitle = document.getElementById("authTitle");
-      const authMessage = document.getElementById("authMessage");
-
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";
-
-      let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
-        isVerified: false,
-        email: "",
-        deviceToken: "",
-        trialStart: null,
-        lastKnownTime: null,
-        isTampered: false
-      };
-
-      function getDeviceToken() {
-        if (!userLicence.deviceToken) {
-          userLicence.deviceToken = "DEV-" + Math.random().toString(36).substring(2, 15).toUpperCase() + "-" + new Date().getTime().toString().slice(-4);
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-        }
-        return userLicence.deviceToken;
-      }
-
-      async function checkAppLicenceStatus() {
-        if (userLicence.isTampered) {
-          lockAppCompletely("⚠️ Clock Tampering Detected!", "Violation detected. Security block engaged.");
-          return;
-        }
-
-        let currentTime = new Date().getTime();
-        let currentToken = getDeviceToken();
-
-        if (userLicence.lastKnownTime && currentTime < userLicence.lastKnownTime) {
-          userLicence.isTampered = true;
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-          lockAppCompletely("⚠️ Clock Tampering Detected!", "Security Engine Interrupted.");
-          return;
-        }
-
-        if (!userLicence.trialStart) {
-          userLicence.trialStart = currentTime;
-        }
-        userLicence.lastKnownTime = currentTime;
-        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-
-        // 🎯 FIXED: Direct Server Verification Check First (Bina guest trial error crash ke)
-        if (navigator.onLine && (userLicence.email || currentToken)) {
-          try {
-            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email || '')}&token=${encodeURIComponent(currentToken)}`, {
-              method: 'GET'
-            }).then(r => r.json());
-
-            if (res.authorized) {
-              userLicence.isVerified = true;
-              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-              if (authLockScreen) authLockScreen.style.display = "none";
-              document.getElementById("modeStatus").textContent = "Billing Active (Pro Subscription Active)";
-              return;
-            } else {
-              if (userLicence.isVerified) {
-                userLicence.isVerified = false;
-                localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-              }
-            }
-          } catch (err) {}
-        }
-
-        // Agar user verified nahi hai, tabhi lock screen dikhao
-        if (!userLicence.isVerified) {
-          authLockScreen.style.display = "flex";
-          emailSection.style.display = "block";
-          otpSection.style.display = "none";
-        } else {
-          authLockScreen.style.display = "none";
-          document.getElementById("modeStatus").textContent = "Billing Active";
-        }
-      }
-
-      function lockAppCompletely(title, msg) {
-        if (authLockScreen) authLockScreen.style.display = "flex";
-        if (authTitle) authTitle.innerHTML = title;
-        if (authMessage) authMessage.innerHTML = msg;
-        if (emailSection) emailSection.style.display = "none";
-        if (otpSection) otpSection.style.display = "none";
-      }
-/*
-      window.requestOTP = async function() {
-        let emailVal = authEmail.value.trim().toLowerCase();
-        if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
-
-        document.getElementById("btnSendRequest").innerText = "Checking Records System...";
-        
-        try {
-          let res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({ action: 'requestOTP', email: emailVal })
-          }).then(r => r.json());
-
-          if(res.success) {
-            userLicence.email = emailVal;
-            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-            emailSection.style.display = 'none';
-            otpSection.style.display = 'block';
-            authMessage.innerHTML = `Dynamic 6-digit access OTP security pass token successfully sent across email address matching destination: <b>${emailVal}</b>`;
-          } else {
-            if(res.exists) {
-              if(authEmail) authEmail.style.display = "none";
-              if(document.getElementById("btnSendRequest")) document.getElementById("btnSendRequest").style.display = "none";
-              if(document.getElementById("btnInstantVerify")) document.getElementById("btnInstantVerify").style.display = "none";
-
-              let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
-              let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai aur yeh database mein already registered dikha raha hai. Kripya mujhe aage ka subscription plan active karwana hai.`);
-              let adminEmail = "support@webmy.in";
-
-              authMessage.innerHTML = `
-                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
-                  <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 6px; font-size: 15px;'>🚨 Email Already Registered!</span>
-                  ${res.message}
-                </div>
-                <a href="mailto:${adminEmail}?subject=${customMailSubject}&body=${customMailBody}" target="_blank" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 45px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Open Gmail to Message Admin ✉️</a>
-              `;
-            } else {
-              alert(res.message);
-            }
-          }
-        } catch(e) { 
-          alert("Network Connection Error! Check data status."); 
-        }
-
-        if(document.getElementById("btnSendRequest")) {
-          document.getElementById("btnSendRequest").innerText = "Request Pro Activation 🚀";
-        }
-      };
-*/
-      /* ---------- 🚀 PRO SMART ACTIVATION & STATUS AUTO-DETECTOR ---------- */
-window.requestOTP = async function() {
-  let emailVal = authEmail.value.trim().toLowerCase();
-  if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
-
-  const reqBtn = document.getElementById("btnSendRequest");
-  if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
-  
-  try {
-    let currentToken = getDeviceToken();
-
-    // 🎯 STEP 1: Pehle Direct Status Check Karein Ki Email Active Hai Ya Nahi
-    let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}`, {
-      method: 'GET'
-    }).then(r => r.json()).catch(() => null);
-
-    if (authCheck && authCheck.authorized) {
-      // Agar status Active mila -> Directly Unlock App!
-      userLicence.isVerified = true;
-      userLicence.email = emailVal;
-      userLicence.lastKnownTime = new Date().getTime();
-      localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-
-      alert("🎉 Account Active Found! Application Unlocked.");
-      if(authLockScreen) authLockScreen.style.display = "none";
-      location.reload();
-      return;
-    }
-
-    // 🎯 STEP 2: Agar Active Nahi Hai, Toh Normal Activation / OTP Request Send Karein
-    let res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({ action: 'requestOTP', email: emailVal })
-    }).then(r => r.json());
-
-    if(res.success) {
-      userLicence.email = emailVal;
-      localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-      emailSection.style.display = 'none';
-      otpSection.style.display = 'block';
-      authMessage.innerHTML = `Dynamic 6-digit access OTP security pass token successfully sent to: <b>${emailVal}</b>`;
-    } else {
-      if(res.exists) {
-        // Agar status Pending/Denied hai tabhi warning notice dikhayega
-        if(authEmail) authEmail.style.display = "none";
-        if(reqBtn) reqBtn.style.display = "none";
-        if(document.getElementById("btnInstantVerify")) document.getElementById("btnInstantVerify").style.display = "none";
-
-        let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
-        let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve/active karein.`);
-        let adminEmail = "support@webmy.in";
-
-        authMessage.innerHTML = `
-          <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: left; font-size: 14px; line-height: 1.5; color: #fff;">
-            <span style='color:#f39c12; font-weight:bold; display:block; margin-bottom: 6px; font-size: 15px;'>🚨 Approval Pending!</span>
-            Aapka email registered hai par abhi tak status Active nahi hua hai. Admin approval ke liye message karein.
-          </div>
-          <a href="mailto:${adminEmail}?subject=${customMailSubject}&body=${customMailBody}" target="_blank" style="text-decoration: none; color: white; background: linear-gradient(to bottom, #f39c12, #d35400); display: flex; height: 45px; font-size: 14px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">Open Gmail to Message Admin ✉️</a>
-        `;
-      } else {
-        alert(res.message);
-      }
-    }
-  } catch(e) { 
-    alert("Network Connection Error! Check data status."); 
-  }
-
-  if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
-};
-
-      window.verifyOTP = async function() {
-        let otpVal = authOTP.value.trim();
-        if(!otpVal) return alert('Enter validation token pin code');
-        
-        let currentToken = getDeviceToken();
-        document.getElementById("btnVerifyCode").innerText = "Registering Data Core...";
-
-        try {
-          let res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({ action: 'verifyOTP', email: userLicence.email, otp: otpVal, token: currentToken })
-          }).then(r => r.json());
-
-          if(res.success) {
-            alert("🎉 Request Submitted Successfully!\nAdmin review queued system active.");
-            location.reload();
-          } else {
-            alert(res.message);
-          }
-        } catch(e) { alert("Processing error."); }
-        document.getElementById("btnVerifyCode").innerText = "Verify Code & Submit Request 📩";
-      };
-
-      window.checkDeviceLockInstant = async function() {
-        let emailVal = authEmail.value.trim().toLowerCase();
-        
-        if(!emailVal && userLicence.email) {
-          emailVal = userLicence.email.toLowerCase();
-        }
-
-        if(!emailVal) {
-          return alert('Kripya pehle registered Email enter karein check karne ke liye!');
-        }
-
-        document.getElementById("btnInstantVerify").innerText = "Connecting Live Cloud Server...";
-        
-        try {
-          let currentToken = getDeviceToken();
-          let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}`, {
-            method: 'GET'
-          }).then(r => r.json());
-
-          if(res.authorized) {
-            userLicence.isVerified = true;
-            userLicence.email = emailVal;
-            userLicence.lastKnownTime = new Date().getTime();
-            
-            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-            
-            alert("🎉 Status Match: Active! Application Unlocked.");
-            
-            if(authLockScreen) authLockScreen.style.display = "none";
-            location.reload();
-          } else {
-            alert("Status: Admin ne abhi tak Status 'Active' nahi kiya hai ya email mismatch hai.");
-          }
-        } catch(e) { 
-          alert("Connection drop! Check internet and try again."); 
-        }
-        
-        if(document.getElementById("btnInstantVerify")) {
-          document.getElementById("btnInstantVerify").innerText = "Check Current Activation Status 🔄";
-        }
-      };
-
-      checkAppLicenceStatus();
-
-      // Scanner and App logic
+      let undoHistoryState = null;
       let html5QrCode = null;
       let isScannerRunning = false;
       let isProcessingScan = false;
@@ -577,20 +771,87 @@ window.requestOTP = async function() {
         { code: "103", name: "Chawal", price: 60 }
       ];
 
+      const savedTheme = localStorage.getItem("notebook_theme_mode");
+      if (savedTheme === "dark") document.body.classList.add("dark-mode");
+      const savedFont = localStorage.getItem("notebook_font_size");
+      if (savedFont) {
+        document.documentElement.style.setProperty('--font-base', savedFont);
+        const fSelect = document.getElementById("fontSizeSelect");
+        if (fSelect) fSelect.value = savedFont;
+      }
+
       if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
           document.body.style.height = window.visualViewport.height + 'px';
         });
       }
 
+      function saveLiveDraft() {
+        const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
+        let items = [];
+        if (container) {
+          [...container.children].forEach(row => {
+            const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+            if (val) items.push(val);
+          });
+        }
+        if (items.length > 0 || custName.trim() !== "") {
+          localStorage.setItem("notebook_live_draft", JSON.stringify({ custName, items, timestamp: new Date().getTime() }));
+        }
+      }
+
+      function restoreLiveDraftOnLoad() {
+        const savedDraft = JSON.parse(localStorage.getItem("notebook_live_draft"));
+        if (savedDraft && savedDraft.items && savedDraft.items.length > 0) {
+          const custInput = document.getElementById("custNameInput");
+          if (custInput && savedDraft.custName) custInput.textContent = savedDraft.custName;
+          if (container) {
+            container.innerHTML = "";
+            savedDraft.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
+          }
+          render(); updateSL();
+        }
+      }
+
+      function saveCurrentSnapshot() {
+        const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
+        let items = [];
+        if (container) {
+          [...container.children].forEach(row => {
+            const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+            if (val) items.push(val);
+          });
+        }
+        undoHistoryState = { custName, items, timestamp: new Date().getTime() };
+        const undoBtn = document.getElementById("undoBtn");
+        if (undoBtn) undoBtn.style.display = "flex";
+        localStorage.setItem("notebook_bill_autodraft", JSON.stringify(undoHistoryState));
+      }
+
+      window.executeSmartUndo = function() {
+        let stateToRestore = undoHistoryState || JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
+        if (!stateToRestore || (!stateToRestore.items.length && !stateToRestore.custName)) {
+          return alert("Koi Undo backup data available nahi hai!");
+        }
+        const custInput = document.getElementById("custNameInput");
+        if (custInput) custInput.textContent = stateToRestore.custName;
+        if (container) {
+          container.innerHTML = "";
+          if (stateToRestore.items.length > 0) {
+            stateToRestore.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
+          } else { container.appendChild(makeRow(0)); }
+        }
+        render(); updateSL();
+        const undoBtn = document.getElementById("undoBtn");
+        if (undoBtn) undoBtn.style.display = "none";
+        undoHistoryState = null;
+        alert("🎉 Bill data successfully restored!");
+      };
+
       function toggleCameraUI() {
         const pane = document.getElementById('scannerWrapperZone');
-        if (pane.style.display === 'flex' || isScannerRunning) {
-          stopHardwareCamera();
-        } else {
-          pane.style.display = 'flex';
-          startHardwareCamera();
-        }
+        if (pane.style.display === 'flex' || isScannerRunning) stopHardwareCamera();
+        else { pane.style.display = 'flex'; startHardwareCamera(); }
       }
 
       function startHardwareCamera() {
@@ -599,16 +860,9 @@ window.requestOTP = async function() {
         isProcessingScan = false;
         html5QrCode = new Html5Qrcode("reader");
         const config = { fps: 20, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
-        html5QrCode.start(
-          { facingMode: "environment" },
-          config,
-          onScanSuccessCallback,
-          onScanErrorCallback
-        ).then(() => {
-          isScannerRunning = true;
-        }).catch(err => {
-          document.getElementById('scannerWrapperZone').style.display = 'none';
-        });
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccessCallback, onScanErrorCallback)
+        .then(() => { isScannerRunning = true; })
+        .catch(err => { document.getElementById('scannerWrapperZone').style.display = 'none'; });
       }
 
       function onScanSuccessCallback(decodedText) {
@@ -618,16 +872,9 @@ window.requestOTP = async function() {
         isProcessingScan = true;
         if (navigator.vibrate) navigator.vibrate(100);
         if (html5QrCode) {
-          html5QrCode.stop().then(() => {
-            isScannerRunning = false;
-            html5QrCode = null;
-            executeScannedCodeMatch(normalizedCode);
-          }).catch(() => {
-            executeScannedCodeMatch(normalizedCode);
-          });
-        } else {
-          executeScannedCodeMatch(normalizedCode);
-        }
+          html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; executeScannedCodeMatch(normalizedCode); })
+          .catch(() => { executeScannedCodeMatch(normalizedCode); });
+        } else { executeScannedCodeMatch(normalizedCode); }
       }
 
       function executeScannedCodeMatch(code) {
@@ -636,39 +883,26 @@ window.requestOTP = async function() {
           const activePrice = match.price;
           if (currentMode === 'bill') {
             const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
-            container.appendChild(newRow);
-            updateSL();
-            render();
+            container.appendChild(newRow); updateSL(); render();
             const lastInput = container.lastChild.querySelector(".input");
-            if (lastInput) {
-              lastInput.focus();
-              scrollToActiveInput(lastInput);
-            }
+            if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
           } else {
-            toggleViewMode('bill');
+            window.navToBillMode();
             setTimeout(() => {
               const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
-              container.appendChild(newRow);
-              updateSL();
-              render();
+              container.appendChild(newRow); updateSL(); render();
               const lastInput = container.lastChild.querySelector(".input");
-              if (lastInput) {
-                lastInput.focus();
-                scrollToActiveInput(lastInput);
-              }
+              if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
             }, 300);
           }
-          
           document.getElementById('btnResumeCamUI').style.display = "block";
           document.getElementById('btnResumeCamUI').focus();
         } else {
           if (confirm(`Barcode '${code}' database mein nahi mila! Naya product add karein?`)) {
-            toggleViewMode('entry');
+            window.navToEntryMode();
             document.getElementById('dbCode').value = code;
             document.getElementById('dbName').focus();
-          } else {
-            resumeHardwareScanning();
-          }
+          } else { resumeHardwareScanning(); }
         }
       }
 
@@ -680,15 +914,8 @@ window.requestOTP = async function() {
 
       function stopHardwareCamera() {
         if (html5QrCode && isScannerRunning) {
-          html5QrCode.stop().then(() => {
-            isScannerRunning = false;
-            html5QrCode = null;
-            document.getElementById('scannerWrapperZone').style.display = 'none';
-          });
-        } else {
-          isScannerRunning = false;
-          document.getElementById('scannerWrapperZone').style.display = 'none';
-        }
+          html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; document.getElementById('scannerWrapperZone').style.display = 'none'; });
+        } else { isScannerRunning = false; document.getElementById('scannerWrapperZone').style.display = 'none'; }
         isProcessingScan = false;
       }
 
@@ -696,19 +923,35 @@ window.requestOTP = async function() {
 
       document.getElementById('btnCamToggle').addEventListener('click', toggleCameraUI);
 
+      function toggleViewMode(mode) {
+        currentMode = mode;
+        if(mode === 'entry') {
+          stopHardwareCamera();
+          modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
+          dbEntryPanel.style.display = "flex"; container.style.display = "none";     
+          custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
+          renderDatabaseList(); renderBillsHistoryList(); 
+        } else {
+          modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
+          dbEntryPanel.style.display = "none"; container.style.display = "block";     
+          custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
+          editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
+          dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+        }
+        render();
+      }
+      window.toggleViewMode = toggleViewMode;
+
       function setCaretToEnd(el){
         const range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+        range.selectNodeContents(el); range.collapse(false);
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
       }
 
       function nowDateTimeTick(){
         const now = new Date();
         dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
-        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+        timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12:true});
       }
       setInterval(nowDateTimeTick, 1000);
       nowDateTimeTick();
@@ -754,7 +997,6 @@ window.requestOTP = async function() {
       function parseAndSaveNewItem(text) {
         const cleanText = text.trim();
         if (!cleanText) return;
-
         const words = cleanText.split(/\s+/);
         if (words.length < 2) return;
 
@@ -767,19 +1009,13 @@ window.requestOTP = async function() {
           .trim();
         
         if (!itemName || !cleaned) return;
-
         const tokens = cleaned.split(/\s+/);
         let priceVal = 0;
         
         for (let i = tokens.length - 1; i >= 0; i--) {
           const token = tokens[i];
-          if (/^[0-9.]+$/.test(token)) {
-            priceVal = parseFloat(token);
-            break;
-          }
-          if (/[+\-*/^]/.test(token)) {
-            break;
-          }
+          if (/^[0-9.]+$/.test(token)) { priceVal = parseFloat(token); break; }
+          if (/[+\-*/^]/.test(token)) break;
         }
 
         if (itemName && priceVal > 0) {
@@ -803,38 +1039,28 @@ window.requestOTP = async function() {
         }
 
         sortedDatabase.forEach(item => {
-          const itemRow = document.createElement("div");
-          itemRow.className = "db-item-row";
-
-          const details = document.createElement("div");
-          details.className = "db-item-details";
+          const itemRow = document.createElement("div"); itemRow.className = "db-item-row";
+          const details = document.createElement("div"); details.className = "db-item-details";
           details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Price: ₹${item.price}</span>`;
 
-          const actions = document.createElement("div");
-          actions.className = "db-item-actions";
-
-          const editBtn = document.createElement("button");
-          editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+          const actions = document.createElement("div"); actions.className = "db-item-actions";
+          const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
           editBtn.addEventListener("click", () => {
             document.getElementById("dbCode").value = item.code;
             document.getElementById("dbName").value = item.name;
             document.getElementById("dbPrice").value = item.price;
-            
             editingItemCode = item.code; 
             panelTitle.textContent = "✏️ Edit Product in Ledger Database";
             dbSaveBtn.textContent = "Update Product";
-            dbSaveBtn.style.background = "#e67e22";
-            dbSaveBtn.style.borderColor = "#d35400";
+            dbSaveBtn.style.background = "#e67e22"; dbSaveBtn.style.borderColor = "#d35400";
           });
 
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
           deleteBtn.addEventListener("click", () => {
             if(confirm(`Delete "${item.name}"?`)) {
               itemDatabase = itemDatabase.filter(i => i.code !== item.code);
               localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
-              renderDatabaseList();
-              render();
+              renderDatabaseList(); render();
             }
           });
 
@@ -855,60 +1081,42 @@ window.requestOTP = async function() {
             if (idx > -1) itemDatabase[idx] = { code, name, price };
             editingItemCode = null;
             panelTitle.textContent = "📥 Add Product to Ledger Database";
-            dbSaveBtn.textContent = "Save to Database";
-            dbSaveBtn.style.background = "#3498db";
-            dbSaveBtn.style.borderColor = "#2980b9";
+            dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
           } else {
             const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
             if (exists) { alert("Product matches an existing entry!"); return; }
             itemDatabase.push({ code, name, price });
           }
           localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
-          document.getElementById("dbCode").value = "";
-          document.getElementById("dbName").value = "";
-          document.getElementById("dbPrice").value = "";
-          renderDatabaseList();
-          render();
-        } else {
-          alert("Fill all required fields: code, name & price!");
-        }
+          document.getElementById("dbCode").value = ""; document.getElementById("dbName").value = ""; document.getElementById("dbPrice").value = "";
+          renderDatabaseList(); render();
+        } else { alert("Fill all required fields: code, name & price!"); }
       });
 
       function makeRow(i, text=""){
-        const row = document.createElement("div");
-        row.className = "row";
-        const rowMain = document.createElement("div");
-        rowMain.className = "row-main";
+        const row = document.createElement("div"); row.className = "row";
+        const rowMain = document.createElement("div"); rowMain.className = "row-main";
+        const sl = document.createElement("div"); sl.className = "sl"; sl.textContent = i+1;
 
-        const sl = document.createElement("div");
-        sl.className = "sl"; sl.textContent = i+1;
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "input-wrapper";
-
-        const input = document.createElement("div");
-        input.className = "input";
+        const wrapper = document.createElement("div"); wrapper.className = "input-wrapper";
+        const input = document.createElement("div"); input.className = "input";
         
         input.contentEditable = true;
         input.setAttribute("enterkeyhint", "next");
-        input.setAttribute("autocorrect", "on");
-        input.setAttribute("autocomplete", "on"); 
+        input.setAttribute("autocorrect", "off");
+        input.setAttribute("autocomplete", "off"); 
         input.setAttribute("spellcheck", "false");
         input.textContent = text;
 
         wrapper.appendChild(input);
-        const result = document.createElement("div");
-        result.className = "result";
+        const result = document.createElement("div"); result.className = "result";
 
         rowMain.appendChild(sl); rowMain.appendChild(wrapper); rowMain.appendChild(result);
-
-        const codePatch = document.createElement("div");
-        codePatch.className = "code-patch";
-        
+        const codePatch = document.createElement("div"); codePatch.className = "code-patch";
         row.appendChild(rowMain); row.appendChild(codePatch);
 
         input.addEventListener("input", function() {
-          render();
+          render(); saveLiveDraft();
           const val = input.textContent.trim().toLowerCase();
           const oldBox = wrapper.querySelector(".suggest-box");
           if(oldBox) oldBox.remove();
@@ -919,23 +1127,17 @@ window.requestOTP = async function() {
           );
 
           if(matches.length > 0) {
-            const suggestBox = document.createElement("div");
-            suggestBox.className = "suggest-box";
-            
+            const suggestBox = document.createElement("div"); suggestBox.className = "suggest-box";
             matches.forEach(match => {
-              const itemDiv = document.createElement("div");
-              itemDiv.className = "suggest-item";
+              const itemDiv = document.createElement("div"); itemDiv.className = "suggest-item";
               const activePrice = match.price;
               itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
               const selectItem = (e) => {
                 e.preventDefault(); e.stopPropagation();
                 input.textContent = `${match.name} ${activePrice}`;
-                suggestBox.remove();
-                render();
-                setCaretToEnd(input);
-                activeInput = input;
+                suggestBox.remove(); render(); saveLiveDraft();
+                setCaretToEnd(input); activeInput = input;
               };
-
               itemDiv.addEventListener("mousedown", selectItem);
               itemDiv.addEventListener("touchstart", selectItem);
               suggestBox.appendChild(itemDiv);
@@ -948,10 +1150,9 @@ window.requestOTP = async function() {
           setTimeout(() => {
             const box = wrapper.querySelector(".suggest-box");
             if(box) box.remove();
-            
             const currentText = input.textContent.trim();
-            if (currentText) { parseAndSaveNewItem(currentText); }
-            render();
+            if (currentText) parseAndSaveNewItem(currentText);
+            render(); saveLiveDraft();
           }, 350); 
         });
 
@@ -962,25 +1163,19 @@ window.requestOTP = async function() {
             if(currentText !== ""){
               parseAndSaveNewItem(currentText);
               container.appendChild(makeRow(container.children.length));
-              updateSL();
-              render();
+              updateSL(); render(); saveLiveDraft();
               const lastInput = container.lastChild.querySelector(".input");
-              lastInput.focus();
-              scrollToActiveInput(lastInput);
+              lastInput.focus(); scrollToActiveInput(lastInput);
             }
           }
           if(e.key === "Backspace" && input.textContent.trim() === ""){
             if(container.children.length > 1){
               e.preventDefault();
               const prev = row.previousElementSibling || row.nextElementSibling;
-              row.remove();
-              updateSL();
-              render();
+              row.remove(); updateSL(); render(); saveLiveDraft();
               if(prev){
                 const target = prev.querySelector(".input");
-                target.focus();
-                setCaretToEnd(target);
-                scrollToActiveInput(target);
+                target.focus(); setCaretToEnd(target); scrollToActiveInput(target);
               }
             }
           }
@@ -994,11 +1189,11 @@ window.requestOTP = async function() {
       }
 
       function render(){
-        let grand = 0;
+        let subtotal = 0;
 
         [...container.children].forEach(row => {
           const inputEl = row.querySelector(".input");
-          const text = inputEl.textContent.trim();
+          const text = inputEl ? inputEl.textContent.trim() : "";
           const resBox = row.querySelector(".result");
           const patchBox = row.querySelector(".code-patch");
           
@@ -1014,9 +1209,7 @@ window.requestOTP = async function() {
             if (foundItem) {
               patchBox.textContent = `Code: ${foundItem.code}`;
               patchBox.classList.add("visible");
-            } else {
-              patchBox.classList.remove("visible");
-            }
+            } else { patchBox.classList.remove("visible"); }
           }
 
           if (currentMode === 'bill') {
@@ -1034,64 +1227,69 @@ window.requestOTP = async function() {
             
             for (let i = tokens.length - 1; i >= 0; i--) {
               if (/[+\-*/^]/.test(tokens[i]) && /[0-9]/.test(tokens[i])) {
-                calcExpr = tokens[i];
-                break;
+                calcExpr = tokens[i]; break;
               }
             }
             
             if (!calcExpr) {
               for (let i = tokens.length - 1; i >= 0; i--) {
-                if (/^[0-9.]+$/.test(tokens[i])) {
-                  calcExpr = tokens[i];
-                  break;
-                }
+                if (/^[0-9.]+$/.test(tokens[i])) { calcExpr = tokens[i]; break; }
               }
             }
             
-            if (calcExpr && /[0-9]/.test(calcExpr)) {
-              val = evalExpr(calcExpr);
-            }
+            if (calcExpr && /[0-9]/.test(calcExpr)) val = evalExpr(calcExpr);
             
             resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-            grand += val;
+            subtotal += val;
             resBox.style.display = "block";
-          } else {
-            resBox.style.display = "none";
-          }
+          } else { resBox.style.display = "none"; }
         });
 
-        const formattedTotal = "₹" + grand.toLocaleString('en-IN');
-        const formattedWords = "In Words: " + totalInWords(grand);
+        const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
+        const percentValInput = document.getElementById("percentVal");
+        const percentVal = parseFloat(percentValInput ? percentValInput.value : 0) || 0;
+
+        let adjustmentAmount = (subtotal * percentVal) / 100;
+        let finalGrandTotal = subtotal;
+
+        if (percentVal > 0) {
+          if (percentType === "DISC") {
+            finalGrandTotal = subtotal - adjustmentAmount;
+            if (adjustmentLbl) adjustmentLbl.textContent = `Discount (${percentVal}%):`;
+            if (adjustmentVal) adjustmentVal.textContent = `-₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+          } else if (percentType === "TAX") {
+            finalGrandTotal = subtotal + adjustmentAmount;
+            if (adjustmentLbl) adjustmentLbl.textContent = `Tax/GST (${percentVal}%):`;
+            if (adjustmentVal) adjustmentVal.textContent = `+₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+          }
+          if (adjustmentRow) adjustmentRow.style.display = "flex";
+        } else {
+          if (adjustmentRow) adjustmentRow.style.display = "none";
+        }
+
+        finalGrandTotal = Math.max(0, finalGrandTotal);
+
+        const formattedSubtotal = "₹" + subtotal.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+        const formattedTotal = "₹" + finalGrandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+        const formattedWords = "In Words: " + totalInWords(finalGrandTotal);
 
         if (currentMode === 'bill') {
+          if (subtotalValBox) subtotalValBox.textContent = formattedSubtotal;
           totalBox.textContent = formattedTotal;
           totalWordsBox.textContent = formattedWords;
           totalWordsBox.style.display = "block"; 
         } else {
+          if (subtotalValBox) subtotalValBox.textContent = "----";
           totalBox.textContent = "----";
           totalWordsBox.style.display = "none";
         }
       }
+      window.render = render;
 
-      function toggleViewMode(mode) {
-        currentMode = mode;
-        if(mode === 'entry') {
-          modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
-          dbEntryPanel.style.display = "flex"; container.style.display = "none";     
-          custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
-          renderDatabaseList(); renderBillsHistoryList(); 
-        } else {
-          modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
-          dbEntryPanel.style.display = "none"; container.style.display = "block";     
-          custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
-          editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
-          dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
-        }
-        render();
-      }
-
-      entryModeBtn.addEventListener("click", () => toggleViewMode('entry'));
-      billModeBtn.addEventListener("click", () => toggleViewMode('bill'));
+      const percentValEl = document.getElementById("percentVal");
+      if (percentValEl) percentValEl.addEventListener("input", render);
+      const percentTypeEl = document.getElementById("percentType");
+      if (percentTypeEl) percentTypeEl.addEventListener("change", render);
 
       function scrollToActiveInput(element) {
         if (!element) return;
@@ -1100,8 +1298,7 @@ window.requestOTP = async function() {
 
       container.addEventListener("focusin", function(e) {
         if(e.target.classList.contains("input")) {
-          activeInput = e.target;
-          scrollToActiveInput(activeInput);
+          activeInput = e.target; scrollToActiveInput(activeInput);
         }
       });
 
@@ -1120,10 +1317,8 @@ window.requestOTP = async function() {
             range.insertNode(textNode);
             range.setStartAfter(textNode);
             range.setEndAfter(textNode);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            render();
-            scrollToActiveInput(activeInput);
+            sel.removeAllRanges(); sel.addRange(range);
+            render(); saveLiveDraft(); scrollToActiveInput(activeInput);
           }
         });
       });
@@ -1156,28 +1351,7 @@ window.requestOTP = async function() {
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
       });
 
-      shareBtn.addEventListener("click", async () => {
-        let itemsListText = "";
-        const lines = [...container.children].slice(0, 20);
-        lines.forEach((row, index) => {
-          const itemText = row.querySelector(".input").textContent.trim();
-          const itemTotal = row.querySelector(".result").textContent.trim();
-          if(itemText) { itemsListText += `${index + 1}) ${itemText} = ₹${itemTotal || 0}\n`; }
-        });
-        if([...container.children].length > 20) { itemsListText += "...and more products listed.\n"; }
-
-        const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
-        const customerName = document.getElementById("custNameInput").textContent.trim() || 'N/A';
-        const payloadMessage = `*${shopTitle}*\nCust: ${customerName}\n---------------------\n${itemsListText}---------------------\n*Total bill: ${totalBox.textContent}*\n\n`;
-
-        if (navigator.share) {
-          try { await navigator.share({ title: shopTitle, text: payloadMessage, url: window.location.href }); } catch (err) { console.log(err); }
-        } else {
-          navigator.clipboard.writeText(`${payloadMessage} App Link: ${window.location.href}`); alert("Bill ki details copy ho gayi hain!");
-        }
-      });
-
-      csvBtn.addEventListener("click", function() {
+      window.executeCSVExport = function() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Serial No,Item Description,Amount (INR)\n";
         [...container.children].forEach((row, idx) => {
@@ -1190,7 +1364,7 @@ window.requestOTP = async function() {
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri); link.setAttribute("download", `ledger_report.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      });
+      };
 
       async function autoTranslateText(text) {
         if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
@@ -1260,17 +1434,33 @@ window.requestOTP = async function() {
         printWindow.document.close();
       }
 
-      async function printBill() {
+      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TIME & WRAPPING ---------- */
+      window.printBill = async function() {
+        const printModeDropdown = document.getElementById("printModeSelect");
+        const currentPrintMode = printModeDropdown ? printModeDropdown.value : 'ENG';
+
+        // 🔒 MULTI Print Mode Lock Check
+        if (currentPrintMode === 'MULTI') {
+          let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {};
+          if (!userLicence.isVerified) {
+            window.openAuthModal();
+            return;
+          }
+        }
+
         let validRows = [];
+        let subtotalCalc = 0;
         [...container.children].forEach(row => {
           const itemText = row.querySelector(".input").textContent.trim();
           const itemTotal = row.querySelector(".result").textContent.trim();
-          if(itemText) validRows.push({ text: itemText, total: itemTotal });
+          if(itemText) {
+            validRows.push({ text: itemText, total: itemTotal });
+            subtotalCalc += parseFloat(itemTotal.replace(/,/g, '')) || 0;
+          }
         });
 
         if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
         
-        const currentPrintMode = printModeSelect.value;
         if (currentPrintMode === 'COMP') {
           executeComputerBrowserPrint();
           return;
@@ -1291,9 +1481,10 @@ window.requestOTP = async function() {
           const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
 
           let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
-          esc += '\x1B\x61\x00Date: ' + dateEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
-          esc += 'S.No Item                      Amt\n';
+          esc += '\x1B\x61\x00Date: ' + dateEl.textContent + ' ' + timeEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+          esc += 'S.No Item                 Amount\n';
           esc += '--------------------------------\n';
+          
           for (let i = 0; i < validRows.length; i++) {
             let rowItem = validRows[i];
             let finalPrintName = "";
@@ -1318,12 +1509,38 @@ window.requestOTP = async function() {
             let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
             let amtStr = cleanAmt.padStart(9, ' ');
             
-            let nameSpace = 32 - sNo.length - amtStr.length;
-            let choppedName = finalPrintName.substring(0, nameSpace).padEnd(nameSpace, ' ');
+            let maxNameWidth = 32 - sNo.length - amtStr.length;
 
-            esc += sNo + choppedName + amtStr + "\n";
+            if (finalPrintName.length <= maxNameWidth) {
+              let paddedName = finalPrintName.padEnd(maxNameWidth, ' ');
+              esc += sNo + paddedName + amtStr + "\n";
+            } else {
+              let firstChunk = finalPrintName.substring(0, maxNameWidth);
+              esc += sNo + firstChunk + amtStr + "\n";
+              let remainingText = finalPrintName.substring(maxNameWidth);
+              while (remainingText.length > 0) {
+                let subChunk = remainingText.substring(0, 28);
+                esc += "   " + subChunk + "\n";
+                remainingText = remainingText.substring(28);
+              }
+            }
           }
           
+          esc += "--------------------------------\n";
+          esc += `Subtotal: Rs. ${subtotalCalc.toFixed(2)}\n`;
+
+          const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
+          const percentVal = parseFloat(document.getElementById("percentVal") ? document.getElementById("percentVal").value : 0) || 0;
+          
+          if (percentVal > 0) {
+            let adjAmt = (subtotalCalc * percentVal) / 100;
+            if (percentType === "DISC") {
+              esc += `Discount (${percentVal}%): -Rs. ${adjAmt.toFixed(2)}\n`;
+            } else {
+              esc += `Tax/GST (${percentVal}%): +Rs. ${adjAmt.toFixed(2)}\n`;
+            }
+          }
+
           let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
           esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
           
@@ -1341,45 +1558,113 @@ window.requestOTP = async function() {
           alert("Print Error: " + error.message);
           printerDevice = null;
         }
-      }
-      printBtn.addEventListener("click", printBill);
+      };
 
-      function renderBillsHistoryList() {
+      function renderBillsHistoryList(searchFilter = "") {
+        if (!dbBillsHistoryList) return;
         dbBillsHistoryList.innerHTML = "";
-        if(savedBillsHistory.length === 0) {
-          dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>"; return;
+
+        if (savedBillsHistory.length === 0) {
+          dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
+          const summaryBox = document.getElementById("custSummaryBox");
+          if (summaryBox) summaryBox.style.display = "none";
+          return;
         }
-        [...savedBillsHistory].reverse().forEach((bill, revIdx) => {
-          const actualIdx = savedBillsHistory.length - 1 - revIdx;
+
+        let filteredBills = [...savedBillsHistory];
+        if (searchFilter) {
+          filteredBills = filteredBills.filter(bill => 
+            (bill.custName && bill.custName.toLowerCase().includes(searchFilter)) ||
+            (bill.billCode && bill.billCode.toLowerCase().includes(searchFilter))
+          );
+        }
+
+        const summaryBox = document.getElementById("custSummaryBox");
+        if (searchFilter && filteredBills.length > 0) {
+          let grandTotalCust = 0;
+          filteredBills.forEach(b => {
+            let numericTotal = parseFloat(b.total.replace(/[₹,]/g, '')) || 0;
+            grandTotalCust += numericTotal;
+          });
+          if (summaryBox) {
+            summaryBox.style.display = "block";
+            document.getElementById("custBillCount").textContent = filteredBills.length;
+            document.getElementById("custTotalAmount").textContent = "₹" + grandTotalCust.toLocaleString('en-IN');
+          }
+        } else {
+          if (summaryBox) summaryBox.style.display = "none";
+        }
+
+        if (filteredBills.length === 0) {
+          dbBillsHistoryList.innerHTML = `<div style='font-size:13px; color:#e74c3c; text-align:center; padding:15px;'>'${searchFilter}' ke naam par koi bill nahi mila.</div>`;
+          return;
+        }
+
+        [...filteredBills].reverse().forEach((bill) => {
+          const actualIdx = savedBillsHistory.findIndex(b => b.billCode === bill.billCode);
           const bRow = document.createElement("div"); bRow.className = "bill-history-row";
           const details = document.createElement("div"); details.className = "bill-meta-details";
-          details.innerHTML = `${bill.custName || 'Unknown Cust'} <span>Code: ${bill.billCode} | Total: ${bill.total}</span>`;
-          const actions = document.createElement("div"); actions.className = "db-item-actions";
+          details.innerHTML = `👤 <b>${bill.custName || 'Unknown Cust'}</b> <span>Code: ${bill.billCode} | ${bill.date || ''} ${bill.time || ''} | Total: <b style="color:#e67e22;">${bill.total}</b></span>`;
 
+          const actions = document.createElement("div"); actions.className = "db-item-actions";
           const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
           editBtn.addEventListener("click", () => {
             document.getElementById("custNameInput").textContent = bill.custName;
             container.innerHTML = "";
             bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
-            toggleViewMode('bill'); render();
+            window.navToBillMode(); render(); saveLiveDraft();
           });
 
           const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
           deleteBtn.addEventListener("click", () => {
-            if(confirm(`Are you sure you want to delete bill for "${bill.custName}" (${bill.billCode})?`)) {
-              savedBillsHistory.splice(actualIdx, 1);
-              localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); renderBillsHistoryList();
+            if(confirm(`Delete bill for "${bill.custName}" (${bill.billCode})?`)) {
+              if (actualIdx !== -1) {
+                savedBillsHistory.splice(actualIdx, 1);
+                localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); 
+                renderBillsHistoryList(searchFilter);
+              }
             }
           });
-          actions.appendChild(editBtn); actions.appendChild(deleteBtn); bRow.appendChild(details); bRow.appendChild(actions); dbBillsHistoryList.appendChild(bRow);
+
+          actions.appendChild(editBtn); actions.appendChild(deleteBtn);
+          bRow.appendChild(details); bRow.appendChild(actions);
+          dbBillsHistoryList.appendChild(bRow);
         });
       }
 
+      window.renderBillsHistoryList = renderBillsHistoryList;
+
       clearBtn.addEventListener("click", function(){
-        container.innerHTML = ""; document.getElementById("custNameInput").textContent = ""; container.appendChild(makeRow(0)); render();
+        saveCurrentSnapshot();
+        container.innerHTML = ""; document.getElementById("custNameInput").textContent = "";
+        const custSearchInput = document.getElementById("custSearchInput");
+        if (custSearchInput) custSearchInput.value = "";
+        const percentVal = document.getElementById("percentVal");
+        if (percentVal) percentVal.value = "";
+        localStorage.removeItem("notebook_live_draft");
+        container.appendChild(makeRow(0)); render();
       });
 
-      container.appendChild(makeRow(0));
+      restoreLiveDraftOnLoad();
+      const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
+      if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
+        const undoBtn = document.getElementById("undoBtn");
+        if (undoBtn) undoBtn.style.display = "flex";
+      }
+
+      const custInputEl = document.getElementById("custNameInput");
+      if (custInputEl) {
+        custInputEl.addEventListener("input", saveLiveDraft);
+      }
+
+      const undoBtnEl = document.getElementById("undoBtn");
+      if (undoBtnEl) {
+        undoBtnEl.addEventListener("click", window.executeSmartUndo);
+      }
+
+      if (container.children.length === 0) {
+        container.appendChild(makeRow(0));
+      }
       render();
     })();
   </script>
