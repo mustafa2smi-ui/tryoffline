@@ -1422,7 +1422,7 @@
           return data[0][0][0];
         } catch (e) { return text; }
       }
-
+/*
       function executeComputerBrowserPrint() {
         const cName = document.getElementById('custNameInput').textContent.trim() || "Valued Customer";
         const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
@@ -1480,6 +1480,108 @@
         printWindow.document.write(htmlContent);
         printWindow.document.close();
       }
+*/
+      /* ---------- 🖨️ HIGH-QUALITY DESKTOP A4 INVOICE PRINT ENGINE (FIXED) ---------- */
+function executeComputerBrowserPrint() {
+  const cName = document.getElementById('custNameInput') ? document.getElementById('custNameInput').textContent.trim() : "Valued Customer";
+  const shopTitle = document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : 'Notebook Bill';
+  const dateStr = document.getElementById("date") ? document.getElementById("date").textContent : "";
+  const timeStr = document.getElementById("time") ? document.getElementById("time").textContent : "";
+  const totalValEl = document.getElementById("total");
+  const netTotal = totalValEl ? totalValEl.textContent : "₹0.00";
+  const totalWordsEl = document.getElementById("totalWords");
+  const totalWords = totalWordsEl ? totalWordsEl.textContent : "";
+
+  let printWindow = window.open('', '_blank', 'width=800,height=900');
+  if (!printWindow) {
+    alert("Pop-up blocked! Kripya browser settings mein Pop-ups allow karein.");
+    return;
+  }
+
+  let htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice - ${shopTitle}</title>
+      <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { padding: 20px; background: #fff; color: #2c3e50; margin: 0; }
+        .invoice-box { max-width: 650px; margin: auto; padding: 20px; border: 2px solid #2c3e50; border-radius: 6px; }
+        .inv-head { text-align: center; border-bottom: 2px solid #1abc9c; padding-bottom: 8px; margin-bottom: 12px; }
+        .inv-head h2 { margin: 0; color: #1abc9c; font-size: 22px; text-transform: uppercase; }
+        .inv-head p { margin: 2px 0 0 0; font-size: 11px; color: #7f8c8d; font-weight: bold; }
+        .meta-grid { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px; font-weight: 600; background: #f8f9fa; padding: 8px 10px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 12px; }
+        th { background: #2c3e50; color: #fff; text-align: left; padding: 6px 8px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 6px 8px; border-bottom: 1px solid #ecf0f1; font-weight: 600; }
+        .text-right { text-align: right; }
+        .total-box { text-align: right; font-size: 15px; font-weight: bold; color: #d35400; border-top: 2px solid #2c3e50; padding-top: 6px; }
+        .words-box { font-size: 10px; font-style: italic; color: #7f8c8d; text-align: right; margin-top: 2px; }
+        .footer-msg { text-align: center; margin-top: 20px; font-size: 11px; color: #95a5a6; border-top: 1px dashed #bdc3c7; padding-top: 8px; }
+        @media print { body { padding: 0; } .invoice-box { border: none; } }
+      </style>
+    </head>
+    <body>
+      <div class="invoice-box">
+        <div class="inv-head">
+          <h2>${shopTitle}</h2>
+          <p>RETAIL COUNTER INVOICE</p>
+        </div>
+        <div class="meta-grid">
+          <div><span>Customer Name:</span> <b>${cName}</b></div>
+          <div><span>Date & Time:</span> ${dateStr} ${timeStr}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 35px;">#</th>
+              <th>Item Description</th>
+              <th class="text-right" style="width: 90px;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+
+  const container = document.getElementById("container");
+  if (container) {
+    [...container.children].forEach((row, idx) => {
+      const itemText = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+      const itemTotal = row.querySelector(".result") ? row.querySelector(".result").textContent.trim() : "";
+      if (itemText) {
+        htmlContent += `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${itemText}</td>
+            <td class="text-right">₹${itemTotal || 0}</td>
+          </tr>
+        `;
+      }
+    });
+  }
+
+  htmlContent += `
+          </tbody>
+        </table>
+        <div class="total-box">GRAND TOTAL: ${netTotal}</div>
+        <div class="words-box">${totalWords}</div>
+        <div class="footer-msg">🙏 Thank You! Visit Again 🙏</div>
+      </div>
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+            window.close();
+          }, 400);
+        };
+      <\/script>
+    </body>
+    </html>
+  `;
+
+  printWindow.document.open();
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+}
 
       /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE ---------- */
       window.printBill = async function() {
