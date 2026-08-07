@@ -11,6 +11,17 @@
   <meta name="description" content="Free mobile billing app for retail shops with Bluetooth thermal receipt generator and digital ledger.">
   <meta name="robots" content="index, follow">
 
+  <!-- Favicon Icons & Social OG Meta Tags -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.webmy.in/">
+  <meta property="og:title" content="Notebook Bill Pro - Smart Counter Billing">
+  <meta property="og:description" content="Instant Bluetooth thermal receipt printing and digital ledger for retail shops.">
+  <meta property="og:image" content="https://www.webmy.in/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
   <!-- 🔥 BARCODE SCANNER LIBRARY -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   
@@ -221,7 +232,7 @@
         </button>
 
         <div class="settings-section-lbl">Account & Subscription</div>
-        <button class="settings-item-btn" onclick="openAuthModal()">
+        <button class="settings-item-btn" onclick="openAuthModal(); closeSettingsModal();">
           <span>🔑 Subscription Status & Auth</span> <span id="authBadgeLbl" style="color:#1abc9c; font-size:11px;">Check</span>
         </button>
 
@@ -437,15 +448,12 @@
       return userLicence.deviceToken;
     }
 
-    // 🔥 24-HOUR AUTO SYNC WITH GOOGLE SHEET (CACHE OVERRIDE ENGINE)
     async function verifyLiveStatusWithSheet(forceRefresh = false) {
       let now = new Date().getTime();
       let twentyFourHours = 24 * 60 * 60 * 1000;
 
-      // Agar Email missing hai toh verification nahi hoga
       if (!userLicence.email) return false;
 
-      // Check karein ki 24 Hours hue hain ya force refresh triggered hai
       if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > twentyFourHours) {
         if (navigator.onLine) {
           try {
@@ -460,7 +468,6 @@
               localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
               return true;
             } else {
-              // 🚨 DENIED DETECTED: Instant Cache Wipeout
               userLicence.isVerified = false;
               userLicence.lastSyncTime = now;
               localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
@@ -495,7 +502,6 @@
       try {
         let currentToken = getDeviceToken();
 
-        // 1. Direct Live Status Query First
         let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}`, {
           method: 'GET'
         }).then(r => r.json()).catch(() => null);
@@ -512,7 +518,6 @@
           return;
         }
 
-        // 2. Request OTP if not active
         let res = await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'cors',
@@ -526,7 +531,17 @@
           document.getElementById("otpSection").style.display = 'block';
           document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
         } else {
-          alert(res.message || "Approval pending. Please contact admin.");
+          // Direct Gmail Open Option Link
+          let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+          let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve karein.`);
+          let gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=support@webmy.in&su=${customMailSubject}&body=${customMailBody}`;
+
+          document.getElementById("authMessage").innerHTML = `
+            <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+              Aapka email pending hai. Fast approval ke liye direct message karein.
+            </div>
+            <a href="${gmailComposeUrl}" target="_blank" style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail App ✉️</a>
+          `;
         }
       } catch(e) { 
         alert("Network Error! Check your internet connection."); 
@@ -607,6 +622,7 @@
 
     /* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
     window.openLegalModal = function(type) {
+      closeSettingsModal();
       const modal = document.getElementById("legalModal");
       const title = document.getElementById("legalModalTitle");
       const body = document.getElementById("legalModalBody");
@@ -647,6 +663,7 @@
     };
 
     window.shareAppText = function() {
+      closeSettingsModal();
       const shareData = { title: "Notebook Bill Pro", text: "Pro Smart Digital Ledger & Thermal Billing Engine App", url: window.location.href };
       if (navigator.share) navigator.share(shareData);
       else alert("App Link Copied: " + window.location.href);
@@ -992,15 +1009,22 @@
         return s + " Only";
       }
 
+      /* 🔥 BARCODE & DUP-CODE PREVENTION FIX IN ITEM AUTOSAVE */
       function parseAndSaveNewItem(text) {
         const cleanText = text.trim();
         if (!cleanText) return;
+
+        // Rule 1: Skip auto-save if string already has Code Tag [101]
+        if (/\[[a-zA-Z0-9]+\]/.test(cleanText)) return;
+
         const words = cleanText.split(/\s+/);
         if (words.length < 2) return;
 
         const itemName = words[0];
+        // Rule 2: Skip auto-save if item name is purely long barcode number
+        if (/^\d{8,14}$/.test(itemName)) return;
+
         const restPart = words.slice(1).join(' ');
-        
         const cleaned = restPart
           .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
           .replace(/[₹$€£]/g, '')
@@ -1017,7 +1041,7 @@
         }
 
         if (itemName && priceVal > 0) {
-          const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+          const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase() || i.code === itemName);
           if (!exists) {
             const code = (itemDatabase.length + 101).toString();
             itemDatabase.push({ code, name: itemName, price: priceVal });
@@ -1432,14 +1456,13 @@
         printWindow.document.close();
       }
 
-      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE WITH DYNAMIC TIME & WRAPPING ---------- */
+      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE ---------- */
       window.printBill = async function() {
         const printModeDropdown = document.getElementById("printModeSelect");
         const currentPrintMode = printModeDropdown ? printModeDropdown.value : 'ENG';
 
         // 🔒 MULTI Print Mode Lock & LIVE status Verification
         if (currentPrintMode === 'MULTI') {
-          // Force live verification with sheet to bypass local cache
           let isLiveAuthorized = await verifyLiveStatusWithSheet(true); 
           if (!isLiveAuthorized) {
             window.openAuthModal();
@@ -1644,9 +1667,8 @@
         container.appendChild(makeRow(0)); render();
       });
 
-      // App Initialization
       restoreLiveDraftOnLoad();
-      verifyLiveStatusWithSheet(false); // Background 24-Hour Auto-Sync Check
+      verifyLiveStatusWithSheet(false);
 
       const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
       if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
