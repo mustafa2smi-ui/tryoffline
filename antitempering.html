@@ -319,6 +319,14 @@
             <option value="17px">Large</option>
           </select>
         </div>
+<div class="settings-item-btn" style="cursor: default;">
+  <span>📄 Comp Print Size</span>
+  <select id="printPaperSizeSelect" onchange="changeCompPrintSize(this.value)" style="background:#1a252f; color:#fff; border:1px solid var(--line); border-radius:4px; padding:2px 6px; font-size:12px;">
+    <option value="A4_FULL">A4 Full Page</option>
+    <option value="A4_HALF" selected>5x8 Inch / Half A4 (Bold)</option>
+    <option value="THERMAL_80">Thermal Receipt (80mm)</option>
+  </select>
+</div>
 
         <div class="settings-section-lbl">App Info & Legal</div>
         <button class="settings-item-btn" onclick="shareAppText(); closeSettingsModal();">
@@ -481,6 +489,78 @@
   </div>
 
   <script>
+    // LocalStorage se saved paper size load karein
+let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
+
+window.changeCompPrintSize = function(sizeVal) {
+  currentCompPaperSize = sizeVal;
+  localStorage.setItem("notebook_comp_paper_size", sizeVal);
+  applyPrintSizeCSS(sizeVal);
+};
+
+// CSS Rules ko Dynamic Switch karne ka Engine
+function applyPrintSizeCSS(sizeVal) {
+  let styleTag = document.getElementById("dynamicPrintStyle");
+  if (!styleTag) {
+    styleTag = document.createElement("style");
+    styleTag.id = "dynamicPrintStyle";
+    document.head.appendChild(styleTag);
+  }
+
+  let cssRules = "";
+
+  if (sizeVal === "A4_HALF") {
+    // 📄 5x8 INCH / HALF A4 BOLD LAYOUT
+    cssRules = `
+      @media print {
+        @page { size: 5in 8in; margin: 0.2in; }
+        body * { visibility: hidden !important; }
+        #paper, #paper * { visibility: visible !important; }
+        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 10px !important; }
+        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+        .row { border-bottom: 1px solid #000 !important; padding: 8px 0 !important; }
+        .input, .result { color: #000 !important; font-size: 18px !important; font-weight: 800 !important; }
+        #custBlock span, #custNameInput { font-size: 16px !important; font-weight: bold !important; color: #000 !important; }
+      }
+    `;
+  } else if (sizeVal === "THERMAL_80") {
+    // 🖨️ 80MM COMPACT RECEIPT LAYOUT
+    cssRules = `
+      @media print {
+        @page { size: 3.15in auto; margin: 0.1in; }
+        body * { visibility: hidden !important; }
+        #paper, #paper * { visibility: visible !important; }
+        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 5px !important; }
+        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+        .row { border-bottom: 1px dashed #000 !important; padding: 4px 0 !important; }
+        .input, .result { color: #000 !important; font-size: 13px !important; font-weight: 700 !important; }
+      }
+    `;
+  } else {
+    // 📑 STANDARD A4 FULL PAGE LAYOUT
+    cssRules = `
+      @media print {
+        @page { size: A4; margin: 0.5in; }
+        body * { visibility: hidden !important; }
+        #paper, #paper * { visibility: visible !important; }
+        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 15px !important; }
+        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+        .row { border-bottom: 1px solid #ccc !important; padding: 6px 0 !important; }
+        .input, .result { color: #000 !important; font-size: 15px !important; font-weight: 600 !important; }
+      }
+    `;
+  }
+
+  styleTag.innerHTML = cssRules;
+}
+
+// App Load hote waqt Preference Restore karein
+document.addEventListener("DOMContentLoaded", function() {
+  const pSelect = document.getElementById("printPaperSizeSelect");
+  if (pSelect) pSelect.value = currentCompPaperSize;
+  applyPrintSizeCSS(currentCompPaperSize);
+});
+
     /* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE ---------- */
     (function() {
       let currentToken = new Date().getTime();
