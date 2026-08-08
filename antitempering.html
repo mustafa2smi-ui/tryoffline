@@ -297,6 +297,15 @@
         </button>
 
         <div class="settings-section-lbl">Backup & Export</div>
+        
+
+<!-- Compact Warning Box -->
+<div style="background: #2c3e50; border-left: 3px solid #f39c12; padding: 6px 8px; font-size: 11px; color: #bdc3c7; border-radius: 3px; margin-bottom: 6px;">
+  ⚠️ <i>Data loss se bachne ke liye regular backup (.json) export karein.</i>
+</div>
+
+
+        
         <button class="settings-item-btn" onclick="exportAppData(); closeSettingsModal();">
           <span>📤 Backup Data (.json)</span> ⬇️
         </button>
@@ -416,6 +425,17 @@
       </div>
 
       <div class="row-list" id="container"></div>
+<!-- ⚠️ STORAGE DISCLAIMER BANNER -->
+<div style="background: rgba(211, 84, 0, 0.15); border: 1.5px solid #d35400; border-radius: 6px; padding: 10px; margin-bottom: 12px; color: #f39c12; font-size: 12px; line-height: 1.5;">
+  <div style="font-weight: 800; font-size: 13px; color: #e67e22; margin-bottom: 4px; display: flex; align-items: center; gap: 5px;">
+    <span>⚠️</span> IMPORTANT DATA SAFETY NOTICE
+  </div>
+  Yeh app browser storage par billing save karti hai. Security ke liye:
+  <ul style="margin-left: 18px; margin-top: 4px; color: #dcdde1;">
+    <li>Settings se regular <b>Backup Data (.json)</b> download karein.</li>
+    <li>Main billing record apni physical <b>Dukan Notebook</b> mein bhi zaroor darj karein.</li>
+  </ul>
+</div>
 
       <div class="db-list-container" id="dbListContainer">
         <div class="db-list-header">All Saved Products (Alphabetical)</div>
