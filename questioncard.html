@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Islamic Interactive Quiz Builder</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { padding: 20px; background-color: #f4f7f6; color: #333; max-width: 800px; margin: auto; }
+    h2 { color: #1b5e20; text-align: center; margin-bottom: 20px; }
+    
+    .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    label { font-weight: bold; display: block; margin-bottom: 8px; }
+    
+    textarea { width: 100%; height: 110px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; resize: vertical; }
+    
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .btn { padding: 8px 14px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+    
+    .btn-q { background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
+    .btn-q:hover { background: #bbdefb; }
+    
+    .btn-blank { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+    .btn-blank:hover { background: #ffe0b2; }
+
+    .btn-dash { background: #f3e5f5; color: #4a148c; border: 1px solid #e1bee7; }
+    .btn-dash:hover { background: #e1bee7; }
+
+    .btn-tf { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+    .btn-tf:hover { background: #c8e6c9; }
+
+    .btn-reset { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; margin-left: auto; }
+    
+    .preview-box { background: #fafafa; border-left: 4px solid #1b5e20; padding: 15px; font-size: 17px; min-height: 80px; white-space: pre-wrap; word-wrap: break-word; }
+    .highlight-blank { background-color: #fff59d; font-weight: bold; padding: 0 4px; border-bottom: 2px solid #fbc02d; }
+    
+    .action-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+    .btn-copy { background: #1b5e20; color: white; padding: 10px 20px; font-size: 15px; }
+    .btn-copy:hover { background: #2e7d32; }
+    .msg { color: #2e7d32; font-weight: bold; display: none; }
+  </style>
+</head>
+<body>
+
+  <h2>📖 Islamic Quiz & Question Builder</h2>
+
+  <div class="card">
+    <label for="inputText">1. Hadees / Aayat Text Paste Karein & Text Select/Highlight Karein:</label>
+    <textarea id="inputText" placeholder="Yaha text paste karein, phir kisi word ko select karke niche diye gaye buttons dabayein..."></textarea>
+    
+    <div class="toolbar">
+      <button class="btn btn-q" onclick="replaceSelection('Kya')">Replace "Kya"</button>
+      <button class="btn btn-q" onclick="replaceSelection('Kitne')">Replace "Kitne"</button>
+      <button class="btn btn-q" onclick="replaceSelection('Kab')">Replace "Kab"</button>
+      <button class="btn btn-q" onclick="replaceSelection('Kis')">Replace "Kis"</button>
+      <button class="btn btn-q" onclick="replaceSelection('Konsi')">Replace "Konsi"</button>
+
+      <button class="btn btn-blank" onclick="makeBlank()">______ (Blank)</button>
+      <button class="btn btn-dash" onclick="cutAndDash()">Aage Ke Alfaz Poora Karo (...)</button>
+      <button class="btn btn-tf" onclick="addTrueFalse()">Right / Wrong Options</button>
+
+      <button class="btn btn-reset" onclick="resetText()">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>2. Live Question Preview:</label>
+    <div id="outputPreview" class="preview-box">Yaha aapka question tayyar hokar dikhega...</div>
+    
+    <div class="action-row">
+      <button class="btn btn-copy" onclick="copyFormattedResult()">Copy Question Text</button>
+      <span id="copyMsg" class="msg">Copied to Clipboard!</span>
+    </div>
+  </div>
+
+  <script>
+    let rawTextHistory = "";
+
+    // Helper: Select kiye gaye text ki positions nikalne ke liye
+    function getSelectionDetails() {
+      let textarea = document.getElementById("inputText");
+      let start = textarea.selectionStart;
+      let end = textarea.selectionEnd;
+      let selectedText = textarea.value.substring(start, end);
+      return { textarea, start, end, selectedText, fullText: textarea.value };
+    }
+
+    // 1. Selected Word ko Question Word (Kya, Kitne, Kis etc.) se badalna
+    function replaceSelection(qWord) {
+      let { textarea, start, end, selectedText, fullText } = getSelectionDetails();
+      if (!selectedText.trim()) {
+        alert("Pehle text area me se kisi word ko select/highlight karein!");
+        return;
+      }
+
+      let before = fullText.substring(0, start);
+      let after = fullText.substring(end);
+      let updatedText = before + qWord + after;
+
+      if (!updatedText.trim().endsWith("?")) {
+        updatedText = updatedText.trim() + " ?";
+      }
+
+      textarea.value = updatedText;
+      updatePreview(updatedText);
+    }
+
+    // 2. Selected Text ko Fill-in-the-blanks (______ ) me badalna
+    function makeBlank() {
+      let { textarea, start, end, selectedText, fullText } = getSelectionDetails();
+      if (!selectedText.trim()) {
+        alert("Pehle wo text select karein jise chhupana (blank karna) chahte hain!");
+        return;
+      }
+
+      let before = fullText.substring(0, start);
+      let after = fullText.substring(end);
+      
+      // Plain text me underline/dash
+      let updatedText = before + " ______ " + after + "\n\n❓ Khali jagah ko bharein.";
+      
+      // HTML preview me highlighted blank dikhane ke liye
+      let htmlPreview = escapeHtml(before) + `<span class="highlight-blank"> ______ </span>` + escapeHtml(after) + `<br><br><b>❓ Khali jagah ko bharein.</b>`;
+
+      textarea.value = before + " ______ " + after;
+      document.getElementById("outputPreview").innerHTML = htmlPreview;
+    }
+
+    // 3. Aage ke Alfaz Poora Karo (Dash Dash Format)
+    function cutAndDash() {
+      let { textarea, start, end, selectedText, fullText } = getSelectionDetails();
+      if (!selectedText.trim()) {
+        alert("Pehle wo hissa select karein jahan se aage ka text hatana/dash karna chahte hain!");
+        return;
+      }
+
+      let remainingText = fullText.substring(0, start);
+      let cutPart = fullText.substring(start); // Aage ka pura part
+
+      let questionText = `Ek Hadees Hai :- "${remainingText.trim()} ....."\n\n❓ Aage ke alfaz ko poora karein.`;
+      
+      document.getElementById("outputPreview").innerText = questionText;
+    }
+
+    // 4. True / False Format
+    function addTrueFalse() {
+      let { textarea, fullText } = getSelectionDetails();
+      if (!fullText.trim()) {
+        alert("Pehle Hadees text paste karein!");
+        return;
+      }
+
+      let formatted = `Sawal: Kya ye bayan sahi hai ya galat?\n"${fullText.trim()}"\n\nOptions:\n1) Sahi (Right)\n2) Galat (Wrong)`;
+      document.getElementById("outputPreview").innerText = formatted;
+    }
+
+    // Live Preview Update Handler
+    function updatePreview(text) {
+      document.getElementById("outputPreview").innerText = text || "Yaha aapka question tayyar hokar dikhega...";
+    }
+
+    // Reset Function
+    function resetText() {
+      document.getElementById("inputText").value = "";
+      document.getElementById("outputPreview").innerText = "Yaha aapka question tayyar hokar dikhega...";
+    }
+
+    // Result Copy karna
+    function copyFormattedResult() {
+      let previewText = document.getElementById("outputPreview").innerText;
+      if (!previewText || previewText === "Yaha aapka question tayyar hokar dikhega...") return;
+
+      navigator.clipboard.writeText(previewText).then(() => {
+        let msg = document.getElementById("copyMsg");
+        msg.style.display = "inline";
+        setTimeout(() => msg.style.display = "none", 2000);
+      });
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Textarea manual typing listener
+    document.getElementById("inputText").addEventListener("input", function(e) {
+      updatePreview(e.target.value);
+    });
+  </script>
+</body>
+</html>
