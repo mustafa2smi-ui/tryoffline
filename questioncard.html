@@ -1,127 +1,163 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <title>Islamic Quiz Builder V3</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <style>
-    /* Styling Updates */
-    body { font-family: sans-serif; background: #e8f5e9; margin: 0; padding: 10px; }
-    .card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; }
-    
-    /* Toolbar Layout */
-    .controls { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-    .btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
-    .btn-phrase { background: #e0e0e0; color: #333; }
-    .btn-arrow { background: #4caf50; color: white; }
-    .btn-main { background: #1b5e20; color: white; }
-    
-    textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; }
-    
-    /* Preview Card (Whatsapp Ready) */
-    #captureArea { background: white; padding: 20px; border: 3px solid #1b5e20; width: 350px; margin: auto; text-align: center; }
-    .bold-title { font-weight: bold; font-size: 20px; margin-bottom: 5px; }
-    .italic-subtitle { font-style: italic; font-weight: bold; margin-bottom: 15px; }
-    .q-text { font-size: 16px; margin-bottom: 15px; text-align: center; }
-    .q-options { text-align: left; display: flex; flex-direction: column; gap: 5px; }
-    .watermark { margin-top: 20px; font-size: 12px; color: #777; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Quiz Generator Pro</title>
+    <!-- Library for Image Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* CSS Styling */
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f4f0; padding: 10px; margin: 0; }
+        .container { max-width: 500px; margin: auto; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        
+        h3 { color: #1b5e20; margin-top: 0; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        /* Toolbar */
+        .toolbar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        button { padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .btn-phrase { background: #e0e0e0; color: #333; }
+        .btn-arrow { background: #4caf50; color: white; }
+        .btn-action { background: #1b5e20; color: white; }
+        
+        /* Preview Card */
+        #captureArea { background: white; padding: 25px; border: 4px solid #1b5e20; width: 350px; margin: 20px auto; text-align: center; border-radius: 15px; }
+        .p-title { font-weight: bold; font-size: 20px; margin-bottom: 5px; color: #1b5e20; }
+        .p-subtitle { font-style: italic; font-weight: bold; font-size: 16px; margin-bottom: 15px; color: #444; }
+        .p-question { font-size: 17px; margin-bottom: 20px; font-weight: 500; }
+        .p-options { text-align: left; margin-left: 20px; }
+        .p-footer { margin-top: 30px; font-size: 12px; color: #555; }
+        
+        input[type="text"] { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
 </head>
 <body>
 
-  <!-- Controls -->
-  <div class="card">
-    <label>1. Quick Phrases (Insert):</label>
-    <div class="controls">
-      <button class="btn btn-phrase" onclick="insertPhrase('Kis Sahabi Ne Kaha: ')">Sahabi Name</button>
-      <button class="btn btn-phrase" onclick="insertPhrase('Quran Me Kaha Hai: ')">Quran Ayah</button>
-      <button class="btn btn-phrase" onclick="insertPhrase('Ek Hadees Hai Ki: ')">Hadees Start</button>
+<div class="container">
+    <h3>📖 Islamic Quiz Builder Pro</h3>
+
+    <!-- Control Section -->
+    <div class="card">
+        <label><b>Watermark Name:</b></label>
+        <input type="text" id="watermarkInput" placeholder="Aapka Naam" oninput="updateCard()">
+        
+        <label style="margin-top: 10px; display: block;"><b>Hadees Text:</b></label>
+        <textarea id="inputText" oninput="updateCard()" placeholder="Text yaha paste karein..."></textarea>
+        
+        <div class="toolbar">
+            <button class="btn btn-phrase" onclick="insertPhrase('Kis Sahabi Ne Kaha: ')">Sahabi</button>
+            <button class="btn btn-phrase" onclick="insertPhrase('Quran Me Kaha Hai: ')">Quran</button>
+            <button class="btn btn-phrase" onclick="insertPhrase('Ek Hadees Hai Ki: ')">Hadees</button>
+            <button class="btn btn-arrow" onclick="adjustSelection(-1)">⬅️ Select</button>
+            <button class="btn btn-arrow" onclick="adjustSelection(1)">Select ➡️</button>
+            <button class="btn btn-phrase" onclick="makeCaps()">ALL CAPS</button>
+        </div>
+
+        <label style="margin-top: 10px; display: block;"><b>Options:</b></label>
+        <input type="text" id="optA" placeholder="A) Sahi Jawab Ka Intezar Hai" oninput="updateCard()">
+        <input type="text" id="optB" placeholder="B) Sahi Jawab Ka Intezar Hai" oninput="updateCard()">
+        <input type="text" id="optC" placeholder="C) Sahi Jawab Ka Intezar Hai" oninput="updateCard()">
+        <input type="text" id="optD" placeholder="D) Sahi Jawab Ka Intezar Hai" oninput="updateCard()">
     </div>
 
-    <label>2. Selection Control (Select Text):</label>
-    <div class="controls">
-      <button class="btn btn-arrow" onclick="expandSelection(-1)">⬅️ Select Left</button>
-      <button class="btn btn-arrow" onclick="expandSelection(1)">Select Right ➡️</button>
-      <button class="btn btn-main" onclick="applyFormat('Answer The Question', 'Kya')">Kya</button>
-      <button class="btn btn-main" onclick="applyFormat('Answer The Question', 'Kitne')">Kitne</button>
+    <!-- Preview Card -->
+    <div id="captureArea">
+        <div class="p-title" id="outTitle">*🌹 Islamic Quiz*</div>
+        <div class="p-subtitle" id="outSub">_*Fill In Blank*_</div>
+        <div class="p-question" id="outQuestion">Yaha sawal aayega...</div>
+        <div class="p-options" id="outOptions">
+            A) Sahi Jawab Ka Intezar Hai<br>
+            B) Sahi Jawab Ka Intezar Hai<br>
+            C) Sahi Jawab Ka Intezar Hai<br>
+            D) Sahi Jawab Ka Intezar Hai
+        </div>
+        <div class="p-footer">
+            <div id="outWatermark"></div>
+            <div>[Jazakallah Khairan Kaseera]</div>
+            <div id="outDate"></div>
+        </div>
     </div>
 
-    <textarea id="inputText" oninput="updateCard()" placeholder="Text yaha paste karein..."></textarea>
-  </div>
-
-  <!-- Preview -->
-  <div id="captureArea">
-    <div class="bold-title" id="pTitle">*🌹 Islamic Quiz*</div>
-    <div class="italic-subtitle" id="pSubtitle">_*Fill In Blank*_</div>
-    <div class="q-text" id="pQuestion">Yaha sawal aayega...</div>
-    <div class="q-options" id="pOptions">
-      A) Sahi Jawab Ka Intezar Hai<br>
-      B) Sahi Jawab Ka Intezar Hai<br>
-      C) Sahi Jawab Ka Intezar Hai<br>
-      D) Sahi Jawab Ka Intezar Hai
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+        <button class="btn btn-action" style="flex:1" onclick="copyWhatsApp()">📋 Copy WhatsApp</button>
+        <button class="btn btn-action" style="flex:1; background:#d32f2f" onclick="downloadImg()">🖼️ Download PNG</button>
     </div>
-    <div class="watermark" id="pFooter">[Jazakallah Khairan Kaseera]<br><span id="pDate"></span></div>
-  </div>
-
-  <div style="text-align:center; margin-top:10px;">
-    <button class="btn btn-main" onclick="copyWhatsApp()">📋 Copy for WhatsApp</button>
-    <button class="btn btn-main" onclick="downloadImg()">🖼️ Download Image</button>
-  </div>
+</div>
 
 <script>
-  // Selection Logic
-  function expandSelection(dir) {
-    let ta = document.getElementById("inputText");
-    if(dir === 1 && ta.selectionEnd < ta.value.length) ta.selectionEnd++;
-    if(dir === -1 && ta.selectionStart > 0) ta.selectionStart--;
-    ta.focus();
-  }
+    // Logic for Selection Arrows
+    function adjustSelection(dir) {
+        let ta = document.getElementById('inputText');
+        if (dir === -1 && ta.selectionStart > 0) ta.selectionStart--;
+        if (dir === 1 && ta.selectionEnd < ta.value.length) ta.selectionEnd++;
+        ta.focus();
+    }
 
-  function insertPhrase(p) {
-    let ta = document.getElementById("inputText");
-    ta.value = p + ta.value;
+    // Insert Phrases
+    function insertPhrase(text) {
+        let ta = document.getElementById('inputText');
+        ta.value = text + ta.value;
+        updateCard();
+    }
+
+    // Capitalize
+    function makeCaps() {
+        let ta = document.getElementById('inputText');
+        ta.value = ta.value.toUpperCase();
+        updateCard();
+    }
+
+    // Main Update Function
+    function updateCard() {
+        // Update Title/Sub
+        document.getElementById('outQuestion').innerText = document.getElementById('inputText').value;
+        document.getElementById('outWatermark').innerText = document.getElementById('watermarkInput').value;
+        document.getElementById('outDate').innerText = new Date().toLocaleDateString('en-GB');
+
+        // Options Update
+        let oA = document.getElementById('optA').value || "Sahi Jawab Ka Intezar Hai";
+        let oB = document.getElementById('optB').value || "Sahi Jawab Ka Intezar Hai";
+        let oC = document.getElementById('optC').value || "Sahi Jawab Ka Intezar Hai";
+        let oD = document.getElementById('optD').value || "Sahi Jawab Ka Intezar Hai";
+        
+        document.getElementById('outOptions').innerHTML = 
+            `A) ${oA}<br>B) ${oB}<br>C) ${oC}<br>D) ${oD}`;
+    }
+
+    // WhatsApp Copy (with * and _ for Formatting)
+    function copyWhatsApp() {
+        let title = "*🌹 Islamic Quiz*\n\n";
+        let sub = "_*Fill In Blank*_\n\n";
+        let q = document.getElementById('inputText').value + "\n\n";
+        let oA = document.getElementById('optA').value || "Sahi Jawab Ka Intezar Hai";
+        let oB = document.getElementById('optB').value || "Sahi Jawab Ka Intezar Hai";
+        let oC = document.getElementById('optC').value || "Sahi Jawab Ka Intezar Hai";
+        let oD = document.getElementById('optD').value || "Sahi Jawab Ka Intezar Hai";
+        
+        let opts = `A) ${oA}\nB) ${oB}\nC) ${oC}\nD) ${oD}\n\n`;
+        let water = document.getElementById('watermarkInput').value + "\n";
+        let footer = "[Jazakallah Khairan Kaseera]";
+        
+        navigator.clipboard.writeText(title + sub + q + opts + water + footer);
+        alert("Text Copied with WhatsApp format!");
+    }
+
+    // Download Image
+    function downloadImg() {
+        html2canvas(document.getElementById('captureArea')).then(canvas => {
+            let link = document.createElement('a');
+            link.download = 'Islamic_Quiz.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    // Initialize Date
     updateCard();
-  }
-
-  // Formatting Function
-  function applyFormat(subtitle, qWord) {
-    let ta = document.getElementById("inputText");
-    let start = ta.selectionStart;
-    let end = ta.selectionEnd;
-    let selected = ta.value.substring(start, end);
-    if(!selected) return alert("Pehle arrow se text select karein!");
-    
-    ta.value = ta.value.substring(0, start) + qWord + ta.value.substring(end);
-    document.getElementById("pSubtitle").innerText = "_*" + subtitle + "*_";
-    updateCard();
-  }
-
-  function updateCard() {
-    let val = document.getElementById("inputText").value;
-    document.getElementById("pQuestion").innerText = val;
-    document.getElementById("pDate").innerText = new Date().toLocaleDateString();
-  }
-
-  // Copy with WhatsApp Formatting
-  function copyWhatsApp() {
-    let title = "*🌹 Islamic Quiz*\n\n";
-    let sub = document.getElementById("pSubtitle").innerText + "\n\n";
-    let q = document.getElementById("pQuestion").innerText + "\n\n";
-    let opts = "A) Sahi Jawab Ka Intezar Hai\nB) Sahi Jawab Ka Intezar Hai\nC) Sahi Jawab Ka Intezar Hai\nD) Sahi Jawab Ka Intezar Hai\n\n";
-    let footer = "[Jazakallah Khairan Kaseera]";
-    
-    navigator.clipboard.writeText(title + sub + q + opts + footer);
-    alert("WhatsApp Format Copied!");
-  }
-
-  function downloadImg() {
-    html2canvas(document.getElementById("captureArea")).then(canvas => {
-      let link = document.createElement('a');
-      link.download = 'quiz.png';
-      link.href = canvas.toDataURL();
-      link.click();
-    });
-  }
 </script>
+
 </body>
 </html>
