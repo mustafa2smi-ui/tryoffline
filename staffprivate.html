@@ -654,7 +654,7 @@ let twentyFourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Interval
       localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
       return true;
     }
-
+/*
     async function verifyLiveStatusWithSheet(forceRefresh = false) {
       if (!verifyClockIntegrity()) return false;
 
@@ -697,6 +697,62 @@ let twentyFourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Interval
           } catch (e) { return userLicence.isVerified; }
         }
       }
+*/
+          async function verifyLiveStatusWithSheet(forceRefresh = false) {
+      if (!verifyClockIntegrity()) return false;
+
+      let now = new Date().getTime();
+      let twentyFourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Interval
+
+      if (!userLicence.email) return false;
+
+      if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > twentyFourHours) {
+        if (navigator.onLine) {
+          try {
+            let currentToken = getDeviceToken();
+            let currentOrigin = window.location.origin;
+
+            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=STAFF&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+              method: 'GET'
+            }).then(r => r.json()).catch(() => null);
+
+            // 🎯 CHECK 1: Agar App Variant Mismatch hai (Public Email on Staff App)
+            if (res && res.status === "VariantMismatch") {
+              userLicence.isVerified = false;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Commercial Public App' par registered hai.\nYeh App sirf 'Staff & Private Members' ke liye hai.\n\nAgar yahan access chahiye toh doosre Email ID se register karein.");
+              
+              // Blur Lock Screen Show Karein
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+
+            // 🎯 CHECK 2: Active License Check
+            if (res && res.authorized) {
+              userLicence.isVerified = true;
+              userLicence.isTampered = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              
+              // Hide Blur Lock Screen
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "none";
+              return true;
+            } else {
+              userLicence.isVerified = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              
+              // Show Blur Lock Screen
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+          } catch (e) { return userLicence.isVerified; }
+        }
+      }
 
       // Local State Check
       const authLockScreen = document.getElementById("authLockScreen");
@@ -707,7 +763,17 @@ let twentyFourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Interval
       }
       return userLicence.isVerified;
     }
-
+/*
+      // Local State Check
+      const authLockScreen = document.getElementById("authLockScreen");
+      if (!userLicence.isVerified) {
+        if (authLockScreen) authLockScreen.style.display = "flex";
+      } else {
+        if (authLockScreen) authLockScreen.style.display = "none";
+      }
+      return userLicence.isVerified;
+    }
+*/
     window.openAuthModal = function() {
       const m = document.getElementById("authLockScreen");
       if (m) m.style.display = "flex";
