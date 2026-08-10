@@ -650,7 +650,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
           try {
             let currentToken = getDeviceToken();
             let currentOrigin = window.location.origin;
-            
+            /*
             // 🎯 ADDED: appVariant=PUBLIC & clientOrigin Parameter
             let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
               method: 'GET'
@@ -670,6 +670,62 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
             }
           } catch (e) { return userLicence.isVerified; }
         }
+      }
+      return userLicence.isVerified;
+    }
+*/
+                        let currentToken = getDeviceToken();
+            let currentOrigin = window.location.origin;
+
+            // 🎯 1. GET CheckAuth Request (PUBLIC Variant & Domain Origin)
+            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+              method: 'GET'
+            }).then(r => r.json()).catch(() => null);
+
+            // 🎯 2. CHECK: Agar Staff Email ID se Public App kholi gayi hai (Variant Mismatch Block)
+            if (res && res.status === "VariantMismatch") {
+              userLicence.isVerified = false;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Staff Private App' ke liye registered hai.\nPublic Commercial App access ke liye naya email enter karein.");
+
+              // Lock Screen Show Karein
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+
+            // 🎯 3. CHECK: Active Status & License Approval
+            if (res && res.authorized) {
+              userLicence.isVerified = true;
+              userLicence.isTampered = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              // Lock Screen Hide Karein
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "none";
+              return true;
+            } else {
+              userLicence.isVerified = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              // Lock Screen Show Karein
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+          } catch (e) { return userLicence.isVerified; }
+        }
+      }
+
+      // Local Verification State Lock
+      const authLockScreen = document.getElementById("authLockScreen");
+      if (!userLicence.isVerified) {
+        if (authLockScreen) authLockScreen.style.display = "flex";
+      } else {
+        if (authLockScreen) authLockScreen.style.display = "none";
       }
       return userLicence.isVerified;
     }
