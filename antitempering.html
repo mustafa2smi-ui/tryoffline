@@ -598,10 +598,10 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     })();
 
-    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE WITH 24HR AUTO-SYNC ---------- */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";
-
-    let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE WITH 24HR AUTO-SYNC ---------- *
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";*/
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YRayptbTnms2wJycPVfeiTLe_lceIdFfGGY2kutHmClXuD0WbiA/exec";
+      let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
       isVerified: false,
       email: "",
       deviceToken: "",
@@ -619,6 +619,91 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     /* 🛡️ CLOCK TAMPERING WATCHDOG (Date Rollback Detector) */
+    function verifyClockIntegrity() {
+      let currentTime = new Date().getTime();
+      
+      if (userLicence.isTampered) {
+        return false;
+      }
+
+      if (userLicence.lastKnownTime && currentTime < (userLicence.lastKnownTime - 60000)) {
+        userLicence.isTampered = true;
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+        return false;
+      }
+
+      userLicence.lastKnownTime = currentTime;
+      localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+      return true;
+    }
+
+    async function verifyLiveStatusWithSheet(forceRefresh = false) {
+      if (!verifyClockIntegrity()) return false;
+
+      let now = new Date().getTime();
+      let twentyFourHours = 24 * 60 * 60 * 1000; // 24 Hours Sync Timer
+
+      if (!userLicence.email) return false;
+
+      if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > twentyFourHours) {
+        if (navigator.onLine) {
+          try {
+            let currentToken = getDeviceToken();
+            let currentOrigin = window.location.origin;
+            
+            // 🎯 ADDED: appVariant=PUBLIC & clientOrigin Parameter
+            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+              method: 'GET'
+            }).then(r => r.json()).catch(() => null);
+
+            if (res && res.authorized) {
+              userLicence.isVerified = true;
+              userLicence.isTampered = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              return true;
+            } else {
+              userLicence.isVerified = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              return false;
+            }
+          } catch (e) { return userLicence.isVerified; }
+        }
+      }
+      return userLicence.isVerified;
+    }
+
+    window.openAuthModal = function() {
+      const m = document.getElementById("authLockScreen");
+      if (m) m.style.display = "flex";
+      const emailInput = document.getElementById("authEmail");
+      if (emailInput && userLicence.email) emailInput.value = userLicence.email;
+    };
+
+    window.closeAuthModal = function() {
+      const m = document.getElementById("authLockScreen");
+      if (m) m.style.display = "none";
+    };
+/*
+    let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+      isVerified: false,
+      email: "",
+      deviceToken: "",
+      lastSyncTime: null,
+      lastKnownTime: null,
+      isTampered: false
+    };
+
+    function getDeviceToken() {
+      if (!userLicence.deviceToken) {
+        userLicence.deviceToken = "DEV-" + Math.random().toString(36).substring(2, 15).toUpperCase() + "-" + new Date().getTime().toString().slice(-4);
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+      }
+      return userLicence.deviceToken;
+    }
+
+    /* 🛡️ CLOCK TAMPERING WATCHDOG (Date Rollback Detector) *
     function verifyClockIntegrity() {
       let currentTime = new Date().getTime();
       
@@ -683,7 +768,110 @@ document.addEventListener("DOMContentLoaded", function() {
       const m = document.getElementById("authLockScreen");
       if (m) m.style.display = "none";
     };
+*/
+        window.requestOTP = async function() {
+      const authEmail = document.getElementById("authEmail");
+      let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
+      if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
 
+      const reqBtn = document.getElementById("btnSendRequest");
+      if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
+      
+      try {
+        let currentToken = getDeviceToken();
+        let currentOrigin = window.location.origin;
+
+        // 🎯 1. GET CheckAuth Call Updated (PUBLIC Variant & Origin added)
+        let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+          method: 'GET'
+        }).then(r => r.json()).catch(() => null);
+
+        if (authCheck && authCheck.authorized) {
+          userLicence.isVerified = true;
+          userLicence.email = emailVal;
+          userLicence.lastSyncTime = new Date().getTime();
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+          alert("🎉 Status Match: Active! Pro Features Unlocked.");
+          closeAuthModal();
+          location.reload();
+          return;
+        }
+
+        // 🎯 2. POST requestOTP Call Updated (PUBLIC Variant & Origin added)
+        let res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          body: JSON.stringify({ 
+            action: 'requestOTP', 
+            email: emailVal,
+            appVariant: 'PUBLIC',               // 👈 PUBLIC Flag
+            clientOrigin: currentOrigin         // 👈 Domain Origin Lock
+          })
+        }).then(r => r.json());
+
+        if(res.success) {
+          userLicence.email = emailVal;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          document.getElementById("emailSection").style.display = 'none';
+          document.getElementById("otpSection").style.display = 'block';
+          document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
+        } else {
+          // Native Direct Gmail App Launch Link
+          let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+          let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve karein.`);
+          let directGmailAppUrl = `mailto:support@webmy.in?subject=${customMailSubject}&body=${customMailBody}`;
+
+          document.getElementById("authMessage").innerHTML = `
+            <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+              Aapka email pending hai. Fast approval ke liye direct message karein.
+            </div>
+            <a href="${directGmailAppUrl}" style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail App ✉️</a>
+          `;
+        }
+      } catch(e) { 
+        alert("Network Error! Check your internet connection."); 
+      }
+
+      if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+    };
+
+    window.verifyOTP = async function() {
+      const authOTP = document.getElementById("authOTP");
+      let otpVal = authOTP ? authOTP.value.trim() : "";
+      if(!otpVal) return alert('Enter validation token pin code');
+      
+      let currentToken = getDeviceToken();
+      let currentOrigin = window.location.origin;
+
+      const btn = document.getElementById("btnVerifyCode");
+      if (btn) btn.innerText = "Registering...";
+
+      try {
+        // 🎯 3. POST verifyOTP Call Updated (PUBLIC Variant & Origin added)
+        let res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          body: JSON.stringify({ 
+            action: 'verifyOTP', 
+            email: userLicence.email, 
+            otp: otpVal, 
+            token: currentToken,
+            appVariant: 'PUBLIC',               // 👈 PUBLIC Flag
+            clientOrigin: currentOrigin         // 👈 Domain Origin Lock
+          })
+        }).then(r => r.json());
+
+        if(res.success) {
+          alert("🎉 Request Submitted Successfully!\nAdmin approval queued.");
+          location.reload();
+        } else {
+          alert(res.message);
+        }
+      } catch(e) { alert("Processing error."); }
+      if (btn) btn.innerText = "Verify OTP & Unlock 📩";
+    };
+/*
     window.requestOTP = async function() {
       const authEmail = document.getElementById("authEmail");
       let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
@@ -768,7 +956,7 @@ document.addEventListener("DOMContentLoaded", function() {
       } catch(e) { alert("Processing error."); }
       if (btn) btn.innerText = "Verify OTP & Unlock 📩";
     };
-
+*/
     /* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
     window.openSettingsModal = function() {
       const m = document.getElementById("settingsModal");
