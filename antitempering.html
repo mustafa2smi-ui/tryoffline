@@ -270,6 +270,10 @@
       <button onclick="closeAuthModal()" style="background: transparent; color: #95a5a6; border: none; font-size: 12px; cursor: pointer; margin-top: 15px; text-decoration: underline;">Cancel / Close</button>
     </div>
   </div>
+<!-- 📌 ELEGANT APP VARIANT NOTICE BOX -->
+<div style="background: rgba(41, 128, 185, 0.15); border-left: 3px solid #3498db; padding: 8px 10px; font-size: 11px; color: #ecf0f1; border-radius: 4px; margin-top: 10px; text-align: left; line-height: 1.4;">
+  📌 <b>Single App License Notice:</b> Ek Email ID se sirf ek hi App Variant (`PUBLIC` ya `STAFF`) register ho sakti hai. Kisi dusre account ke liye naya Gmail ID aur OTP verification istemal karein.
+</div>
 
   <!-- ⚙️ PRO SETTINGS DRAWER MODAL -->
   <div id="settingsModal" class="settings-modal-overlay">
@@ -280,6 +284,16 @@
       </div>
 
       <div class="settings-menu-list">
+        <!-- 🏠 Home Page Reload Button -->
+<button class="settings-item-btn" onclick="location.reload();">
+  <span>🏠 Home Screen</span> 🔄
+</button>
+
+<!-- 🔑 Switch Email / Demo Mode Button -->
+<button class="settings-item-btn" onclick="switchAccountDemo();" style="border-left: 3px solid #e74c3c;">
+  <span>🔑 Switch Email (Demo Account)</span> 🚪
+</button>
+
         <!-- 🛒 BUY PRINTER REDIRECT BUTTON (Point 2) -->
         <a href="index.html" target="_self" style="text-decoration: none;">
           <button class="settings-item-btn" style="background: linear-gradient(135deg, #e67e22, #d35400); border: none;">
@@ -830,6 +844,25 @@ if (trapValue !== "") {
     };
 
     /* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
+    window.switchAccountDemo = function() {
+  if (confirm("🔑 Demo Test Mode:\n\nKya aap dusre Email ID se status check ya test login karna chahte hain?")) {
+    // Current Licence Memory Reset
+    userLicence.isVerified = false;
+    userLicence.email = "";
+    userLicence.lastSyncTime = null;
+    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+    // Open Auth Screen Directly
+    closeSettingsModal();
+    const m = document.getElementById("authLockScreen");
+    if (m) m.style.display = "flex";
+    
+    // Reset Email Input Field
+    const emailInput = document.getElementById("authEmail");
+    if (emailInput) emailInput.value = "";
+  }
+};
+
     window.openSettingsModal = function() {
       const m = document.getElementById("settingsModal");
       if (m) m.style.display = "flex";
