@@ -542,7 +542,7 @@
   <script>
     // LocalStorage se saved paper size load karein
 let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
-let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+/*let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
   isVerified: false,
   email: "",
   deviceToken: "",
@@ -550,7 +550,7 @@ let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
   lastKnownTime: null,
   isTampered: false,
   activatedDate: null // 👈 Added Activated Date Tracker
-};
+};*/
 // 💳 Public App Subscription Badge Display Engine
 function updateSubscriptionBadge() {
   const badge = document.getElementById("subStatusBadge");
@@ -658,7 +658,8 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
       deviceToken: "",
       lastSyncTime: null,
       lastKnownTime: null,
-      isTampered: false
+      isTampered: false,
+        activatedDate: null 
     };
 
     function getDeviceToken() {
