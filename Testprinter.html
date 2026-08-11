@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thermal Hindi Test</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#eee;
+  padding:15px;
+}
+
+#receipt{
+  width:384px; /* 58mm printer ke liye approx */
+  background:white;
+  color:#000;
+  padding:15px;
+  box-sizing:border-box;
+  font-size:20px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin-top:15px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="receipt">
+
+  <div style="text-align:center;font-weight:bold;font-size:25px;">
+    सराफा किराना स्टोर
+  </div>
+
+  <hr>
+
+  सामान: चावल  
+  <br>
+  मात्रा: 2 किलो  
+  <br>
+  कीमत: ₹120
+  <br><br>
+
+  ग्राहक: मोहम्मद मुस्तफा
+  <br>
+
+  धन्यवाद! फिर आइए।
+  <br><br>
+
+  தமிழ்: வணக்கம்
+  <br>
+  తెలుగు: నమస్కారం
+  <br>
+  اردو: شکریہ
+  <br>
+  বাংলা: ধন্যবাদ
+
+  <hr>
+
+  <b>कुल: ₹240</b>
+
+</div>
+
+<button onclick="makeImage()">
+  🖨️ Thermal Image बनाएं
+</button>
+
+<script>
+
+function makeImage(){
+
+  const receipt = document.getElementById("receipt");
+
+  html2canvas(receipt,{
+    scale:1,
+    backgroundColor:"#ffffff"
+  }).then(canvas => {
+
+    // Test ke liye image screen par dikhayenge
+    const img = new Image();
+
+    img.src = canvas.toDataURL("image/png");
+
+    img.style.width = "384px";
+    img.style.maxWidth = "100%";
+    img.style.marginTop = "20px";
+
+    document.body.appendChild(img);
+
+    console.log("Image ready for thermal printer");
+
+  });
+
+}
+
+</script>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+</body>
+</html>
