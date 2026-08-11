@@ -1,110 +1,1058 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Thermal Printer Hindi Test</title>
+
+  <!-- html2canvas -->
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Thermal Hindi Test</title>
 
-<style>
-body{
-  font-family: Arial, sans-serif;
-  background:#eee;
-  padding:15px;
-}
+  <style>
 
-#receipt{
-  width:384px; /* 58mm printer ke liye approx */
-  background:white;
-  color:#000;
-  padding:15px;
-  box-sizing:border-box;
-  font-size:20px;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-button{
-  width:100%;
-  padding:15px;
-  margin-top:15px;
-  font-size:18px;
-}
-</style>
+    body {
+      margin: 0;
+      padding: 15px;
+      background: #eeeeee;
+      font-family: Arial, sans-serif;
+      color: #111;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 5px;
+    }
+
+    .box {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      font-size: 20px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .connect {
+      background: #222;
+      color: white;
+    }
+
+    .bitmap {
+      background: #087f23;
+      color: white;
+    }
+
+    .textprint {
+      background: #1455c0;
+      color: white;
+    }
+
+    .imagebtn {
+      background: #777;
+      color: white;
+    }
+
+    #status {
+      padding: 12px;
+      background: #fff;
+      border-radius: 8px;
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+
+    /* ==========================
+       THERMAL RECEIPT
+       ========================== */
+
+    #receipt {
+      width: 384px;
+      background: white;
+      color: black;
+      padding: 15px;
+      font-size: 20px;
+      line-height: 1.45;
+      font-family:
+        "Noto Sans Devanagari",
+        Arial,
+        sans-serif;
+    }
+
+    #receiptTitle {
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    #previewImage {
+      max-width: 100%;
+      margin-top: 15px;
+      border: 1px solid #aaa;
+      background: white;
+    }
+
+  </style>
 </head>
+
 
 <body>
 
+<h2>🖨️ Thermal Printer Test</h2>
+
+
+<!-- ======================================
+     BLUETOOTH
+     ====================================== -->
+
+<div class="box">
+
+  <button class="connect"
+          onclick="connectPrinter()">
+
+    🔵 Connect Bluetooth Printer
+
+  </button>
+
+  <div id="status">
+    Printer Connected नहीं है
+  </div>
+
+</div>
+
+
+
+<!-- ======================================
+     INPUT TEXT
+     ====================================== -->
+
+<div class="box">
+
+  <h3>⌨️ अपना Text लिखकर Test करें</h3>
+
+  <textarea id="testText">नमस्ते मोहम्मद मुस्तफा!
+
+यह हिन्दी का परीक्षण है।
+
+English: Hello
+
+मराठी: नमस्कार
+
+தமிழ்: வணக்கம்
+
+తెలుగు: నమస్కారం
+
+বাংলা: ধন্যবাদ
+
+ગુજરાતી: નમસ્તે
+
+اردو: شکریہ
+
+₹250.00</textarea>
+
+
+  <button class="textprint"
+          onclick="printDirectText()">
+
+    📝 Direct Text Print Test
+
+  </button>
+
+
+  <button class="bitmap"
+          onclick="printTextAsBitmap()">
+
+    🖨️ Text → Bitmap → Print
+
+  </button>
+
+</div>
+
+
+
+<!-- ======================================
+     FIXED RECEIPT TEST
+     ====================================== -->
+
+<div class="box">
+
+  <h3>🧾 Fixed Receipt Test</h3>
+
+  <button class="bitmap"
+          onclick="printHindiTest()">
+
+    🖨️ Hindi Receipt Bitmap Print
+
+  </button>
+
+  <button class="imagebtn"
+          onclick="makeImage()">
+
+    👁️ Receipt Image देखें
+
+  </button>
+
+</div>
+
+
+
+<!-- ======================================
+     RECEIPT
+     ====================================== -->
+
 <div id="receipt">
 
-  <div style="text-align:center;font-weight:bold;font-size:25px;">
+  <div id="receiptTitle">
     सराफा किराना स्टोर
   </div>
 
   <hr>
 
-  सामान: चावल  
+  <b>सामान:</b> चावल
   <br>
-  मात्रा: 2 किलो  
+
+  <b>मात्रा:</b> 2 किलो
   <br>
-  कीमत: ₹120
+
+  <b>कीमत:</b> ₹120
+
   <br><br>
 
-  ग्राहक: मोहम्मद मुस्तफा
-  <br>
+  <b>ग्राहक:</b>
+  मोहम्मद मुस्तफा
+
+  <br><br>
 
   धन्यवाद! फिर आइए।
+
   <br><br>
 
   தமிழ்: வணக்கம்
+
   <br>
+
   తెలుగు: నమస్కారం
+
   <br>
+
   اردو: شکریہ
+
   <br>
+
   বাংলা: ধন্যবাদ
+
+  <br>
+
+  ગુજરાતી: નમસ્તે
 
   <hr>
 
-  <b>कुल: ₹240</b>
+  <div style="
+      text-align:center;
+      font-size:24px;
+      font-weight:bold;
+  ">
+
+    कुल: ₹240
+
+  </div>
+
+  <br>
+
+  <div style="text-align:center;">
+    SHUKRIYA! VISIT AGAIN
+  </div>
+
+  <br><br><br>
 
 </div>
 
-<button onclick="makeImage()">
-  🖨️ Thermal Image बनाएं
-</button>
-<button onclick="printHindiTest()">
-  🖨️ Hindi Test Print
-</button>
+
+
+<img id="previewImage"
+     style="display:none;">
+
+
+
 <script>
 
-function makeImage(){
+/* ==================================================
+   CONFIG
+   ================================================== */
 
-  const receipt = document.getElementById("receipt");
+const CONFIG = {
 
-  html2canvas(receipt,{
-    scale:1,
-    backgroundColor:"#ffffff"
-  }).then(canvas => {
+  // Bluetooth printer ko ek baar mein kitna data bhejna hai
+  PRINTER_CHUNK_SIZE: 180
 
-    // Test ke liye image screen par dikhayenge
-    const img = new Image();
+};
 
-    img.src = canvas.toDataURL("image/png");
 
-    img.style.width = "384px";
-    img.style.maxWidth = "100%";
-    img.style.marginTop = "20px";
 
-    document.body.appendChild(img);
+/* ==================================================
+   GLOBAL PRINTER
+   ================================================== */
 
-    console.log("Image ready for thermal printer");
+let printerDevice = null;
 
-  });
+let printerCharacteristic = null;
+
+
+
+/* ==================================================
+   STATUS
+   ================================================== */
+
+function setStatus(message) {
+
+  document.getElementById("status").textContent =
+    message;
+
+}
+
+
+
+/* ==================================================
+   CONNECT BLUETOOTH PRINTER
+   ================================================== */
+
+async function connectPrinter() {
+
+  try {
+
+    setStatus("🔍 Bluetooth printer search ho raha hai...");
+
+
+    /*
+      IMPORTANT:
+
+      Ye filters aapke original code wale hain.
+    */
+
+    printerDevice =
+      await navigator.bluetooth.requestDevice({
+
+        filters: [
+
+          { namePrefix: "Bluetooth" },
+          { namePrefix: "SRS" },
+          { namePrefix: "MPT" },
+          { namePrefix: "MTP" }
+
+        ],
+
+        optionalServices: [
+
+          "000018f0-0000-1000-8000-00805f9b34fb"
+
+        ]
+
+      });
+
+
+    console.log(
+      "Printer:",
+      printerDevice.name
+    );
+
+
+    setStatus(
+      "🔗 " +
+      (printerDevice.name || "Printer") +
+      " connect ho raha hai..."
+    );
+
+
+    const server =
+      await printerDevice.gatt.connect();
+
+
+    const service =
+      await server.getPrimaryService(
+        "000018f0-0000-1000-8000-00805f9b34fb"
+      );
+
+
+    printerCharacteristic =
+      await service.getCharacteristic(
+        "00002af1-0000-1000-8000-00805f9b34fb"
+      );
+
+
+    setStatus(
+      "✅ Printer Connected: " +
+      (printerDevice.name || "Bluetooth Printer")
+    );
+
+
+    console.log(
+      "Bluetooth printer connected successfully"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      "❌ Bluetooth Error: " +
+      error.message
+    );
+
+    printerDevice = null;
+    printerCharacteristic = null;
+
+  }
+
+}
+
+
+
+/* ==================================================
+   ENSURE PRINTER CONNECTED
+   ================================================== */
+
+async function ensurePrinter() {
+
+  if (
+    !printerDevice ||
+    !printerCharacteristic
+  ) {
+
+    await connectPrinter();
+
+  }
+
+
+  if (!printerCharacteristic) {
+
+    throw new Error(
+      "Printer connect नहीं हुआ।"
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   SEND DATA IN CHUNKS
+   ================================================== */
+
+async function sendToPrinter(data) {
+
+  for (
+    let i = 0;
+    i < data.length;
+    i += CONFIG.PRINTER_CHUNK_SIZE
+  ) {
+
+    const chunk =
+      data.slice(
+        i,
+        i + CONFIG.PRINTER_CHUNK_SIZE
+      );
+
+
+    await printerCharacteristic.writeValue(
+      chunk
+    );
+
+
+    // Printer ko thoda time
+    await new Promise(
+      resolve => setTimeout(resolve, 60)
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   DIRECT TEXT PRINT
+   ================================================== */
+
+async function printDirectText() {
+
+  try {
+
+    await ensurePrinter();
+
+
+    const text =
+      document.getElementById(
+        "testText"
+      ).value;
+
+
+    /*
+      ESC @ = Initialize printer
+      ESC a 1 = Center
+    */
+
+    const esc =
+      "\x1B\x40" +
+
+      "\x1B\x61\x01" +
+
+      text +
+
+      "\n\n\n\n";
+
+
+    const encoder =
+      new TextEncoder();
+
+
+    const data =
+      encoder.encode(esc);
+
+
+    await sendToPrinter(data);
+
+
+    setStatus(
+      "📝 Direct Text Print भेज दिया गया"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      "❌ Text Print Error: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   HTML RECEIPT → IMAGE
+   ================================================== */
+
+async function receiptToCanvas() {
+
+  const receipt =
+    document.getElementById(
+      "receipt"
+    );
+
+
+  const canvas =
+    await html2canvas(
+      receipt,
+      {
+
+        scale: 1,
+
+        backgroundColor:
+          "#ffffff",
+
+        width: 384,
+
+        windowWidth: 384
+
+      }
+    );
+
+
+  return canvas;
+
+}
+
+
+
+/* ==================================================
+   SHOW IMAGE
+   ================================================== */
+
+async function makeImage() {
+
+  try {
+
+    const canvas =
+      await receiptToCanvas();
+
+
+    const img =
+      document.getElementById(
+        "previewImage"
+      );
+
+
+    img.src =
+      canvas.toDataURL(
+        "image/png"
+      );
+
+
+    img.style.display =
+      "block";
+
+
+  } catch (error) {
+
+    alert(
+      "Image Error: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   TEXTAREA → TEMP RECEIPT → CANVAS
+   ================================================== */
+
+async function textToCanvas() {
+
+  const text =
+    document.getElementById(
+      "testText"
+    ).value;
+
+
+  const temp =
+    document.createElement(
+      "div"
+    );
+
+
+  temp.style.position =
+    "fixed";
+
+  temp.style.left =
+    "-10000px";
+
+  temp.style.top =
+    "0";
+
+
+  temp.style.width =
+    "384px";
+
+  temp.style.background =
+    "#ffffff";
+
+  temp.style.color =
+    "#000000";
+
+  temp.style.padding =
+    "15px";
+
+  temp.style.boxSizing =
+    "border-box";
+
+  temp.style.fontSize =
+    "22px";
+
+  temp.style.lineHeight =
+    "1.5";
+
+  temp.style.whiteSpace =
+    "pre-wrap";
+
+  temp.style.wordBreak =
+    "break-word";
+
+  temp.style.fontFamily =
+    "'Noto Sans Devanagari', Arial, sans-serif";
+
+
+  temp.textContent =
+    text;
+
+
+  document.body.appendChild(
+    temp
+  );
+
+
+  const canvas =
+    await html2canvas(
+      temp,
+      {
+
+        scale: 1,
+
+        backgroundColor:
+          "#ffffff",
+
+        width: 384,
+
+        windowWidth: 384
+
+      }
+    );
+
+
+  document.body.removeChild(
+    temp
+  );
+
+
+  return canvas;
+
+}
+
+
+
+/* ==================================================
+   TEXT → BITMAP → BLUETOOTH PRINT
+   ================================================== */
+
+async function printTextAsBitmap() {
+
+  try {
+
+    await ensurePrinter();
+
+
+    setStatus(
+      "🖼️ Text ko bitmap mein convert kar raha hai..."
+    );
+
+
+    const canvas =
+      await textToCanvas();
+
+
+    const data =
+      canvasToEscPosRaster(
+        canvas
+      );
+
+
+    setStatus(
+      "🖨️ Bitmap printer ko bheja ja raha hai..."
+    );
+
+
+    await sendToPrinter(
+      data
+    );
+
+
+    await sendFeed();
+
+
+    setStatus(
+      "✅ Bitmap Text Print भेज दिया गया!"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      "❌ Bitmap Print Error: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   FIXED HINDI RECEIPT PRINT
+   ================================================== */
+
+async function printHindiTest() {
+
+  try {
+
+    await ensurePrinter();
+
+
+    setStatus(
+      "🖼️ Receipt bitmap तैयार हो रहा है..."
+    );
+
+
+    const canvas =
+      await receiptToCanvas();
+
+
+    const data =
+      canvasToEscPosRaster(
+        canvas
+      );
+
+
+    setStatus(
+      "🖨️ Printer ko receipt bheji ja rahi hai..."
+    );
+
+
+    await sendToPrinter(
+      data
+    );
+
+
+    await sendFeed();
+
+
+    setStatus(
+      "✅ Hindi Bitmap Receipt Print भेज दिया गया!"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      "❌ Hindi Print Error: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   CANVAS → ESC/POS RASTER
+   ================================================== */
+
+function canvasToEscPosRaster(canvas) {
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  const width =
+    canvas.width;
+
+  const height =
+    canvas.height;
+
+
+  /*
+    Width ko 8 ka multiple banate hain.
+  */
+
+  const rasterWidth =
+    Math.floor(
+      width / 8
+    ) * 8;
+
+
+  const bytesPerRow =
+    rasterWidth / 8;
+
+
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      rasterWidth,
+      height
+    );
+
+
+  const pixels =
+    imageData.data;
+
+
+  /*
+    GS v 0
+    Raster Bit Image
+  */
+
+  const header =
+    new Uint8Array([
+
+      0x1D,
+      0x76,
+      0x30,
+      0x00,
+
+      bytesPerRow & 0xFF,
+      (bytesPerRow >> 8) & 0xFF,
+
+      height & 0xFF,
+      (height >> 8) & 0xFF
+
+    ]);
+
+
+  const bitmap =
+    new Uint8Array(
+      bytesPerRow * height
+    );
+
+
+  let index = 0;
+
+
+  for (
+    let y = 0;
+    y < height;
+    y++
+  ) {
+
+    for (
+      let x = 0;
+      x < rasterWidth;
+      x += 8
+    ) {
+
+      let byte = 0;
+
+
+      for (
+        let bit = 0;
+        bit < 8;
+        bit++
+      ) {
+
+        const px =
+          (
+            (y * rasterWidth) +
+            (x + bit)
+          ) * 4;
+
+
+        const r =
+          pixels[px];
+
+        const g =
+          pixels[px + 1];
+
+        const b =
+          pixels[px + 2];
+
+
+        /*
+          RGB → grayscale
+        */
+
+        const gray =
+          (r * 0.299) +
+          (g * 0.587) +
+          (b * 0.114);
+
+
+        /*
+          Threshold
+
+          160 = black/white decision
+        */
+
+        if (gray < 160) {
+
+          byte |=
+            (0x80 >> bit);
+
+        }
+
+      }
+
+
+      bitmap[index++] =
+        byte;
+
+    }
+
+  }
+
+
+  const result =
+    new Uint8Array(
+      header.length +
+      bitmap.length
+    );
+
+
+  result.set(
+    header,
+    0
+  );
+
+
+  result.set(
+    bitmap,
+    header.length
+  );
+
+
+  return result;
+
+}
+
+
+
+/* ==================================================
+   PAPER FEED
+   ================================================== */
+
+async function sendFeed() {
+
+  const feed =
+    new Uint8Array([
+
+      0x0A,
+      0x0A,
+      0x0A,
+      0x0A
+
+    ]);
+
+
+  await printerCharacteristic.writeValue(
+    feed
+  );
 
 }
 
 </script>
-
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 </body>
 </html>
