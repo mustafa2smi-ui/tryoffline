@@ -291,6 +291,9 @@
 <button class="settings-item-btn" onclick="switchAccountDemo();" style="border-left: 3px solid #e74c3c;">
   <span>🔑 Switch Email (Demo Account)</span> 🚪
 </button>
+<button class="settings-item-btn" onclick="openPublicSubscriptionModal();" style="border-left: 3px solid #27ae60;">
+  <span>⭐ Pro Subscription Status</span> 🔓
+</button>
 
         <!-- 🛒 BUY PRINTER REDIRECT BUTTON (Point 2) -->
         <a href="index.html" target="_self" style="text-decoration: none;">
@@ -842,6 +845,38 @@ if (trapValue !== "") {
     };
 
     /* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
+   // Public App Switch / Subscription Status Check Engine
+window.openPublicSubscriptionModal = function() {
+  closeSettingsModal();
+  const m = document.getElementById("authLockScreen");
+  if (m) m.style.display = "flex";
+
+  const emailInput = document.getElementById("authEmail");
+  if (emailInput) {
+    emailInput.value = userLicence.email || "";
+  }
+
+  const authMsg = document.getElementById("authMessage");
+  if (authMsg) {
+    if (userLicence.isVerified) {
+      authMsg.innerHTML = `<div style="background:#27ae60; color:#fff; padding:8px; border-radius:4px; font-size:12px;">✅ Pro Subscription Active (${userLicence.email})</div>`;
+    } else {
+      authMsg.innerHTML = `<div style="background:#e67e22; color:#fff; padding:8px; border-radius:4px; font-size:12px;">🔒 Pro Multi-Language Thermal Print is Locked</div>`;
+    }
+  }
+};
+
+// Account Reset / Change Email Button (Public App Ke Liye)
+window.resetPublicAccount = function() {
+  if (confirm("Kya aap naya Email ID se Pro Status verify karna chahte hain?")) {
+    userLicence.isVerified = false;
+    userLicence.email = "";
+    userLicence.lastSyncTime = null;
+    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+    openPublicSubscriptionModal();
+  }
+};
+
     window.switchAccountDemo = function() {
   if (confirm("🔑 Demo Test Mode:\n\nKya aap dusre Email ID se status check ya test login karna chahte hain?")) {
     // Current Licence Memory Reset
