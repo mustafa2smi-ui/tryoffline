@@ -369,6 +369,11 @@
         <button class="settings-item-btn" onclick="openLegalModal('privacy');">
           <span>🔒 Privacy Policy & Terms</span> 📄
         </button>
+        <!-- 💳 SUBSCRIPTION STATUS BADGE -->
+<div id="subStatusBadge" style="margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 11px; text-align: center; font-weight: bold;">
+  <!-- JS Dynamic Content Output -->
+</div>
+        
       </div>
     </div>
   </div>
@@ -537,6 +542,34 @@
   <script>
     // LocalStorage se saved paper size load karein
 let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
+let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+  isVerified: false,
+  email: "",
+  deviceToken: "",
+  lastSyncTime: null,
+  lastKnownTime: null,
+  isTampered: false,
+  activatedDate: null // 👈 Added Activated Date Tracker
+};
+// 💳 Public App Subscription Badge Display Engine
+function updateSubscriptionBadge() {
+  const badge = document.getElementById("subStatusBadge");
+  if (!badge) return;
+
+  if (userLicence.isVerified) {
+    let pDate = userLicence.activatedDate || new Date().toLocaleDateString('en-IN');
+    badge.style.background = "rgba(39, 174, 96, 0.15)";
+    badge.style.border = "1px solid #27ae60";
+    badge.style.color = "#2ecc71";
+    badge.innerHTML = `🟢 Pro Multi-Print Active<br><span style="font-size:10px; color:#bdc3c7;">Purchased Date: <b>${pDate}</b></span>`;
+  } else {
+    badge.style.background = "rgba(231, 76, 60, 0.15)";
+    badge.style.border = "1px solid #e74c3c";
+    badge.style.color = "#e74c3c";
+    badge.innerHTML = `🔴 Subscription Suspended or Ended<br><span style="font-size:10px; color:#bdc3c7;">Please re-activate to use Pro features.</span>`;
+  }
+}
+
 
 window.changeCompPrintSize = function(sizeVal) {
   currentCompPaperSize = sizeVal;
@@ -687,6 +720,33 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
               return false;
             }
 
+// Verification Success (Active) Condition Ke Andar:
+if (res && res.authorized) {
+  userLicence.isVerified = true;
+  userLicence.isTampered = false;
+  userLicence.lastSyncTime = now;
+  
+  // Save activation date if not already set
+  if (!userLicence.activatedDate) {
+    userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
+  }
+  
+  localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+  updateSubscriptionBadge();
+  return true;
+} else {
+  userLicence.isVerified = false;
+  userLicence.lastSyncTime = now;
+  localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+  updateSubscriptionBadge();
+  // Lock Screen Show Karein
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+  
+}
+
+/*
             // 🎯 3. CHECK: Active Status & License Approval
             if (res && res.authorized) {
               userLicence.isVerified = true;
@@ -708,6 +768,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
               if (authLockScreen) authLockScreen.style.display = "flex";
               return false;
             }
+            */
           } catch (e) { return userLicence.isVerified; }
         }
       }
@@ -895,12 +956,18 @@ window.resetPublicAccount = function() {
     if (emailInput) emailInput.value = "";
   }
 };
-
+/*
     window.openSettingsModal = function() {
       const m = document.getElementById("settingsModal");
       if (m) m.style.display = "flex";
     };
-
+*/
+// Settings Drawer Modal Open hote hi Badge Refresh karein
+window.openSettingsModal = function() {
+  updateSubscriptionBadge();
+  const m = document.getElementById("settingsModal");
+  if (m) m.style.display = "flex";
+};
     window.closeSettingsModal = function() {
       const m = document.getElementById("settingsModal");
       if (m) m.style.display = "none";
