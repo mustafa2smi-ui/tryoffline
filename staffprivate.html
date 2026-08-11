@@ -235,6 +235,9 @@
         <button class="settings-item-btn" onclick="openAuthModal(); closeSettingsModal();">
           <span>🔑 Subscription Status & Auth</span> <span id="authBadgeLbl" style="color:#1abc9c; font-size:11px;">Check</span>
         </button>
+<button class="settings-item-btn" onclick="switchStaffAccount();" style="border-left: 3px solid #e74c3c;">
+  <span>🔑 Switch Staff Account</span> 🚪
+</button>
 
         <div class="settings-section-lbl">Backup & Export</div>
         <button class="settings-item-btn" onclick="exportAppData(); closeSettingsModal();">
@@ -704,7 +707,24 @@
       document.documentElement.style.setProperty('--font-base', sizeVal);
       localStorage.setItem("notebook_font_size", sizeVal);
     };
+/*Check subscription*/
+    window.switchStaffAccount = function() {
+  if (confirm("🔑 Switch Staff Account:\n\nKya aap dusre Email ID se Staff Access check karna chahte hain?")) {
+    userLicence.isVerified = false;
+    userLicence.email = "";
+    userLicence.lastSyncTime = null;
+    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
 
+    closeSettingsModal();
+    const m = document.getElementById("authLockScreen");
+    if (m) m.style.display = "flex";
+    
+    const emailInput = document.getElementById("authEmail");
+    if (emailInput) emailInput.value = "";
+  }
+};
+
+    
     /* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
     window.openLegalModal = function(type) {
       closeSettingsModal();
