@@ -687,7 +687,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YR
       localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
       return true;
     }
-
+/*
                 async function verifyLiveStatusWithSheet(forceRefresh = false) {
       if (!verifyClockIntegrity()) return false;
 
@@ -741,7 +741,7 @@ if (res && res.authorized) {
   updateSubscriptionBadge();
   // Lock Screen Show Karein
             /*  const authLockScreen = document.getElementById("authLockScreen");
-              if (authLockScreen) authLockScreen.style.display = "flex";*/
+              if (authLockScreen) authLockScreen.style.display = "flex";*
               return false;
   
 }
@@ -768,7 +768,7 @@ if (res && res.authorized) {
               if (authLockScreen) authLockScreen.style.display = "flex";
               return false;
             }
-            */
+            *
           } catch (e) { return userLicence.isVerified; }
         }
       }
@@ -782,6 +782,80 @@ if (res && res.authorized) {
       }
       return userLicence.isVerified;
     }
+*/
+    async function verifyLiveStatusWithSheet(forceRefresh = false) {
+  if (!verifyClockIntegrity()) return false;
+
+  let now = new Date().getTime();
+  let fourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Timer
+
+  if (!userLicence.email) return false;
+
+  if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > fourHours) {
+    if (navigator.onLine) {
+      try {
+        let currentToken = getDeviceToken();
+        let currentOrigin = window.location.origin;
+
+        // 🎯 1. GET CheckAuth Request (PUBLIC Variant & Domain Origin)
+        let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+          method: 'GET'
+        }).then(r => r.json()).catch(() => null);
+
+        // 🎯 2. CHECK: Agar Staff Email ID se Public App kholi gayi hai (Variant Mismatch Block)
+        if (res && res.status === "VariantMismatch") {
+          userLicence.isVerified = false;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          updateSubscriptionBadge();
+
+          alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Staff Private App' ke liye registered hai.\nPublic Commercial App access ke liye naya email enter karein.");
+
+          const authLockScreen = document.getElementById("authLockScreen");
+          if (authLockScreen) authLockScreen.style.display = "flex";
+          return false;
+        }
+
+        // 🎯 3. Verification Success (Active) Condition
+        if (res && res.authorized) {
+          userLicence.isVerified = true;
+          userLicence.isTampered = false;
+          userLicence.lastSyncTime = now;
+          
+          if (!userLicence.activatedDate) {
+            userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
+          }
+          
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          updateSubscriptionBadge();
+          
+          const authLockScreen = document.getElementById("authLockScreen");
+          if (authLockScreen) authLockScreen.style.display = "none";
+          return true;
+        } else {
+          userLicence.isVerified = false;
+          userLicence.lastSyncTime = now;
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          updateSubscriptionBadge();
+          
+          return false;
+        }
+      } catch (e) { 
+        updateSubscriptionBadge();
+        return userLicence.isVerified; 
+      }
+    }
+  }
+
+  updateSubscriptionBadge();
+  return userLicence.isVerified;
+}
+
+window.openAuthModal = function() {
+  const m = document.getElementById("authLockScreen");
+  if (m) m.style.display = "flex";
+  const emailInput = document.getElementById("authEmail");
+  if (emailInput && userLicence.email) emailInput.value = userLicence.email;
+};
 
     window.openAuthModal = function() {
       const m = document.getElementById("authLockScreen");
