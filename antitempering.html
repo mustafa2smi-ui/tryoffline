@@ -652,7 +652,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE WITH 24HR AUTO-SYNC ---------- *
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";*/
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YRayptbTnms2wJycPVfeiTLe_lceIdFfGGY2kutHmClXuD0WbiA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM61rIrf0QO5yxu6ZAR_LOI8G6AMkksK6WaWgynZVi4dQSy8pjHKYI8gh8SCNXaW7FAQ/exec";
       let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
       isVerified: false,
       email: "",
@@ -816,7 +816,25 @@ if (res && res.authorized) {
           if (authLockScreen) authLockScreen.style.display = "flex";
           return false;
         }
-
+        // 🎯 3. Verification Success (Active) Condition
+        if (res && res.authorized) {
+          userLicence.isVerified = true;
+          userLicence.isTampered = false;
+          userLicence.lastSyncTime = now;
+          
+          // 🎯 Live Google Sheet Date Override
+          if (res.activationDate) {
+            userLicence.activatedDate = res.activationDate;
+          }
+          
+          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+          updateSubscriptionBadge();
+          
+          const authLockScreen = document.getElementById("authLockScreen");
+          if (authLockScreen) authLockScreen.style.display = "none";
+          return true;
+        }
+/*
         // 🎯 3. Verification Success (Active) Condition
         if (res && res.authorized) {
           userLicence.isVerified = true;
@@ -841,6 +859,7 @@ if (res && res.authorized) {
           
           return false;
         }
+        */
       } catch (e) { 
         updateSubscriptionBadge();
         return userLicence.isVerified; 
