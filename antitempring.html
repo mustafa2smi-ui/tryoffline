@@ -538,606 +538,542 @@
     </div>
 
   </div>
-
-  <script>
+<script>
     // LocalStorage se saved paper size load karein
 let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
-/*let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
-  isVerified: false,
-  email: "",
-  deviceToken: "",
-  lastSyncTime: null,
-  lastKnownTime: null,
-  isTampered: false,
-  activatedDate: null // 👈 Added Activated Date Tracker
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywyXYpQOCCBJeYz3-aLP5vL0Z7z5ti8cj2NxvWTKhaLyqW2kr2Kj7BswM0EsxLzrtV/exec";
+
+let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
+    isVerified: false,
+    email: "",
+    deviceToken: "",
+    lastSyncTime: null,
+    lastKnownTime: null,
+    isTampered: false,
+    activatedDate: null 
 };
-    */
+
 // 💳 Public App Subscription Badge Display Engine
 function updateSubscriptionBadge() {
-  const badge = document.getElementById("subStatusBadge");
-  if (!badge) return;
+    const badge = document.getElementById("subStatusBadge");
+    if (!badge) return;
 
-  if (userLicence.isVerified) {
-    let pDate = userLicence.activatedDate || new Date().toLocaleDateString('en-IN');
-    badge.style.background = "rgba(39, 174, 96, 0.15)";
-    badge.style.border = "1px solid #27ae60";
-    badge.style.color = "#2ecc71";
-    badge.innerHTML = `🟢 Pro Multi-Print Active<br><span style="font-size:10px; color:#bdc3c7;">Purchased Date: <b>${pDate}</b></span>`;
-  } else {
-    badge.style.background = "rgba(231, 76, 60, 0.15)";
-    badge.style.border = "1px solid #e74c3c";
-    badge.style.color = "#e74c3c";
-    badge.innerHTML = `🔴 Subscription Suspended or Ended<br><span style="font-size:10px; color:#bdc3c7;">Please re-activate to use Pro features.</span>`;
-  }
+    if (userLicence.isVerified) {
+        let pDate = userLicence.activatedDate || new Date().toLocaleDateString('en-IN');
+        badge.style.background = "rgba(39, 174, 96, 0.15)";
+        badge.style.border = "1px solid #27ae60";
+        badge.style.color = "#2ecc71";
+        badge.innerHTML = `🟢 Pro Multi-Print Active<br><span style="font-size:10px; color:#bdc3c7;">Purchased Date: <b>${pDate}</b></span>`;
+    } else {
+        badge.style.background = "rgba(231, 76, 60, 0.15)";
+        badge.style.border = "1px solid #e74c3c";
+        badge.style.color = "#e74c3c";
+        badge.innerHTML = `🔴 Subscription Suspended or Ended<br><span style="font-size:10px; color:#bdc3c7;">Please re-activate to use Pro features.</span>`;
+    }
 }
 
-
 window.changeCompPrintSize = function(sizeVal) {
-  currentCompPaperSize = sizeVal;
-  localStorage.setItem("notebook_comp_paper_size", sizeVal);
-  applyPrintSizeCSS(sizeVal);
+    currentCompPaperSize = sizeVal;
+    localStorage.setItem("notebook_comp_paper_size", sizeVal);
+    applyPrintSizeCSS(sizeVal);
 };
 
 // CSS Rules ko Dynamic Switch karne ka Engine
 function applyPrintSizeCSS(sizeVal) {
-  let styleTag = document.getElementById("dynamicPrintStyle");
-  if (!styleTag) {
-    styleTag = document.createElement("style");
-    styleTag.id = "dynamicPrintStyle";
-    document.head.appendChild(styleTag);
-  }
+    let styleTag = document.getElementById("dynamicPrintStyle");
+    if (!styleTag) {
+        styleTag = document.createElement("style");
+        styleTag.id = "dynamicPrintStyle";
+        document.head.appendChild(styleTag);
+    }
 
-  let cssRules = "";
+    let cssRules = "";
 
-  if (sizeVal === "A4_HALF") {
-    // 📄 5x8 INCH / HALF A4 BOLD LAYOUT
-    cssRules = `
-      @media print {
-        @page { size: 5in 8in; margin: 0.2in; }
-        body * { visibility: hidden !important; }
-        #paper, #paper * { visibility: visible !important; }
-        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 10px !important; }
-        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
-        .row { border-bottom: 1px solid #000 !important; padding: 8px 0 !important; }
-        .input, .result { color: #000 !important; font-size: 18px !important; font-weight: 800 !important; }
-        #custBlock span, #custNameInput { font-size: 16px !important; font-weight: bold !important; color: #000 !important; }
-      }
-    `;
-  } else if (sizeVal === "THERMAL_80") {
-    // 🖨️ 80MM COMPACT RECEIPT LAYOUT
-    cssRules = `
-      @media print {
-        @page { size: 3.15in auto; margin: 0.1in; }
-        body * { visibility: hidden !important; }
-        #paper, #paper * { visibility: visible !important; }
-        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 5px !important; }
-        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
-        .row { border-bottom: 1px dashed #000 !important; padding: 4px 0 !important; }
-        .input, .result { color: #000 !important; font-size: 13px !important; font-weight: 700 !important; }
-      }
-    `;
-  } else {
-    // 📑 STANDARD A4 FULL PAGE LAYOUT
-    cssRules = `
-      @media print {
-        @page { size: A4; margin: 0.5in; }
-        body * { visibility: hidden !important; }
-        #paper, #paper * { visibility: visible !important; }
-        #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 15px !important; }
-        .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
-        .row { border-bottom: 1px solid #ccc !important; padding: 6px 0 !important; }
-        .input, .result { color: #000 !important; font-size: 15px !important; font-weight: 600 !important; }
-      }
-    `;
-  }
+    if (sizeVal === "A4_HALF") {
+        cssRules = `
+            @media print {
+                @page { size: 5in 8in; margin: 0.2in; }
+                body * { visibility: hidden !important; }
+                #paper, #paper * { visibility: visible !important; }
+                #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 10px !important; }
+                .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+                .row { border-bottom: 1px solid #000 !important; padding: 8px 0 !important; }
+                .input, .result { color: #000 !important; font-size: 18px !important; font-weight: 800 !important; }
+                #custBlock span, #custNameInput { font-size: 16px !important; font-weight: bold !important; color: #000 !important; }
+            }
+        `;
+    } else if (sizeVal === "THERMAL_80") {
+        cssRules = `
+            @media print {
+                @page { size: 3.15in auto; margin: 0.1in; }
+                body * { visibility: hidden !important; }
+                #paper, #paper * { visibility: visible !important; }
+                #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 5px !important; }
+                .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+                .row { border-bottom: 1px dashed #000 !important; padding: 4px 0 !important; }
+                .input, .result { color: #000 !important; font-size: 13px !important; font-weight: 700 !important; }
+            }
+        `;
+    } else {
+        cssRules = `
+            @media print {
+                @page { size: A4; margin: 0.5in; }
+                body * { visibility: hidden !important; }
+                #paper, #paper * { visibility: visible !important; }
+                #paper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; border: none !important; background: #fff !important; color: #000 !important; padding: 15px !important; }
+                .brand-header, .scanner-section, .bottom-dashboard, .settings-modal-overlay, .suggest-box, .code-patch, .paper::before { display: none !important; }
+                .row { border-bottom: 1px solid #ccc !important; padding: 6px 0 !important; }
+                .input, .result { color: #000 !important; font-size: 15px !important; font-weight: 600 !important; }
+            }
+        `;
+    }
 
-  styleTag.innerHTML = cssRules;
+    styleTag.innerHTML = cssRules;
 }
 
 // App Load hote waqt Preference Restore karein
 document.addEventListener("DOMContentLoaded", function() {
-  const pSelect = document.getElementById("printPaperSizeSelect");
-  if (pSelect) pSelect.value = currentCompPaperSize;
-  applyPrintSizeCSS(currentCompPaperSize);
+    const pSelect = document.getElementById("printPaperSizeSelect");
+    if (pSelect) pSelect.value = currentCompPaperSize;
+    applyPrintSizeCSS(currentCompPaperSize);
 });
 
-    /* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE ---------- */
-    (function() {
-      let currentToken = new Date().getTime();
-      if (!window.location.href.includes("v_token=")) {
+/* ---------- 🛡️ AUTOMATIC ANTI-CACHE ENGINE ---------- */
+(function() {
+    let currentToken = new Date().getTime();
+    if (!window.location.href.includes("v_token=")) {
         let separator = window.location.href.includes("?") ? "&" : "?";
         window.history.replaceState(null, "", window.location.href + separator + "v_token=" + currentToken);
-      }
-    })();
+    }
+})();
 
-    /* ---------- 🔐 GOOGLE SHEET AUTOMATED AUTH ENGINE WITH 24HR AUTO-SYNC ---------- *
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8l5T8ang8_MCQdMULgJ-l6BN2eN_Ti34jm8XrLKDyoXeLdbenA9wsqM1AH3XzIqS80g/exec";*/
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlcx1faNTJJ_i0ly4YRayptbTnms2wJycPVfeiTLe_lceIdFfGGY2kutHmClXuD0WbiA/exec";
-      let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
-      isVerified: false,
-      email: "",
-      deviceToken: "",
-      lastSyncTime: null,
-      lastKnownTime: null,
-      isTampered: false,
-        activatedDate: null // 👈 Added Activated Date Tracker
-    };
-
-    function getDeviceToken() {
-      if (!userLicence.deviceToken) {
+function getDeviceToken() {
+    if (!userLicence.deviceToken) {
         userLicence.deviceToken = "DEV-" + Math.random().toString(36).substring(2, 15).toUpperCase() + "-" + new Date().getTime().toString().slice(-4);
         localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-      }
-      return userLicence.deviceToken;
+    }
+    return userLicence.deviceToken;
+}
+
+/* 🛡️ CLOCK TAMPERING WATCHDOG (Date Rollback Detector) */
+function verifyClockIntegrity() {
+    let currentTime = new Date().getTime();
+    
+    if (userLicence.isTampered) {
+        return false;
     }
 
-    /* 🛡️ CLOCK TAMPERING WATCHDOG (Date Rollback Detector) */
-    function verifyClockIntegrity() {
-      let currentTime = new Date().getTime();
-      
-      if (userLicence.isTampered) {
-        return false;
-      }
-
-      if (userLicence.lastKnownTime && currentTime < (userLicence.lastKnownTime - 60000)) {
+    if (userLicence.lastKnownTime && currentTime < (userLicence.lastKnownTime - 60000)) {
         userLicence.isTampered = true;
         localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
         return false;
-      }
-
-      userLicence.lastKnownTime = currentTime;
-      localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-      return true;
     }
-/*
-                async function verifyLiveStatusWithSheet(forceRefresh = false) {
-      if (!verifyClockIntegrity()) return false;
 
-      let now = new Date().getTime();
-      let twentyFourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Timer
-
-      if (!userLicence.email) return false;
-
-      if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > twentyFourHours) {
-        if (navigator.onLine) {
-          try {
-            let currentToken = getDeviceToken();
-            let currentOrigin = window.location.origin;
-
-            // 🎯 1. GET CheckAuth Request (PUBLIC Variant & Domain Origin)
-            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
-              method: 'GET'
-            }).then(r => r.json()).catch(() => null);
-
-            // 🎯 2. CHECK: Agar Staff Email ID se Public App kholi gayi hai (Variant Mismatch Block)
-            if (res && res.status === "VariantMismatch") {
-              userLicence.isVerified = false;
-              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-
-              alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Staff Private App' ke liye registered hai.\nPublic Commercial App access ke liye naya email enter karein.");
-
-              // Lock Screen Show Karein
-              const authLockScreen = document.getElementById("authLockScreen");
-              if (authLockScreen) authLockScreen.style.display = "flex";
-              return false;
-            }
-
-// Verification Success (Active) Condition Ke Andar:
-if (res && res.authorized) {
-  userLicence.isVerified = true;
-  userLicence.isTampered = false;
-  userLicence.lastSyncTime = now;
-  
-  // Save activation date if not already set
-  if (!userLicence.activatedDate) {
-    userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
-  }
-  
-  localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-  updateSubscriptionBadge();
-  return true;
-} else {
-  userLicence.isVerified = false;
-  userLicence.lastSyncTime = now;
-  localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-  updateSubscriptionBadge();
-  // Lock Screen Show Karein
-            /*  const authLockScreen = document.getElementById("authLockScreen");
-              if (authLockScreen) authLockScreen.style.display = "flex";*
-              return false;
-  
+    userLicence.lastKnownTime = currentTime;
+    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+    return true;
 }
 
-/*
-            // 🎯 3. CHECK: Active Status & License Approval
-            if (res && res.authorized) {
-              userLicence.isVerified = true;
-              userLicence.isTampered = false;
-              userLicence.lastSyncTime = now;
-              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-
-              // Lock Screen Hide Karein
-              const authLockScreen = document.getElementById("authLockScreen");
-              if (authLockScreen) authLockScreen.style.display = "none";
-              return true;
-            } else {
-              userLicence.isVerified = false;
-              userLicence.lastSyncTime = now;
-              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-
-              // Lock Screen Show Karein
-              const authLockScreen = document.getElementById("authLockScreen");
-              if (authLockScreen) authLockScreen.style.display = "flex";
-              return false;
-            }
-            *
-          } catch (e) { return userLicence.isVerified; }
-        }
-      }
-
-      // Local Verification State Lock Check
-      const authLockScreen = document.getElementById("authLockScreen");
-      if (!userLicence.isVerified) {
-        if (authLockScreen) authLockScreen.style.display = "flex";
-      } else {
-        if (authLockScreen) authLockScreen.style.display = "none";
-      }
-      return userLicence.isVerified;
-    }
-*/
-    async function verifyLiveStatusWithSheet(forceRefresh = false) {
-  if (!verifyClockIntegrity()) return false;
-
-  let now = new Date().getTime();
-  let fourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Timer
-
-  if (!userLicence.email) return false;
-
-  if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > fourHours) {
-    if (navigator.onLine) {
-      try {
-        let currentToken = getDeviceToken();
-        let currentOrigin = window.location.origin;
-
-        // 🎯 1. GET CheckAuth Request (PUBLIC Variant & Domain Origin)
-        let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
-          method: 'GET'
-        }).then(r => r.json()).catch(() => null);
-
-        // 🎯 2. CHECK: Agar Staff Email ID se Public App kholi gayi hai (Variant Mismatch Block)
-        if (res && res.status === "VariantMismatch") {
-          userLicence.isVerified = false;
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-          updateSubscriptionBadge();
-
-          alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Staff Private App' ke liye registered hai.\nPublic Commercial App access ke liye naya email enter karein.");
-
-          const authLockScreen = document.getElementById("authLockScreen");
-          if (authLockScreen) authLockScreen.style.display = "flex";
-          return false;
-        }
-
-        // 🎯 3. Verification Success (Active) Condition
-        if (res && res.authorized) {
-          userLicence.isVerified = true;
-          userLicence.isTampered = false;
-          userLicence.lastSyncTime = now;
-          
-          if (!userLicence.activatedDate) {
-            userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
-          }
-          
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-          updateSubscriptionBadge();
-          
-          const authLockScreen = document.getElementById("authLockScreen");
-          if (authLockScreen) authLockScreen.style.display = "none";
-          return true;
-        } else {
-          userLicence.isVerified = false;
-          userLicence.lastSyncTime = now;
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-          updateSubscriptionBadge();
-          
-          return false;
-        }
-      } catch (e) { 
+// ✅ FIXED: Complete verifyLiveStatusWithSheet function
+async function verifyLiveStatusWithSheet(forceRefresh = false) {
+    if (!verifyClockIntegrity()) {
         updateSubscriptionBadge();
-        return userLicence.isVerified; 
-      }
+        return false;
     }
-  }
 
-  updateSubscriptionBadge();
-  return userLicence.isVerified;
+    let now = new Date().getTime();
+    let fourHours = 4 * 60 * 60 * 1000; // 4 Hours Sync Timer
+
+    if (!userLicence.email) {
+        updateSubscriptionBadge();
+        return false;
+    }
+
+    if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > fourHours) {
+        if (navigator.onLine) {
+            try {
+                let currentToken = getDeviceToken();
+                let currentOrigin = window.location.origin;
+
+                // GET CheckAuth Request (PUBLIC Variant & Domain Origin)
+                let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+                    method: 'GET'
+                }).then(r => r.json()).catch(() => null);
+
+                // CHECK: Variant Mismatch Block
+                if (res && res.status === "VariantMismatch") {
+                    userLicence.isVerified = false;
+                    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+                    updateSubscriptionBadge();
+
+                    alert("🚫 ACCESS DENIED!\n\nAapka Email ID 'Staff Private App' ke liye registered hai.\nPublic Commercial App access ke liye naya email enter karein.");
+
+                    const authLockScreen = document.getElementById("authLockScreen");
+                    if (authLockScreen) authLockScreen.style.display = "flex";
+                    return false;
+                }
+
+                // ✅ FIXED: Proper authorization check
+                if (res && res.authorized) {
+                    userLicence.isVerified = true;
+                    userLicence.isTampered = false;
+                    userLicence.lastSyncTime = now;
+                    
+                    // Live Google Sheet Date Override
+                    if (res.activationDate) {
+                        userLicence.activatedDate = res.activationDate;
+                    } else if (!userLicence.activatedDate) {
+                        userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
+                    }
+                    
+                    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+                    updateSubscriptionBadge();
+                    
+                    const authLockScreen = document.getElementById("authLockScreen");
+                    if (authLockScreen) authLockScreen.style.display = "none";
+                    return true;
+                } else {
+                    // ✅ FIXED: Proper denial handling
+                    userLicence.isVerified = false;
+                    userLicence.lastSyncTime = now;
+                    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+                    updateSubscriptionBadge();
+                    
+                    const authLockScreen = document.getElementById("authLockScreen");
+                    if (authLockScreen) authLockScreen.style.display = "flex";
+                    return false;
+                }
+            } catch (e) { 
+                console.error("Auth check error:", e);
+                updateSubscriptionBadge();
+                return userLicence.isVerified; 
+            }
+        } else {
+            // Offline mode - use cached status
+            updateSubscriptionBadge();
+            return userLicence.isVerified;
+        }
+    }
+
+    // ✅ FIXED: Always update badge and handle lock screen
+    updateSubscriptionBadge();
+    const authLockScreen = document.getElementById("authLockScreen");
+    if (!userLicence.isVerified && authLockScreen) {
+        authLockScreen.style.display = "flex";
+    } else if (authLockScreen) {
+        authLockScreen.style.display = "none";
+    }
+    return userLicence.isVerified;
 }
 
 window.openAuthModal = function() {
-  const m = document.getElementById("authLockScreen");
-  if (m) m.style.display = "flex";
-  const emailInput = document.getElementById("authEmail");
-  if (emailInput && userLicence.email) emailInput.value = userLicence.email;
+    const m = document.getElementById("authLockScreen");
+    if (m) m.style.display = "flex";
+    const emailInput = document.getElementById("authEmail");
+    if (emailInput && userLicence.email) emailInput.value = userLicence.email;
+    updateSubscriptionBadge();
 };
 
-    window.closeAuthModal = function() {
-      const m = document.getElementById("authLockScreen");
-      if (m) m.style.display = "none";
-    };
+window.closeAuthModal = function() {
+    const m = document.getElementById("authLockScreen");
+    if (m) m.style.display = "none";
+};
 
-        window.requestOTP = async function() {
-          // 🛑 Honeypot Spam Bot Detection Check
-const trapValue = document.getElementById("website_trap") ? document.getElementById("website_trap").value : "";
-if (trapValue !== "") {
-  console.log("Spam Bot Intercepted!");
-  return; // Silent Drop for Bots
-}
+// ✅ FIXED: Complete requestOTP function
+window.requestOTP = async function() {
+    // Honeypot Spam Bot Detection Check
+    const trapValue = document.getElementById("website_trap") ? document.getElementById("website_trap").value : "";
+    if (trapValue !== "") {
+        console.log("Spam Bot Intercepted!");
+        return; // Silent Drop for Bots
+    }
 
-      const authEmail = document.getElementById("authEmail");
-      let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
-      if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+    const authEmail = document.getElementById("authEmail");
+    let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
+    if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
 
-      const reqBtn = document.getElementById("btnSendRequest");
-      if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
-      
-      try {
+    const reqBtn = document.getElementById("btnSendRequest");
+    if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
+    
+    try {
         let currentToken = getDeviceToken();
         let currentOrigin = window.location.origin;
 
-        // 🎯 1. GET CheckAuth Call Updated (PUBLIC Variant & Origin added)
+        // 1. GET CheckAuth Call (PUBLIC Variant & Origin added)
         let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
-          method: 'GET'
+            method: 'GET'
         }).then(r => r.json()).catch(() => null);
 
         if (authCheck && authCheck.authorized) {
-          userLicence.isVerified = true;
-          userLicence.email = emailVal;
-          userLicence.lastSyncTime = new Date().getTime();
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            userLicence.isVerified = true;
+            userLicence.email = emailVal;
+            userLicence.lastSyncTime = new Date().getTime();
+            
+            // ✅ FIXED: Save activation date
+            if (authCheck.activationDate) {
+                userLicence.activatedDate = authCheck.activationDate;
+            } else if (!userLicence.activatedDate) {
+                userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
+            }
+            
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            updateSubscriptionBadge();
 
-          alert("🎉 Status Match: Active! Pro Features Unlocked.");
-          closeAuthModal();
-          location.reload();
-          return;
+            alert("🎉 Status Match: Active! Pro Features Unlocked.");
+            closeAuthModal();
+            location.reload();
+            return;
         }
 
-        // 🎯 2. POST requestOTP Call Updated (PUBLIC Variant & Origin added)
+        // 2. POST requestOTP Call (PUBLIC Variant & Origin added)
         let res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'cors',
-          body: JSON.stringify({ 
-            action: 'requestOTP', 
-            email: emailVal,
-            appVariant: 'PUBLIC',               // 👈 PUBLIC Flag
-            clientOrigin: currentOrigin         // 👈 Domain Origin Lock
-          })
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ 
+                action: 'requestOTP', 
+                email: emailVal,
+                appVariant: 'PUBLIC',
+                clientOrigin: currentOrigin
+            })
         }).then(r => r.json());
 
         if(res.success) {
-          userLicence.email = emailVal;
-          localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-          document.getElementById("emailSection").style.display = 'none';
-          document.getElementById("otpSection").style.display = 'block';
-          document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            document.getElementById("emailSection").style.display = 'none';
+            document.getElementById("otpSection").style.display = 'block';
+            document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
         } else {
-          // Native Direct Gmail App Launch Link
-          let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
-          let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve karein.`);
-          let directGmailAppUrl = `mailto:support@webmy.in?subject=${customMailSubject}&body=${customMailBody}`;
+            // Native Direct Gmail App Launch Link
+            let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
+            let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve karein.`);
+            let directGmailAppUrl = `mailto:support@webmy.in?subject=${customMailSubject}&body=${customMailBody}`;
 
-          document.getElementById("authMessage").innerHTML = `
-            <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
-              Aapka email pending hai. Fast approval ke liye direct message karein.
-            </div>
-            <a href="${directGmailAppUrl}" style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail App ✉️</a>
-          `;
+            document.getElementById("authMessage").innerHTML = `
+                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+                    Aapka email pending hai. Fast approval ke liye direct message karein.
+                </div>
+                <a href="${directGmailAppUrl}" style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail App ✉️</a>
+            `;
         }
-      } catch(e) { 
+    } catch(e) { 
         alert("Network Error! Check your internet connection."); 
-      }
+    }
 
-      if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
-    };
+    if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+};
 
-    window.verifyOTP = async function() {
-      const authOTP = document.getElementById("authOTP");
-      let otpVal = authOTP ? authOTP.value.trim() : "";
-      if(!otpVal) return alert('Enter validation token pin code');
-      
-      let currentToken = getDeviceToken();
-      let currentOrigin = window.location.origin;
+// ✅ FIXED: Complete verifyOTP function
+window.verifyOTP = async function() {
+    const authOTP = document.getElementById("authOTP");
+    let otpVal = authOTP ? authOTP.value.trim() : "";
+    if(!otpVal) return alert('Enter validation token pin code');
+    
+    let currentToken = getDeviceToken();
+    let currentOrigin = window.location.origin;
 
-      const btn = document.getElementById("btnVerifyCode");
-      if (btn) btn.innerText = "Registering...";
+    const btn = document.getElementById("btnVerifyCode");
+    if (btn) btn.innerText = "Registering...";
 
-      try {
-        // 🎯 3. POST verifyOTP Call Updated (PUBLIC Variant & Origin added)
+    try {
+        // POST verifyOTP Call (PUBLIC Variant & Origin added)
         let res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'cors',
-          body: JSON.stringify({ 
-            action: 'verifyOTP', 
-            email: userLicence.email, 
-            otp: otpVal, 
-            token: currentToken,
-            appVariant: 'PUBLIC',               // 👈 PUBLIC Flag
-            clientOrigin: currentOrigin         // 👈 Domain Origin Lock
-          })
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ 
+                action: 'verifyOTP', 
+                email: userLicence.email, 
+                otp: otpVal, 
+                token: currentToken,
+                appVariant: 'PUBLIC',
+                clientOrigin: currentOrigin
+            })
         }).then(r => r.json());
 
         if(res.success) {
-          alert("🎉 Request Submitted Successfully!\nAdmin approval queued.");
-          location.reload();
+            // ✅ FIXED: Set verification status properly
+            userLicence.isVerified = false; // Will be verified after admin approval
+            userLicence.lastSyncTime = new Date().getTime();
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            updateSubscriptionBadge();
+            
+            alert("🎉 Request Submitted Successfully!\nAdmin approval queued.");
+            location.reload();
         } else {
-          alert(res.message);
+            alert(res.message || "Verification failed. Please try again.");
         }
-      } catch(e) { alert("Processing error."); }
-      if (btn) btn.innerText = "Verify OTP & Unlock 📩";
-    };
-
-    /* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
-   // Public App Switch / Subscription Status Check Engine
-window.openPublicSubscriptionModal = function() {
-  closeSettingsModal();
-  const m = document.getElementById("authLockScreen");
-  if (m) m.style.display = "flex";
-
-  const emailInput = document.getElementById("authEmail");
-  if (emailInput) {
-    emailInput.value = userLicence.email || "";
-  }
-
-  const authMsg = document.getElementById("authMessage");
-  if (authMsg) {
-    if (userLicence.isVerified) {
-      authMsg.innerHTML = `<div style="background:#27ae60; color:#fff; padding:8px; border-radius:4px; font-size:12px;">✅ Pro Subscription Active (${userLicence.email})</div>`;
-    } else {
-      authMsg.innerHTML = `<div style="background:#e67e22; color:#fff; padding:8px; border-radius:4px; font-size:12px;">🔒 Pro Multi-Language Thermal Print is Locked</div>`;
+    } catch(e) { 
+        alert("Processing error. Check your internet connection."); 
     }
-  }
+    if (btn) btn.innerText = "Verify OTP & Unlock 📩";
+};
+
+/* ---------- ⚙️ SETTINGS DRAWER CONTROLLERS ---------- */
+// Public App Switch / Subscription Status Check Engine
+window.openPublicSubscriptionModal = function() {
+    closeSettingsModal();
+    const m = document.getElementById("authLockScreen");
+    if (m) m.style.display = "flex";
+
+    const emailInput = document.getElementById("authEmail");
+    if (emailInput) {
+        emailInput.value = userLicence.email || "";
+    }
+
+    const authMsg = document.getElementById("authMessage");
+    if (authMsg) {
+        if (userLicence.isVerified) {
+            authMsg.innerHTML = `<div style="background:#27ae60; color:#fff; padding:8px; border-radius:4px; font-size:12px;">✅ Pro Subscription Active (${userLicence.email})</div>`;
+        } else {
+            authMsg.innerHTML = `<div style="background:#e67e22; color:#fff; padding:8px; border-radius:4px; font-size:12px;">🔒 Pro Multi-Language Thermal Print is Locked</div>`;
+        }
+    }
+    updateSubscriptionBadge();
 };
 
 // Account Reset / Change Email Button (Public App Ke Liye)
 window.resetPublicAccount = function() {
-  if (confirm("Kya aap naya Email ID se Pro Status verify karna chahte hain?")) {
-    userLicence.isVerified = false;
-    userLicence.email = "";
-    userLicence.lastSyncTime = null;
-    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
-    openPublicSubscriptionModal();
-  }
+    if (confirm("Kya aap naya Email ID se Pro Status verify karna chahte hain?")) {
+        userLicence.isVerified = false;
+        userLicence.email = "";
+        userLicence.lastSyncTime = null;
+        userLicence.activatedDate = null;
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+        updateSubscriptionBadge();
+        openPublicSubscriptionModal();
+    }
 };
 
-    window.switchAccountDemo = function() {
-  if (confirm("🔑 Demo Test Mode:\n\nKya aap dusre Email ID se status check ya test login karna chahte hain?")) {
-    // Current Licence Memory Reset
-    userLicence.isVerified = false;
-    userLicence.email = "";
-    userLicence.lastSyncTime = null;
-    localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+window.switchAccountDemo = function() {
+    if (confirm("🔑 Demo Test Mode:\n\nKya aap dusre Email ID se status check ya test login karna chahte hain?")) {
+        // Current Licence Memory Reset
+        userLicence.isVerified = false;
+        userLicence.email = "";
+        userLicence.lastSyncTime = null;
+        userLicence.activatedDate = null;
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
 
-    // Open Auth Screen Directly
-    closeSettingsModal();
-    const m = document.getElementById("authLockScreen");
-    if (m) m.style.display = "flex";
-    
-    // Reset Email Input Field
-    const emailInput = document.getElementById("authEmail");
-    if (emailInput) emailInput.value = "";
-  }
+        // Open Auth Screen Directly
+        closeSettingsModal();
+        const m = document.getElementById("authLockScreen");
+        if (m) m.style.display = "flex";
+        
+        // Reset Email Input Field
+        const emailInput = document.getElementById("authEmail");
+        if (emailInput) emailInput.value = "";
+        updateSubscriptionBadge();
+    }
 };
-/*
-    window.openSettingsModal = function() {
-      const m = document.getElementById("settingsModal");
-      if (m) m.style.display = "flex";
-    };
-*/
+
 // Settings Drawer Modal Open hote hi Badge Refresh karein
 window.openSettingsModal = function() {
-  updateSubscriptionBadge();
-  const m = document.getElementById("settingsModal");
-  if (m) m.style.display = "flex";
+    updateSubscriptionBadge();
+    const m = document.getElementById("settingsModal");
+    if (m) m.style.display = "flex";
 };
-    window.closeSettingsModal = function() {
-      const m = document.getElementById("settingsModal");
-      if (m) m.style.display = "none";
-    };
 
-    window.navToEntryMode = function() {
-      closeSettingsModal();
-      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
-      const b = document.getElementById("btnBackToBill");
-      if (b) b.style.display = "flex";
-    };
+window.closeSettingsModal = function() {
+    const m = document.getElementById("settingsModal");
+    if (m) m.style.display = "none";
+};
 
-    window.navToSavedBills = function() {
-      closeSettingsModal();
-      if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
-      const b = document.getElementById("btnBackToBill");
-      if (b) b.style.display = "flex";
-      const hList = document.getElementById("dbBillsHistoryList");
-      if (hList) hList.scrollIntoView({ behavior: 'smooth' });
-    };
+window.navToEntryMode = function() {
+    closeSettingsModal();
+    if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+    const b = document.getElementById("btnBackToBill");
+    if (b) b.style.display = "flex";
+};
 
-    window.navToBillMode = function() {
-      if (typeof window.toggleViewMode === "function") window.toggleViewMode('bill');
-      const b = document.getElementById("btnBackToBill");
-      if (b) b.style.display = "none";
-    };
+window.navToSavedBills = function() {
+    closeSettingsModal();
+    if (typeof window.toggleViewMode === "function") window.toggleViewMode('entry');
+    const b = document.getElementById("btnBackToBill");
+    if (b) b.style.display = "flex";
+    const hList = document.getElementById("dbBillsHistoryList");
+    if (hList) hList.scrollIntoView({ behavior: 'smooth' });
+};
 
-    window.toggleDarkMode = function() {
-      document.body.classList.toggle("dark-mode");
-      const isDark = document.body.classList.contains("dark-mode");
-      localStorage.setItem("notebook_theme_mode", isDark ? "dark" : "light");
-    };
+window.navToBillMode = function() {
+    if (typeof window.toggleViewMode === "function") window.toggleViewMode('bill');
+    const b = document.getElementById("btnBackToBill");
+    if (b) b.style.display = "none";
+};
 
-    window.changeAppFontSize = function(sizeVal) {
-      document.documentElement.style.setProperty('--font-base', sizeVal);
-      localStorage.setItem("notebook_font_size", sizeVal);
-    };
+window.toggleDarkMode = function() {
+    document.body.classList.toggle("dark-mode");
+    const isDark = document.body.classList.contains("dark-mode");
+    localStorage.setItem("notebook_theme_mode", isDark ? "dark" : "light");
+};
 
-    /* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
-    window.openLegalModal = function(type) {
-      closeSettingsModal();
-      const modal = document.getElementById("legalModal");
-      const title = document.getElementById("legalModalTitle");
-      const body = document.getElementById("legalModalBody");
-      
-      if (type === 'privacy') {
+window.changeAppFontSize = function(sizeVal) {
+    document.documentElement.style.setProperty('--font-base', sizeVal);
+    localStorage.setItem("notebook_font_size", sizeVal);
+};
+
+/* ---------- 📄 LEGAL & HELP MODAL CONTROLLERS ---------- */
+window.openLegalModal = function(type) {
+    closeSettingsModal();
+    const modal = document.getElementById("legalModal");
+    const title = document.getElementById("legalModalTitle");
+    const body = document.getElementById("legalModalBody");
+    
+    if (type === 'privacy') {
         title.innerHTML = "🔒 Privacy & Security Policy";
         body.innerHTML = `
-          <p><b>Notebook Bill Pro</b> respect karta hai aapki privacy ko.</p><br>
-          <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai.</p><br>
-          <p><b>Security:</b> Transaction history fully offline secure hai. License Auth verification ke alawa koi data transfer nahi hota.</p>
+            <p><b>Notebook Bill Pro</b> respect karta hai aapki privacy ko.</p><br>
+            <p><b>Data Storage:</b> Aapka saara billing data, customer details, aur product list aapke apne device ke <i>LocalStorage</i> mein private taur par save rehta hai.</p><br>
+            <p><b>Security:</b> Transaction history fully offline secure hai. License Auth verification ke alawa koi data transfer nahi hota.</p>
         `;
-      } else if (type === 'terms') {
+    } else if (type === 'terms') {
         title.innerHTML = "📄 Terms of Service";
         body.innerHTML = `
-          <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing engine ka upyog kar sakta hai.</p><br>
-          <p>2. <b>Device Binding:</b> 1 Pro License registered account ke sath bound rehta hai.</p><br>
-          <p>3. <b>Data Backup:</b> Export Backup Feature ka regular istemal karein.</p>
+            <p>1. <b>License Use:</b> Subscription Active hone par user Notebook Bill ki printing engine ka upyog kar sakta hai.</p><br>
+            <p>2. <b>Device Binding:</b> 1 Pro License registered account ke sath bound rehta hai.</p><br>
+            <p>3. <b>Data Backup:</b> Export Backup Feature ka regular istemal karein.</p>
         `;
-      } else {
+    } else {
         title.innerHTML = "⁉️ User Guide & Help";
         body.innerHTML = `
-          <p><b>Quick Shortcuts:</b></p>
-          <ul>
-            <li><b>Item Add:</b> Name and Price likhein (e.g. <i>Sugar 50</i>) aur Enter dabayein.</li>
-            <li><b>Calculation:</b> Math expression likhein (e.g. <i>Tea 45+45+50</i>).</li>
-            <li><b>Barcode Scan:</b> Header mein 📷 Icon daba kar scan karein.</li>
-            <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
-          </ul><br>
-          <p><b>Support Contact:</b> Support/Reactivation ke liye support@webmy.in par message karein.</p>
+            <p><b>Quick Shortcuts:</b></p>
+            <ul>
+                <li><b>Item Add:</b> Name and Price likhein (e.g. <i>Sugar 50</i>) aur Enter dabayein.</li>
+                <li><b>Calculation:</b> Math expression likhein (e.g. <i>Tea 45+45+50</i>).</li>
+                <li><b>Barcode Scan:</b> Header mein 📷 Icon daba kar scan karein.</li>
+                <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
+            </ul><br>
+            <p><b>Support Contact:</b> Support/Reactivation ke liye support@webmy.in par message karein.</p>
         `;
-      }
-      if (modal) modal.style.display = "flex";
-    };
+    }
+    if (modal) modal.style.display = "flex";
+};
 
-    window.closeLegalModal = function() {
-      const modal = document.getElementById("legalModal");
-      if (modal) modal.style.display = "none";
-    };
+window.closeLegalModal = function() {
+    const modal = document.getElementById("legalModal");
+    if (modal) modal.style.display = "none";
+};
 
-    window.shareAppText = function() {
-      closeSettingsModal();
-      const shareData = { title: "Notebook Bill Pro", text: "Pro Smart Digital Ledger & Thermal Billing Engine App", url: window.location.href };
-      if (navigator.share) navigator.share(shareData);
-      else alert("App Link Copied: " + window.location.href);
-    };
+window.shareAppText = function() {
+    closeSettingsModal();
+    const shareData = { title: "Notebook Bill Pro", text: "Pro Smart Digital Ledger & Thermal Billing Engine App", url: window.location.href };
+    if (navigator.share) navigator.share(shareData);
+    else alert("App Link Copied: " + window.location.href);
+};
 
-    /* ---------- 📤 / 📥 EXPORT & IMPORT BACKUP ENGINE ---------- */
-    window.exportAppData = function() {
-      try {
+/* ---------- 📤 / 📥 EXPORT & IMPORT BACKUP ENGINE ---------- */
+window.exportAppData = function() {
+    try {
         const backupData = {
-          app: "NotebookBillPro",
-          version: "ProMax",
-          exportDate: new Date().toLocaleString('en-IN'),
-          ledger_db_v3: JSON.parse(localStorage.getItem("ledger_db_v3")) || [],
-          notebook_invoice_history: JSON.parse(localStorage.getItem("notebook_invoice_history")) || [],
-          shopName: document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : "Notebook Bill"
+            app: "NotebookBillPro",
+            version: "ProMax",
+            exportDate: new Date().toLocaleString('en-IN'),
+            ledger_db_v3: JSON.parse(localStorage.getItem("ledger_db_v3")) || [],
+            notebook_invoice_history: JSON.parse(localStorage.getItem("notebook_invoice_history")) || [],
+            shopName: document.getElementById("shopNameInput") ? document.getElementById("shopNameInput").value : "Notebook Bill"
         };
 
         if (backupData.ledger_db_v3.length === 0 && backupData.notebook_invoice_history.length === 0) {
-          return alert("Export karne ke liye koi saved data nahi mila!");
+            return alert("Export karne ke liye koi saved data nahi mila!");
         }
 
         const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
@@ -1150,181 +1086,181 @@ window.openSettingsModal = function() {
         downloadAnchor.remove();
 
         alert("🎉 Backup file (.json) successfully export ho gayi hai!");
-      } catch (err) { alert("Export Failed: " + err.message); }
-    };
+    } catch (err) { alert("Export Failed: " + err.message); }
+};
 
-    window.exportCSVData = function() {
-      if (typeof window.executeCSVExport === "function") window.executeCSVExport();
-    };
+window.exportCSVData = function() {
+    if (typeof window.executeCSVExport === "function") window.executeCSVExport();
+};
 
-    window.triggerImportFileInput = function() {
-      const fileInput = document.getElementById("importFileInput");
-      if (fileInput) fileInput.click();
-    };
+window.triggerImportFileInput = function() {
+    const fileInput = document.getElementById("importFileInput");
+    if (fileInput) fileInput.click();
+};
 
-    window.importAppData = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+window.importAppData = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
         try {
-          const importedData = JSON.parse(e.target.result);
-          if (!importedData.ledger_db_v3 && !importedData.notebook_invoice_history) {
-            return alert("❌ Invalid Backup File!");
-          }
+            const importedData = JSON.parse(e.target.result);
+            if (!importedData.ledger_db_v3 && !importedData.notebook_invoice_history) {
+                return alert("❌ Invalid Backup File!");
+            }
 
-          if (confirm("🚨 Backup import karne se current list update ho jayegi. Continue?")) {
-            if (importedData.ledger_db_v3) localStorage.setItem("ledger_db_v3", JSON.stringify(importedData.ledger_db_v3));
-            if (importedData.notebook_invoice_history) localStorage.setItem("notebook_invoice_history", JSON.stringify(importedData.notebook_invoice_history));
-            if (importedData.shopName && document.getElementById("shopNameInput")) document.getElementById("shopNameInput").value = importedData.shopName;
+            if (confirm("🚨 Backup import karne se current list update ho jayegi. Continue?")) {
+                if (importedData.ledger_db_v3) localStorage.setItem("ledger_db_v3", JSON.stringify(importedData.ledger_db_v3));
+                if (importedData.notebook_invoice_history) localStorage.setItem("notebook_invoice_history", JSON.stringify(importedData.notebook_invoice_history));
+                if (importedData.shopName && document.getElementById("shopNameInput")) document.getElementById("shopNameInput").value = importedData.shopName;
 
-            alert("🎉 Data Restore Successful!");
-            location.reload();
-          }
+                alert("🎉 Data Restore Successful!");
+                location.reload();
+            }
         } catch (err) { alert("❌ Import Error: Invalid JSON File."); }
-      };
-      reader.readAsText(file);
     };
+    reader.readAsText(file);
+};
 
-    /* ---------- 🔍 CUSTOMER WISE FILTER FUNCTIONS ---------- */
-    window.filterBillsByCustomer = function() {
-      const query = document.getElementById("custSearchInput") ? document.getElementById("custSearchInput").value.trim().toLowerCase() : "";
-      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList(query);
-    };
+/* ---------- 🔍 CUSTOMER WISE FILTER FUNCTIONS ---------- */
+window.filterBillsByCustomer = function() {
+    const query = document.getElementById("custSearchInput") ? document.getElementById("custSearchInput").value.trim().toLowerCase() : "";
+    if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList(query);
+};
 
-    window.clearCustSearch = function() {
-      if (document.getElementById("custSearchInput")) document.getElementById("custSearchInput").value = "";
-      if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList();
-    };
+window.clearCustSearch = function() {
+    if (document.getElementById("custSearchInput")) document.getElementById("custSearchInput").value = "";
+    if (typeof window.renderBillsHistoryList === "function") window.renderBillsHistoryList();
+};
 
-    (function(){
-      const container = document.getElementById("container");
-      const totalBox  = document.getElementById("total");
-      const subtotalValBox = document.getElementById("subtotalVal");
-      const adjustmentRow = document.getElementById("adjustmentRow");
-      const adjustmentLbl = document.getElementById("adjustmentLbl");
-      const adjustmentVal = document.getElementById("adjustmentVal");
-      const totalWordsBox = document.getElementById("totalWords");
-      const dateEl = document.getElementById("date");
-      const timeEl = document.getElementById("time");
-      const localSaveBtn = document.getElementById("localSaveBtn");
-      const clearBtn = document.getElementById("clearBtn");
-      const printBtn = document.getElementById("printBtn");
-      const dbEntryPanel = document.getElementById("dbEntryPanel");
-      const dbSaveBtn = document.getElementById("dbSaveBtn");
-      const dbListContainer = document.getElementById("dbListContainer");
-      const dbItemsList = document.getElementById("dbItemsList");
-      const panelTitle = document.getElementById("panelTitle");
-      const bottomDashboard = document.getElementById("bottomDashboard");
-      const custBlock = document.getElementById("custBlock");
-      const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
-      const printModeSelect = document.getElementById("printModeSelect");
-      const modeStatus = document.getElementById("modeStatus");
+(function(){
+    const container = document.getElementById("container");
+    const totalBox  = document.getElementById("total");
+    const subtotalValBox = document.getElementById("subtotalVal");
+    const adjustmentRow = document.getElementById("adjustmentRow");
+    const adjustmentLbl = document.getElementById("adjustmentLbl");
+    const adjustmentVal = document.getElementById("adjustmentVal");
+    const totalWordsBox = document.getElementById("totalWords");
+    const dateEl = document.getElementById("date");
+    const timeEl = document.getElementById("time");
+    const localSaveBtn = document.getElementById("localSaveBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const printBtn = document.getElementById("printBtn");
+    const dbEntryPanel = document.getElementById("dbEntryPanel");
+    const dbSaveBtn = document.getElementById("dbSaveBtn");
+    const dbListContainer = document.getElementById("dbListContainer");
+    const dbItemsList = document.getElementById("dbItemsList");
+    const panelTitle = document.getElementById("panelTitle");
+    const bottomDashboard = document.getElementById("bottomDashboard");
+    const custBlock = document.getElementById("custBlock");
+    const dbBillsHistoryList = document.getElementById("dbBillsHistoryList");
+    const printModeSelect = document.getElementById("printModeSelect");
+    const modeStatus = document.getElementById("modeStatus");
 
-      let undoHistoryState = null;
-      let html5QrCode = null;
-      let isScannerRunning = false;
-      let isProcessingScan = false;
+    let undoHistoryState = null;
+    let html5QrCode = null;
+    let isScannerRunning = false;
+    let isProcessingScan = false;
 
-      window.stopHardwareCamera = stopHardwareCamera;
-      window.resumeHardwareScanning = resumeHardwareScanning;
-      let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
-      let currentMode = 'bill'; 
-      let activeInput = null;
-      let editingItemCode = null; 
-      let printerDevice = null;
+    window.stopHardwareCamera = stopHardwareCamera;
+    window.resumeHardwareScanning = resumeHardwareScanning;
+    let savedBillsHistory = JSON.parse(localStorage.getItem("notebook_invoice_history")) || [];
+    let currentMode = 'bill'; 
+    let activeInput = null;
+    let editingItemCode = null; 
+    let printerDevice = null;
 
-      let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v3")) || [
+    let itemDatabase = JSON.parse(localStorage.getItem("ledger_db_v3")) || [
         { code: "101", name: "Aata", price: 40 },
         { code: "102", name: "Shakkar", price: 45 },
         { code: "103", name: "Chawal", price: 60 }
-      ];
+    ];
 
-      const savedTheme = localStorage.getItem("notebook_theme_mode");
-      if (savedTheme === "dark") document.body.classList.add("dark-mode");
-      const savedFont = localStorage.getItem("notebook_font_size");
-      if (savedFont) {
+    const savedTheme = localStorage.getItem("notebook_theme_mode");
+    if (savedTheme === "dark") document.body.classList.add("dark-mode");
+    const savedFont = localStorage.getItem("notebook_font_size");
+    if (savedFont) {
         document.documentElement.style.setProperty('--font-base', savedFont);
         const fSelect = document.getElementById("fontSizeSelect");
         if (fSelect) fSelect.value = savedFont;
-      }
+    }
 
-      if (window.visualViewport) {
+    if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
-          document.body.style.height = window.visualViewport.height + 'px';
+            document.body.style.height = window.visualViewport.height + 'px';
         });
-      }
+    }
 
-      function saveLiveDraft() {
+    function saveLiveDraft() {
         const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
         let items = [];
         if (container) {
-          [...container.children].forEach(row => {
-            const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
-            if (val) items.push(val);
-          });
+            [...container.children].forEach(row => {
+                const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+                if (val) items.push(val);
+            });
         }
         if (items.length > 0 || custName.trim() !== "") {
-          localStorage.setItem("notebook_live_draft", JSON.stringify({ custName, items, timestamp: new Date().getTime() }));
+            localStorage.setItem("notebook_live_draft", JSON.stringify({ custName, items, timestamp: new Date().getTime() }));
         }
-      }
+    }
 
-      function restoreLiveDraftOnLoad() {
+    function restoreLiveDraftOnLoad() {
         const savedDraft = JSON.parse(localStorage.getItem("notebook_live_draft"));
         if (savedDraft && savedDraft.items && savedDraft.items.length > 0) {
-          const custInput = document.getElementById("custNameInput");
-          if (custInput && savedDraft.custName) custInput.textContent = savedDraft.custName;
-          if (container) {
-            container.innerHTML = "";
-            savedDraft.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
-          }
-          render(); updateSL();
+            const custInput = document.getElementById("custNameInput");
+            if (custInput && savedDraft.custName) custInput.textContent = savedDraft.custName;
+            if (container) {
+                container.innerHTML = "";
+                savedDraft.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
+            }
+            render(); updateSL();
         }
-      }
+    }
 
-      function saveCurrentSnapshot() {
+    function saveCurrentSnapshot() {
         const custName = document.getElementById("custNameInput") ? document.getElementById("custNameInput").textContent : "";
         let items = [];
         if (container) {
-          [...container.children].forEach(row => {
-            const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
-            if (val) items.push(val);
-          });
+            [...container.children].forEach(row => {
+                const val = row.querySelector(".input") ? row.querySelector(".input").textContent.trim() : "";
+                if (val) items.push(val);
+            });
         }
         undoHistoryState = { custName, items, timestamp: new Date().getTime() };
         const undoBtn = document.getElementById("undoBtn");
         if (undoBtn) undoBtn.style.display = "flex";
         localStorage.setItem("notebook_bill_autodraft", JSON.stringify(undoHistoryState));
-      }
+    }
 
-      window.executeSmartUndo = function() {
+    window.executeSmartUndo = function() {
         let stateToRestore = undoHistoryState || JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
         if (!stateToRestore || (!stateToRestore.items.length && !stateToRestore.custName)) {
-          return alert("Koi Undo backup data available nahi hai!");
+            return alert("Koi Undo backup data available nahi hai!");
         }
         const custInput = document.getElementById("custNameInput");
         if (custInput) custInput.textContent = stateToRestore.custName;
         if (container) {
-          container.innerHTML = "";
-          if (stateToRestore.items.length > 0) {
-            stateToRestore.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
-          } else { container.appendChild(makeRow(0)); }
+            container.innerHTML = "";
+            if (stateToRestore.items.length > 0) {
+                stateToRestore.items.forEach((itemText, idx) => { container.appendChild(makeRow(idx, itemText)); });
+            } else { container.appendChild(makeRow(0)); }
         }
         render(); updateSL();
         const undoBtn = document.getElementById("undoBtn");
         if (undoBtn) undoBtn.style.display = "none";
         undoHistoryState = null;
         alert("🎉 Bill data successfully restored!");
-      };
+    };
 
-      function toggleCameraUI() {
+    function toggleCameraUI() {
         const pane = document.getElementById('scannerWrapperZone');
         if (pane.style.display === 'flex' || isScannerRunning) stopHardwareCamera();
         else { pane.style.display = 'flex'; startHardwareCamera(); }
-      }
+    }
 
-      function startHardwareCamera() {
+    function startHardwareCamera() {
         if (isScannerRunning) return;
         document.getElementById('btnResumeCamUI').style.display = "none";
         isProcessingScan = false;
@@ -1333,112 +1269,112 @@ window.openSettingsModal = function() {
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccessCallback, onScanErrorCallback)
         .then(() => { isScannerRunning = true; })
         .catch(err => { document.getElementById('scannerWrapperZone').style.display = 'none'; });
-      }
+    }
 
-      function onScanSuccessCallback(decodedText) {
+    function onScanSuccessCallback(decodedText) {
         if (isProcessingScan) return;
         let normalizedCode = decodedText.toString().trim();
         if (!normalizedCode) return;
         isProcessingScan = true;
         if (navigator.vibrate) navigator.vibrate(100);
         if (html5QrCode) {
-          html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; executeScannedCodeMatch(normalizedCode); })
-          .catch(() => { executeScannedCodeMatch(normalizedCode); });
+            html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; executeScannedCodeMatch(normalizedCode); })
+            .catch(() => { executeScannedCodeMatch(normalizedCode); });
         } else { executeScannedCodeMatch(normalizedCode); }
-      }
+    }
 
-      function executeScannedCodeMatch(code) {
+    function executeScannedCodeMatch(code) {
         let match = itemDatabase.find(i => i.code.toString().trim() === code);
         if (match) {
-          const activePrice = match.price;
-          if (currentMode === 'bill') {
-            const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
-            container.appendChild(newRow); updateSL(); render();
-            const lastInput = container.lastChild.querySelector(".input");
-            if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
-          } else {
-            window.navToBillMode();
-            setTimeout(() => {
-              const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
-              container.appendChild(newRow); updateSL(); render();
-              const lastInput = container.lastChild.querySelector(".input");
-              if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
-            }, 300);
-          }
-          document.getElementById('btnResumeCamUI').style.display = "block";
-          document.getElementById('btnResumeCamUI').focus();
+            const activePrice = match.price;
+            if (currentMode === 'bill') {
+                const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
+                container.appendChild(newRow); updateSL(); render();
+                const lastInput = container.lastChild.querySelector(".input");
+                if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
+            } else {
+                window.navToBillMode();
+                setTimeout(() => {
+                    const newRow = makeRow(container.children.length, `${match.name} ${activePrice}`);
+                    container.appendChild(newRow); updateSL(); render();
+                    const lastInput = container.lastChild.querySelector(".input");
+                    if (lastInput) { lastInput.focus(); scrollToActiveInput(lastInput); }
+                }, 300);
+            }
+            document.getElementById('btnResumeCamUI').style.display = "block";
+            document.getElementById('btnResumeCamUI').focus();
         } else {
-          if (confirm(`Barcode '${code}' database mein nahi mila! Naya product add karein?`)) {
-            window.navToEntryMode();
-            document.getElementById('dbCode').value = code;
-            document.getElementById('dbName').focus();
-          } else { resumeHardwareScanning(); }
+            if (confirm(`Barcode '${code}' database mein nahi mila! Naya product add karein?`)) {
+                window.navToEntryMode();
+                document.getElementById('dbCode').value = code;
+                document.getElementById('dbName').focus();
+            } else { resumeHardwareScanning(); }
         }
-      }
+    }
 
-      function resumeHardwareScanning() {
+    function resumeHardwareScanning() {
         document.getElementById('btnResumeCamUI').style.display = "none";
         document.getElementById('scannerWrapperZone').style.display = 'flex';
         startHardwareCamera();
-      }
+    }
 
-      function stopHardwareCamera() {
+    function stopHardwareCamera() {
         if (html5QrCode && isScannerRunning) {
-          html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; document.getElementById('scannerWrapperZone').style.display = 'none'; });
+            html5QrCode.stop().then(() => { isScannerRunning = false; html5QrCode = null; document.getElementById('scannerWrapperZone').style.display = 'none'; });
         } else { isScannerRunning = false; document.getElementById('scannerWrapperZone').style.display = 'none'; }
         isProcessingScan = false;
-      }
+    }
 
-      function onScanErrorCallback(err) {}
+    function onScanErrorCallback(err) {}
 
-      document.getElementById('btnCamToggle').addEventListener('click', toggleCameraUI);
+    document.getElementById('btnCamToggle').addEventListener('click', toggleCameraUI);
 
-      function toggleViewMode(mode) {
+    function toggleViewMode(mode) {
         currentMode = mode;
         if(mode === 'entry') {
-          stopHardwareCamera();
-          modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
-          dbEntryPanel.style.display = "flex"; container.style.display = "none";     
-          custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
-          renderDatabaseList(); renderBillsHistoryList(); 
+            stopHardwareCamera();
+            modeStatus.textContent = "Database Entry Active"; modeStatus.classList.add("entry");
+            dbEntryPanel.style.display = "flex"; container.style.display = "none";     
+            custBlock.style.display = "none"; dbListContainer.style.display = "flex"; bottomDashboard.style.display = "none"; 
+            renderDatabaseList(); renderBillsHistoryList(); 
         } else {
-          modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
-          dbEntryPanel.style.display = "none"; container.style.display = "block";     
-          custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
-          editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
-          dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+            modeStatus.textContent = "Billing Active"; modeStatus.classList.remove("entry");
+            dbEntryPanel.style.display = "none"; container.style.display = "block";     
+            custBlock.style.display = "flex"; dbListContainer.style.display = "none"; bottomDashboard.style.display = "flex"; 
+            editingItemCode = null; panelTitle.textContent = "📥 Add Product to Ledger Database";
+            dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
         }
         render();
-      }
-      window.toggleViewMode = toggleViewMode;
+    }
+    window.toggleViewMode = toggleViewMode;
 
-      function setCaretToEnd(el){
+    function setCaretToEnd(el){
         const range = document.createRange();
         range.selectNodeContents(el); range.collapse(false);
         const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-      }
+    }
 
-      function nowDateTimeTick(){
+    function nowDateTimeTick(){
         const now = new Date();
         dateEl.textContent = now.toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'});
         timeEl.textContent = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12:true});
-      }
-      setInterval(nowDateTimeTick, 1000);
-      nowDateTimeTick();
+    }
+    setInterval(nowDateTimeTick, 1000);
+    nowDateTimeTick();
 
-      function evalExpr(expr) {
+    function evalExpr(expr) {
         try {
-          const cleaned = expr.replace(/[^\d.+\-*/^()]/g, '');
-          if (!cleaned || !/[0-9]/.test(cleaned)) return 0;
-          const js = cleaned.replace(/\^/g, "**");
-          const val = Function('"use strict";return(' + js + ')')();
-          if (typeof val === "number" && isFinite(val))
-            return Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+            const cleaned = expr.replace(/[^\d.+\-*/^()]/g, '');
+            if (!cleaned || !/[0-9]/.test(cleaned)) return 0;
+            const js = cleaned.replace(/\^/g, "**");
+            const val = Function('"use strict";return(' + js + ')')();
+            if (typeof val === "number" && isFinite(val))
+                return Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
         } catch (e) {}
         return 0;
-      }
+    }
 
-      function numberToWordsIndian(num){
+    function numberToWordsIndian(num){
         num = Math.floor(Math.abs(num));
         if (num === 0) return "Zero";
         const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
@@ -1454,18 +1390,18 @@ window.openSettingsModal = function() {
         if(thou)  words += (words?" ":"") + twoDigits(thou) + " Thousand";
         if(num)   words += (words?" ":"") + threeDigits(num);
         return words.trim();
-      }
+    }
 
-      function totalInWords(amt){
+    function totalInWords(amt){
         const rupees = Math.floor(amt);
         const paise = Math.round((amt - rupees) * 100);
         let s = numberToWordsIndian(rupees) + " Rupees";
         if (paise>0) s += " and " + numberToWordsIndian(paise) + " Paise";
         return s + " Only";
-      }
+    }
 
-      /* 🔥 BARCODE & DUP-CODE PREVENTION FIX IN ITEM AUTOSAVE */
-      function parseAndSaveNewItem(text) {
+    /* 🔥 BARCODE & DUP-CODE PREVENTION FIX IN ITEM AUTOSAVE */
+    function parseAndSaveNewItem(text) {
         const cleanText = text.trim();
         if (!cleanText) return;
 
@@ -1481,96 +1417,96 @@ window.openSettingsModal = function() {
 
         const restPart = words.slice(1).join(' ');
         const cleaned = restPart
-          .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
-          .replace(/[₹$€£]/g, '')
-          .trim();
+            .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
+            .replace(/[₹$€£]/g, '')
+            .trim();
         
         if (!itemName || !cleaned) return;
         const tokens = cleaned.split(/\s+/);
         let priceVal = 0;
         
         for (let i = tokens.length - 1; i >= 0; i--) {
-          const token = tokens[i];
-          if (/^[0-9.]+$/.test(token)) { priceVal = parseFloat(token); break; }
-          if (/[+\-*/^]/.test(token)) break;
+            const token = tokens[i];
+            if (/^[0-9.]+$/.test(token)) { priceVal = parseFloat(token); break; }
+            if (/[+\-*/^]/.test(token)) break;
         }
 
         if (itemName && priceVal > 0) {
-          const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase() || i.code === itemName);
-          if (!exists) {
-            const code = (itemDatabase.length + 101).toString();
-            itemDatabase.push({ code, name: itemName, price: priceVal });
-            localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
-            renderDatabaseList();
-          }
+            const exists = itemDatabase.find(i => i.name.toLowerCase() === itemName.toLowerCase() || i.code === itemName);
+            if (!exists) {
+                const code = (itemDatabase.length + 101).toString();
+                itemDatabase.push({ code, name: itemName, price: priceVal });
+                localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
+                renderDatabaseList();
+            }
         }
-      }
+    }
 
-      function renderDatabaseList() {
+    function renderDatabaseList() {
         dbItemsList.innerHTML = "";
         const sortedDatabase = [...itemDatabase].sort((a, b) => a.name.localeCompare(b.name));
         
         if(sortedDatabase.length === 0) {
-          dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>";
-          return;
+            dbItemsList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Database list is empty.</div>";
+            return;
         }
 
         sortedDatabase.forEach(item => {
-          const itemRow = document.createElement("div"); itemRow.className = "db-item-row";
-          const details = document.createElement("div"); details.className = "db-item-details";
-          details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Price: ₹${item.price}</span>`;
+            const itemRow = document.createElement("div"); itemRow.className = "db-item-row";
+            const details = document.createElement("div"); details.className = "db-item-details";
+            details.innerHTML = `${item.name} <span>[Code: ${item.code}] | Price: ₹${item.price}</span>`;
 
-          const actions = document.createElement("div"); actions.className = "db-item-actions";
-          const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
-          editBtn.addEventListener("click", () => {
-            document.getElementById("dbCode").value = item.code;
-            document.getElementById("dbName").value = item.name;
-            document.getElementById("dbPrice").value = item.price;
-            editingItemCode = item.code; 
-            panelTitle.textContent = "✏️ Edit Product in Ledger Database";
-            dbSaveBtn.textContent = "Update Product";
-            dbSaveBtn.style.background = "#e67e22"; dbSaveBtn.style.borderColor = "#d35400";
-          });
+            const actions = document.createElement("div"); actions.className = "db-item-actions";
+            const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+            editBtn.addEventListener("click", () => {
+                document.getElementById("dbCode").value = item.code;
+                document.getElementById("dbName").value = item.name;
+                document.getElementById("dbPrice").value = item.price;
+                editingItemCode = item.code; 
+                panelTitle.textContent = "✏️ Edit Product in Ledger Database";
+                dbSaveBtn.textContent = "Update Product";
+                dbSaveBtn.style.background = "#e67e22"; dbSaveBtn.style.borderColor = "#d35400";
+            });
 
-          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
-          deleteBtn.addEventListener("click", () => {
-            if(confirm(`Delete "${item.name}"?`)) {
-              itemDatabase = itemDatabase.filter(i => i.code !== item.code);
-              localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
-              renderDatabaseList(); render();
-            }
-          });
+            const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+            deleteBtn.addEventListener("click", () => {
+                if(confirm(`Delete "${item.name}"?`)) {
+                    itemDatabase = itemDatabase.filter(i => i.code !== item.code);
+                    localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
+                    renderDatabaseList(); render();
+                }
+            });
 
-          actions.appendChild(editBtn); actions.appendChild(deleteBtn);
-          itemRow.appendChild(details); itemRow.appendChild(actions);
-          dbItemsList.appendChild(itemRow);
+            actions.appendChild(editBtn); actions.appendChild(deleteBtn);
+            itemRow.appendChild(details); itemRow.appendChild(actions);
+            dbItemsList.appendChild(itemRow);
         });
-      }
+    }
 
-      dbSaveBtn.addEventListener("click", function() {
+    dbSaveBtn.addEventListener("click", function() {
         const code = document.getElementById("dbCode").value.trim();
         const name = document.getElementById("dbName").value.trim();
         const price = parseFloat(document.getElementById("dbPrice").value) || 0;
 
         if (code && name && price > 0) {
-          if (editingItemCode) {
-            const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
-            if (idx > -1) itemDatabase[idx] = { code, name, price };
-            editingItemCode = null;
-            panelTitle.textContent = "📥 Add Product to Ledger Database";
-            dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
-          } else {
-            const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
-            if (exists) { alert("Product matches an existing entry!"); return; }
-            itemDatabase.push({ code, name, price });
-          }
-          localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
-          document.getElementById("dbCode").value = ""; document.getElementById("dbName").value = ""; document.getElementById("dbPrice").value = "";
-          renderDatabaseList(); render();
+            if (editingItemCode) {
+                const idx = itemDatabase.findIndex(i => i.code === editingItemCode);
+                if (idx > -1) itemDatabase[idx] = { code, name, price };
+                editingItemCode = null;
+                panelTitle.textContent = "📥 Add Product to Ledger Database";
+                dbSaveBtn.textContent = "Save to Database"; dbSaveBtn.style.background = "#3498db"; dbSaveBtn.style.borderColor = "#2980b9";
+            } else {
+                const exists = itemDatabase.find(i => i.code === code || i.name.toLowerCase() === name.toLowerCase());
+                if (exists) { alert("Product matches an existing entry!"); return; }
+                itemDatabase.push({ code, name, price });
+            }
+            localStorage.setItem("ledger_db_v3", JSON.stringify(itemDatabase));
+            document.getElementById("dbCode").value = ""; document.getElementById("dbName").value = ""; document.getElementById("dbPrice").value = "";
+            renderDatabaseList(); render();
         } else { alert("Fill all required fields: code, name & price!"); }
-      });
+    });
 
-      function makeRow(i, text=""){
+    function makeRow(i, text=""){
         const row = document.createElement("div"); row.className = "row";
         const rowMain = document.createElement("div"); rowMain.className = "row-main";
         const sl = document.createElement("div"); sl.className = "sl"; sl.textContent = i+1;
@@ -1593,133 +1529,133 @@ window.openSettingsModal = function() {
         row.appendChild(rowMain); row.appendChild(codePatch);
 
         input.addEventListener("input", function() {
-          render(); saveLiveDraft();
-          const val = input.textContent.trim().toLowerCase();
-          const oldBox = wrapper.querySelector(".suggest-box");
-          if(oldBox) oldBox.remove();
-          if(!val) return;
+            render(); saveLiveDraft();
+            const val = input.textContent.trim().toLowerCase();
+            const oldBox = wrapper.querySelector(".suggest-box");
+            if(oldBox) oldBox.remove();
+            if(!val) return;
 
-          const matches = itemDatabase.filter(item => 
-            item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
-          );
+            const matches = itemDatabase.filter(item => 
+                item.name.toLowerCase().includes(val) || item.code.toLowerCase().includes(val)
+            );
 
-          if(matches.length > 0) {
-            const suggestBox = document.createElement("div"); suggestBox.className = "suggest-box";
-            matches.forEach(match => {
-              const itemDiv = document.createElement("div"); itemDiv.className = "suggest-item";
-              const activePrice = match.price;
-              itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
-              const selectItem = (e) => {
-                e.preventDefault(); e.stopPropagation();
-                input.textContent = `${match.name} ${activePrice}`;
-                suggestBox.remove(); render(); saveLiveDraft();
-                setCaretToEnd(input); activeInput = input;
-              };
-              itemDiv.addEventListener("mousedown", selectItem);
-              itemDiv.addEventListener("touchstart", selectItem);
-              suggestBox.appendChild(itemDiv);
-            });
-            wrapper.appendChild(suggestBox);
-          }
+            if(matches.length > 0) {
+                const suggestBox = document.createElement("div"); suggestBox.className = "suggest-box";
+                matches.forEach(match => {
+                    const itemDiv = document.createElement("div"); itemDiv.className = "suggest-item";
+                    const activePrice = match.price;
+                    itemDiv.textContent = `${match.name} [${match.code}] - ₹${activePrice}`;
+                    const selectItem = (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        input.textContent = `${match.name} ${activePrice}`;
+                        suggestBox.remove(); render(); saveLiveDraft();
+                        setCaretToEnd(input); activeInput = input;
+                    };
+                    itemDiv.addEventListener("mousedown", selectItem);
+                    itemDiv.addEventListener("touchstart", selectItem);
+                    suggestBox.appendChild(itemDiv);
+                });
+                wrapper.appendChild(suggestBox);
+            }
         });
 
         input.addEventListener("blur", function() {
-          setTimeout(() => {
-            const box = wrapper.querySelector(".suggest-box");
-            if(box) box.remove();
-            const currentText = input.textContent.trim();
-            if (currentText) parseAndSaveNewItem(currentText);
-            render(); saveLiveDraft();
-          }, 350); 
+            setTimeout(() => {
+                const box = wrapper.querySelector(".suggest-box");
+                if(box) box.remove();
+                const currentText = input.textContent.trim();
+                if (currentText) parseAndSaveNewItem(currentText);
+                render(); saveLiveDraft();
+            }, 350); 
         });
 
         input.addEventListener("keydown", function(e){
-          if(e.key === "Enter"){
-            e.preventDefault();
-            const currentText = input.textContent.trim();
-            if(currentText !== ""){
-              parseAndSaveNewItem(currentText);
-              container.appendChild(makeRow(container.children.length));
-              updateSL(); render(); saveLiveDraft();
-              const lastInput = container.lastChild.querySelector(".input");
-              lastInput.focus(); scrollToActiveInput(lastInput);
+            if(e.key === "Enter"){
+                e.preventDefault();
+                const currentText = input.textContent.trim();
+                if(currentText !== ""){
+                    parseAndSaveNewItem(currentText);
+                    container.appendChild(makeRow(container.children.length));
+                    updateSL(); render(); saveLiveDraft();
+                    const lastInput = container.lastChild.querySelector(".input");
+                    lastInput.focus(); scrollToActiveInput(lastInput);
+                }
             }
-          }
-          if(e.key === "Backspace" && input.textContent.trim() === ""){
-            if(container.children.length > 1){
-              e.preventDefault();
-              const prev = row.previousElementSibling || row.nextElementSibling;
-              row.remove(); updateSL(); render(); saveLiveDraft();
-              if(prev){
-                const target = prev.querySelector(".input");
-                target.focus(); setCaretToEnd(target); scrollToActiveInput(target);
-              }
+            if(e.key === "Backspace" && input.textContent.trim() === ""){
+                if(container.children.length > 1){
+                    e.preventDefault();
+                    const prev = row.previousElementSibling || row.nextElementSibling;
+                    row.remove(); updateSL(); render(); saveLiveDraft();
+                    if(prev){
+                        const target = prev.querySelector(".input");
+                        target.focus(); setCaretToEnd(target); scrollToActiveInput(target);
+                    }
+                }
             }
-          }
         });
 
         return row;
-      }
+    }
 
-      function updateSL(){
+    function updateSL(){
         [...container.children].forEach((row,i)=>{ row.querySelector(".sl").textContent = i+1; });
-      }
+    }
 
-      function render(){
+    function render(){
         let subtotal = 0;
 
         [...container.children].forEach(row => {
-          const inputEl = row.querySelector(".input");
-          const text = inputEl ? inputEl.textContent.trim() : "";
-          const resBox = row.querySelector(".result");
-          const patchBox = row.querySelector(".code-patch");
-          
-          let val = 0;
+            const inputEl = row.querySelector(".input");
+            const text = inputEl ? inputEl.textContent.trim() : "";
+            const resBox = row.querySelector(".result");
+            const patchBox = row.querySelector(".code-patch");
+            
+            let val = 0;
 
-          const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
-          if (codeMatch) {
-            patchBox.textContent = `Code: ${codeMatch[1]}`;
-            patchBox.classList.add("visible");
-          } else {
-            const wordTokens = text.split(/\s+/);
-            const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
-            if (foundItem) {
-              patchBox.textContent = `Code: ${foundItem.code}`;
-              patchBox.classList.add("visible");
-            } else { patchBox.classList.remove("visible"); }
-          }
+            const codeMatch = text.match(/\[([a-zA-Z0-9]+)\]/);
+            if (codeMatch) {
+                patchBox.textContent = `Code: ${codeMatch[1]}`;
+                patchBox.classList.add("visible");
+            } else {
+                const wordTokens = text.split(/\s+/);
+                const foundItem = itemDatabase.find(i => i.name.toLowerCase() === wordTokens[0].toLowerCase());
+                if (foundItem) {
+                    patchBox.textContent = `Code: ${foundItem.code}`;
+                    patchBox.classList.add("visible");
+                } else { patchBox.classList.remove("visible"); }
+            }
 
-          if (currentMode === 'bill') {
-            const words = text.split(/\s+/);
-            let exprPart = words.length > 1 ? words.slice(1).join(' ') : text;
-            
-            let cleaned = exprPart
-              .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
-              .replace(/[₹$€£]/g, '')
-              .trim();
-            
-            cleaned = cleaned.replace(/\s*([+\-*/^])\s*/g, '$1');
-            const tokens = cleaned.split(/\s+/);
-            let calcExpr = '';
-            
-            for (let i = tokens.length - 1; i >= 0; i--) {
-              if (/[+\-*/^]/.test(tokens[i]) && /[0-9]/.test(tokens[i])) {
-                calcExpr = tokens[i]; break;
-              }
-            }
-            
-            if (!calcExpr) {
-              for (let i = tokens.length - 1; i >= 0; i--) {
-                if (/^[0-9.]+$/.test(tokens[i])) { calcExpr = tokens[i]; break; }
-              }
-            }
-            
-            if (calcExpr && /[0-9]/.test(calcExpr)) val = evalExpr(calcExpr);
-            
-            resBox.textContent = val ? val.toLocaleString('en-IN') : "";
-            subtotal += val;
-            resBox.style.display = "block";
-          } else { resBox.style.display = "none"; }
+            if (currentMode === 'bill') {
+                const words = text.split(/\s+/);
+                let exprPart = words.length > 1 ? words.slice(1).join(' ') : text;
+                
+                let cleaned = exprPart
+                    .replace(/\b(rs|c|kg|g|ml|ltr|l|pcs|pc|pack|box|gram|carton|bag|dozen)\b/gi, '')
+                    .replace(/[₹$€£]/g, '')
+                    .trim();
+                
+                cleaned = cleaned.replace(/\s*([+\-*/^])\s*/g, '$1');
+                const tokens = cleaned.split(/\s+/);
+                let calcExpr = '';
+                
+                for (let i = tokens.length - 1; i >= 0; i--) {
+                    if (/[+\-*/^]/.test(tokens[i]) && /[0-9]/.test(tokens[i])) {
+                        calcExpr = tokens[i]; break;
+                    }
+                }
+                
+                if (!calcExpr) {
+                    for (let i = tokens.length - 1; i >= 0; i--) {
+                        if (/^[0-9.]+$/.test(tokens[i])) { calcExpr = tokens[i]; break; }
+                    }
+                }
+                
+                if (calcExpr && /[0-9]/.test(calcExpr)) val = evalExpr(calcExpr);
+                
+                resBox.textContent = val ? val.toLocaleString('en-IN') : "";
+                subtotal += val;
+                resBox.style.display = "block";
+            } else { resBox.style.display = "none"; }
         });
 
         const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
@@ -1730,18 +1666,18 @@ window.openSettingsModal = function() {
         let finalGrandTotal = subtotal;
 
         if (percentVal > 0) {
-          if (percentType === "DISC") {
-            finalGrandTotal = subtotal - adjustmentAmount;
-            if (adjustmentLbl) adjustmentLbl.textContent = `Discount (${percentVal}%):`;
-            if (adjustmentVal) adjustmentVal.textContent = `-₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
-          } else if (percentType === "TAX") {
-            finalGrandTotal = subtotal + adjustmentAmount;
-            if (adjustmentLbl) adjustmentLbl.textContent = `Tax/GST (${percentVal}%):`;
-            if (adjustmentVal) adjustmentVal.textContent = `+₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
-          }
-          if (adjustmentRow) adjustmentRow.style.display = "flex";
+            if (percentType === "DISC") {
+                finalGrandTotal = subtotal - adjustmentAmount;
+                if (adjustmentLbl) adjustmentLbl.textContent = `Discount (${percentVal}%):`;
+                if (adjustmentVal) adjustmentVal.textContent = `-₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+            } else if (percentType === "TAX") {
+                finalGrandTotal = subtotal + adjustmentAmount;
+                if (adjustmentLbl) adjustmentLbl.textContent = `Tax/GST (${percentVal}%):`;
+                if (adjustmentVal) adjustmentVal.textContent = `+₹` + adjustmentAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+            }
+            if (adjustmentRow) adjustmentRow.style.display = "flex";
         } else {
-          if (adjustmentRow) adjustmentRow.style.display = "none";
+            if (adjustmentRow) adjustmentRow.style.display = "none";
         }
 
         finalGrandTotal = Math.max(0, finalGrandTotal);
@@ -1751,56 +1687,56 @@ window.openSettingsModal = function() {
         const formattedWords = "In Words: " + totalInWords(finalGrandTotal);
 
         if (currentMode === 'bill') {
-          if (subtotalValBox) subtotalValBox.textContent = formattedSubtotal;
-          totalBox.textContent = formattedTotal;
-          totalWordsBox.textContent = formattedWords;
-          totalWordsBox.style.display = "block"; 
+            if (subtotalValBox) subtotalValBox.textContent = formattedSubtotal;
+            totalBox.textContent = formattedTotal;
+            totalWordsBox.textContent = formattedWords;
+            totalWordsBox.style.display = "block"; 
         } else {
-          if (subtotalValBox) subtotalValBox.textContent = "----";
-          totalBox.textContent = "----";
-          totalWordsBox.style.display = "none";
+            if (subtotalValBox) subtotalValBox.textContent = "----";
+            totalBox.textContent = "----";
+            totalWordsBox.style.display = "none";
         }
-      }
-      window.render = render;
+    }
+    window.render = render;
 
-      const percentValEl = document.getElementById("percentVal");
-      if (percentValEl) percentValEl.addEventListener("input", render);
-      const percentTypeEl = document.getElementById("percentType");
-      if (percentTypeEl) percentTypeEl.addEventListener("change", render);
+    const percentValEl = document.getElementById("percentVal");
+    if (percentValEl) percentValEl.addEventListener("input", render);
+    const percentTypeEl = document.getElementById("percentType");
+    if (percentTypeEl) percentTypeEl.addEventListener("change", render);
 
-      function scrollToActiveInput(element) {
+    function scrollToActiveInput(element) {
         if (!element) return;
         setTimeout(() => { element.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
-      }
+    }
 
-      container.addEventListener("focusin", function(e) {
+    container.addEventListener("focusin", function(e) {
         if(e.target.classList.contains("input")) {
-          activeInput = e.target; scrollToActiveInput(activeInput);
+            activeInput = e.target; scrollToActiveInput(activeInput);
         }
-      });
+    });
 
-      document.querySelectorAll(".op-btn").forEach(btn => {
+    document.querySelectorAll(".op-btn").forEach(btn => {
         btn.addEventListener("click", function(e) {
-          e.preventDefault();
-          if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
-          if (activeInput) {
-            activeInput.focus();
-            const op = btn.getAttribute("data-op");
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const range = sel.getRangeAt(0);
-            range.deleteContents();
-            const textNode = document.createTextNode(op);
-            range.insertNode(textNode);
-            range.setStartAfter(textNode);
-            range.setEndAfter(textNode);
-            sel.removeAllRanges(); sel.addRange(range);
-            render(); saveLiveDraft(); scrollToActiveInput(activeInput);
-          }
+            e.preventDefault();
+            if (!activeInput && container.children.length > 0) activeInput = container.lastChild.querySelector(".input");
+            if (activeInput) {
+                activeInput.focus();
+                const op = btn.getAttribute("data-op");
+                const sel = window.getSelection();
+                if (!sel.rangeCount) return;
+                const range = sel.getRangeAt(0);
+                range.deleteContents();
+                const textNode = document.createTextNode(op);
+                range.insertNode(textNode);
+                range.setStartAfter(textNode);
+                range.setEndAfter(textNode);
+                sel.removeAllRanges(); sel.addRange(range);
+                render(); saveLiveDraft(); scrollToActiveInput(activeInput);
+            }
         });
-      });
+    });
 
-      localSaveBtn.addEventListener("click", function() {
+    localSaveBtn.addEventListener("click", function() {
         const customerName = document.getElementById("custNameInput").textContent.trim();
         if(!customerName) { alert("Data save karne ke liye 'Cust Name' zaroor entered karein!"); return; }
 
@@ -1811,255 +1747,254 @@ window.openSettingsModal = function() {
 
         let rowItems = [];
         [...container.children].forEach(row => {
-          const itemValue = row.querySelector(".input").textContent.trim();
-          if(itemValue) rowItems.push(itemValue);
+            const itemValue = row.querySelector(".input").textContent.trim();
+            if(itemValue) rowItems.push(itemValue);
         });
 
         savedBillsHistory.push({
-          billCode: generatedBillCode,
-          custName: customerName,
-          date: dateEl.textContent,
-          time: timeEl.textContent,
-          items: rowItems,
-          total: totalBox.textContent
+            billCode: generatedBillCode,
+            custName: customerName,
+            date: dateEl.textContent,
+            time: timeEl.textContent,
+            items: rowItems,
+            total: totalBox.textContent
         });
 
         localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory));
         alert(`Bill data successfully saved to Browser Storage!\nCode: ${generatedBillCode}`);
-      });
+    });
 
-      window.executeCSVExport = function() {
+    window.executeCSVExport = function() {
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Serial No,Item Description,Amount (INR)\n";
         [...container.children].forEach((row, idx) => {
-          const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
-          const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
-          if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
+            const itemText = row.querySelector(".input").textContent.trim().replace(/,/g, " ");
+            const itemTotal = row.querySelector(".result").textContent.trim().replace(/,/g, "");
+            if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
         });
         csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri); link.setAttribute("download", `ledger_report.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      };
+    };
 
-      async function autoTranslateText(text) {
+    async function autoTranslateText(text) {
         if (/^[a-zA-Z0-9\s]+$/.test(text)) return text;
         const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(text)}`;
         try {
-          const response = await fetch(url);
-          const data = await response.json();
-          return data[0][0][0];
+            const response = await fetch(url);
+            const data = await response.json();
+            return data[0][0][0];
         } catch (e) { return text; }
-      }
+    }
 
-     /* ---------- 🖨️ NATIVE DIRECT COMPUTER/A4 PRINT ENGINE ---------- */
-function executeComputerBrowserPrint() {
-  // Mobile/Desktop Browser ke Direct System Print Dialogue ko invoke karein
-  window.print();
-}
+    /* ---------- 🖨️ NATIVE DIRECT COMPUTER/A4 PRINT ENGINE ---------- */
+    function executeComputerBrowserPrint() {
+        window.print();
+    }
 
-      /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE ---------- */
-      window.printBill = async function() {
+    /* ---------- 🖨️ PRO+ THERMAL PRINT ENGINE ---------- */
+    window.printBill = async function() {
         const printModeDropdown = document.getElementById("printModeSelect");
         const currentPrintMode = printModeDropdown ? printModeDropdown.value : 'ENG';
 
         // 🔒 MULTI Print Mode Lock & LIVE status Verification
         if (currentPrintMode === 'MULTI') {
-          let isLiveAuthorized = await verifyLiveStatusWithSheet(true); 
-          if (!isLiveAuthorized) {
-            window.openAuthModal();
-            return;
-          }
+            let isLiveAuthorized = await verifyLiveStatusWithSheet(true); 
+            if (!isLiveAuthorized) {
+                window.openAuthModal();
+                return;
+            }
         }
 
         let validRows = [];
         let subtotalCalc = 0;
         [...container.children].forEach(row => {
-          const itemText = row.querySelector(".input").textContent.trim();
-          const itemTotal = row.querySelector(".result").textContent.trim();
-          if(itemText) {
-            validRows.push({ text: itemText, total: itemTotal });
-            subtotalCalc += parseFloat(itemTotal.replace(/,/g, '')) || 0;
-          }
+            const itemText = row.querySelector(".input").textContent.trim();
+            const itemTotal = row.querySelector(".result").textContent.trim();
+            if(itemText) {
+                validRows.push({ text: itemText, total: itemTotal });
+                subtotalCalc += parseFloat(itemTotal.replace(/,/g, '')) || 0;
+            }
         });
 
         if (validRows.length === 0) return alert("Pehle Bill mein items add karein!");
         
         if (currentPrintMode === 'COMP') {
-          executeComputerBrowserPrint();
-          return;
+            executeComputerBrowserPrint();
+            return;
         }
 
         try {
-          if (!printerDevice) {
-            printerDevice = await navigator.bluetooth.requestDevice({
-              filters: [{ namePrefix: 'Bluetooth' }, { namePrefix: 'SRS' }, { namePrefix: 'MPT' }, { namePrefix: 'MTP' }],
-              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-            });
-          }
-          const server = await printerDevice.gatt.connect();
-          const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-          const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-
-          const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
-          const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
-
-          let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
-          esc += '\x1B\x61\x00Date: ' + dateEl.textContent + ' ' + timeEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
-          esc += 'S.No Item                 Amount\n';
-          esc += '--------------------------------\n';
-          
-          for (let i = 0; i < validRows.length; i++) {
-            let rowItem = validRows[i];
-            let finalPrintName = "";
-
-            if (currentPrintMode === 'MULTI') {
-              finalPrintName = rowItem.text;
-            } else {
-              let rawLineText = rowItem.text;
-              if (/[^\x00-\x7F]/.test(rawLineText)) {
-                let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
-                let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
-                
-                if(wordsPart) {
-                  let translatedWords = await autoTranslateText(wordsPart);
-                  rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
-                }
-              }
-              finalPrintName = rawLineText.replace(/[^\x00-\x7F]/g, "").trim() || "Item Row";
+            if (!printerDevice) {
+                printerDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'Bluetooth' }, { namePrefix: 'SRS' }, { namePrefix: 'MPT' }, { namePrefix: 'MTP' }],
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+                });
             }
+            const server = await printerDevice.gatt.connect();
+            const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+            const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
 
-            let sNo = (i + 1).toString().padEnd(3, ' ');
-            let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
-            let amtStr = cleanAmt.padStart(9, ' ');
+            const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
+            const cName = document.getElementById('custNameInput').textContent.trim() || "Cash Customer";
+
+            let esc = `\x1B\x40\x1B\x61\x01\x1B\x45\x01${shopTitle.toUpperCase()}\n\x1B\x45\x00OFFLINE COUNTER BILL\n--------------------------------\n`;
+            esc += '\x1B\x61\x00Date: ' + dateEl.textContent + ' ' + timeEl.textContent + '\nCust: ' + cName.substring(0, 22) + '\n--------------------------------\n';
+            esc += 'S.No Item                 Amount\n';
+            esc += '--------------------------------\n';
             
-            let maxNameWidth = 32 - sNo.length - amtStr.length;
+            for (let i = 0; i < validRows.length; i++) {
+                let rowItem = validRows[i];
+                let finalPrintName = "";
 
-            if (finalPrintName.length <= maxNameWidth) {
-              let paddedName = finalPrintName.padEnd(maxNameWidth, ' ');
-              esc += sNo + paddedName + amtStr + "\n";
-            } else {
-              let firstChunk = finalPrintName.substring(0, maxNameWidth);
-              esc += sNo + firstChunk + amtStr + "\n";
-              let remainingText = finalPrintName.substring(maxNameWidth);
-              while (remainingText.length > 0) {
-                let subChunk = remainingText.substring(0, 28);
-                esc += "   " + subChunk + "\n";
-                remainingText = remainingText.substring(28);
-              }
+                if (currentPrintMode === 'MULTI') {
+                    finalPrintName = rowItem.text;
+                } else {
+                    let rawLineText = rowItem.text;
+                    if (/[^\x00-\x7F]/.test(rawLineText)) {
+                        let wordsPart = rawLineText.replace(/[0-9.\s()+\-*/^]+/g, " ").trim();
+                        let mathPart = rawLineText.replace(/[^\d.\s()+\-*/^]+/g, " ").trim();
+                        
+                        if(wordsPart) {
+                            let translatedWords = await autoTranslateText(wordsPart);
+                            rawLineText = mathPart ? `${translatedWords} ${mathPart}` : translatedWords;
+                        }
+                    }
+                    finalPrintName = rawLineText.replace(/[^\x00-\x7F]/g, "").trim() || "Item Row";
+                }
+
+                let sNo = (i + 1).toString().padEnd(3, ' ');
+                let cleanAmt = rowItem.total.replace(/[₹रु]/g, 'Rs.').trim();
+                let amtStr = cleanAmt.padStart(9, ' ');
+                
+                let maxNameWidth = 32 - sNo.length - amtStr.length;
+
+                if (finalPrintName.length <= maxNameWidth) {
+                    let paddedName = finalPrintName.padEnd(maxNameWidth, ' ');
+                    esc += sNo + paddedName + amtStr + "\n";
+                } else {
+                    let firstChunk = finalPrintName.substring(0, maxNameWidth);
+                    esc += sNo + firstChunk + amtStr + "\n";
+                    let remainingText = finalPrintName.substring(maxNameWidth);
+                    while (remainingText.length > 0) {
+                        let subChunk = remainingText.substring(0, 28);
+                        esc += "   " + subChunk + "\n";
+                        remainingText = remainingText.substring(28);
+                    }
+                }
             }
-          }
-          
-          esc += "--------------------------------\n";
-          esc += `Subtotal: Rs. ${subtotalCalc.toFixed(2)}\n`;
+            
+            esc += "--------------------------------\n";
+            esc += `Subtotal: Rs. ${subtotalCalc.toFixed(2)}\n`;
 
-          const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
-          const percentVal = parseFloat(document.getElementById("percentVal") ? document.getElementById("percentVal").value : 0) || 0;
-          
-          if (percentVal > 0) {
-            let adjAmt = (subtotalCalc * percentVal) / 100;
-            if (percentType === "DISC") {
-              esc += `Discount (${percentVal}%): -Rs. ${adjAmt.toFixed(2)}\n`;
-            } else {
-              esc += `Tax/GST (${percentVal}%): +Rs. ${adjAmt.toFixed(2)}\n`;
+            const percentType = document.getElementById("percentType") ? document.getElementById("percentType").value : "DISC";
+            const percentVal = parseFloat(document.getElementById("percentVal") ? document.getElementById("percentVal").value : 0) || 0;
+            
+            if (percentVal > 0) {
+                let adjAmt = (subtotalCalc * percentVal) / 100;
+                if (percentType === "DISC") {
+                    esc += `Discount (${percentVal}%): -Rs. ${adjAmt.toFixed(2)}\n`;
+                } else {
+                    esc += `Tax/GST (${percentVal}%): +Rs. ${adjAmt.toFixed(2)}\n`;
+                }
             }
-          }
 
-          let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
-          esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
-          
-          let encoder = new TextEncoder("utf-8");
-          if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
-          
-          const data = encoder.encode(esc);
-          const chunkSize = 100;
-          for (let i = 0; i < data.length; i += chunkSize) {
-            await characteristic.writeValue(data.slice(i, i + chunkSize));
-            await new Promise(r => setTimeout(r, 50));
-          }
-          alert("Printed successfully! 🎉");
+            let finalCleanTotal = totalBox.textContent.replace(/[₹रु]/g, 'Rs.');
+            esc += "--------------------------------\n" + '\x1B\x61\x02\x1B\x45\x01NET BAL: ' + finalCleanTotal + '\n\x1B\x45\x00' + '\x1B\x61\x01\nTHANK YOU! VISIT AGAIN\n\n\n\n';
+            
+            let encoder = new TextEncoder("utf-8");
+            if (currentPrintMode === 'ENG') { encoder = new TextEncoder("ascii"); }
+            
+            const data = encoder.encode(esc);
+            const chunkSize = 100;
+            for (let i = 0; i < data.length; i += chunkSize) {
+                await characteristic.writeValue(data.slice(i, i + chunkSize));
+                await new Promise(r => setTimeout(r, 50));
+            }
+            alert("Printed successfully! 🎉");
         } catch (error) {
-          alert("Print Error: " + error.message);
-          printerDevice = null;
+            alert("Print Error: " + error.message);
+            printerDevice = null;
         }
-      };
+    };
 
-      function renderBillsHistoryList(searchFilter = "") {
+    function renderBillsHistoryList(searchFilter = "") {
         if (!dbBillsHistoryList) return;
         dbBillsHistoryList.innerHTML = "";
 
         if (savedBillsHistory.length === 0) {
-          dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
-          const summaryBox = document.getElementById("custSummaryBox");
-          if (summaryBox) summaryBox.style.display = "none";
-          return;
+            dbBillsHistoryList.innerHTML = "<div style='font-size:13px; color:var(--muted); text-align:center; padding:15px;'>Koi saved bill nahi mila.</div>";
+            const summaryBox = document.getElementById("custSummaryBox");
+            if (summaryBox) summaryBox.style.display = "none";
+            return;
         }
 
         let filteredBills = [...savedBillsHistory];
         if (searchFilter) {
-          filteredBills = filteredBills.filter(bill => 
-            (bill.custName && bill.custName.toLowerCase().includes(searchFilter)) ||
-            (bill.billCode && bill.billCode.toLowerCase().includes(searchFilter))
-          );
+            filteredBills = filteredBills.filter(bill => 
+                (bill.custName && bill.custName.toLowerCase().includes(searchFilter)) ||
+                (bill.billCode && bill.billCode.toLowerCase().includes(searchFilter))
+            );
         }
 
         const summaryBox = document.getElementById("custSummaryBox");
         if (searchFilter && filteredBills.length > 0) {
-          let grandTotalCust = 0;
-          filteredBills.forEach(b => {
-            let numericTotal = parseFloat(b.total.replace(/[₹,]/g, '')) || 0;
-            grandTotalCust += numericTotal;
-          });
-          if (summaryBox) {
-            summaryBox.style.display = "block";
-            document.getElementById("custBillCount").textContent = filteredBills.length;
-            document.getElementById("custTotalAmount").textContent = "₹" + grandTotalCust.toLocaleString('en-IN');
-          }
+            let grandTotalCust = 0;
+            filteredBills.forEach(b => {
+                let numericTotal = parseFloat(b.total.replace(/[₹,]/g, '')) || 0;
+                grandTotalCust += numericTotal;
+            });
+            if (summaryBox) {
+                summaryBox.style.display = "block";
+                document.getElementById("custBillCount").textContent = filteredBills.length;
+                document.getElementById("custTotalAmount").textContent = "₹" + grandTotalCust.toLocaleString('en-IN');
+            }
         } else {
-          if (summaryBox) summaryBox.style.display = "none";
+            if (summaryBox) summaryBox.style.display = "none";
         }
 
         if (filteredBills.length === 0) {
-          dbBillsHistoryList.innerHTML = `<div style='font-size:13px; color:#e74c3c; text-align:center; padding:15px;'>'${searchFilter}' ke naam par koi bill nahi mila.</div>`;
-          return;
+            dbBillsHistoryList.innerHTML = `<div style='font-size:13px; color:#e74c3c; text-align:center; padding:15px;'>'${searchFilter}' ke naam par koi bill nahi mila.</div>`;
+            return;
         }
 
         [...filteredBills].reverse().forEach((bill) => {
-          const actualIdx = savedBillsHistory.findIndex(b => b.billCode === bill.billCode);
-          const bRow = document.createElement("div"); bRow.className = "bill-history-row";
-          const details = document.createElement("div"); details.className = "bill-meta-details";
-          details.innerHTML = `👤 <b>${bill.custName || 'Unknown Cust'}</b> <span>Code: ${bill.billCode} | ${bill.date || ''} ${bill.time || ''} | Total: <b style="color:#e67e22;">${bill.total}</b></span>`;
+            const actualIdx = savedBillsHistory.findIndex(b => b.billCode === bill.billCode);
+            const bRow = document.createElement("div"); bRow.className = "bill-history-row";
+            const details = document.createElement("div"); details.className = "bill-meta-details";
+            details.innerHTML = `👤 <b>${bill.custName || 'Unknown Cust'}</b> <span>Code: ${bill.billCode} | ${bill.date || ''} ${bill.time || ''} | Total: <b style="color:#e67e22;">${bill.total}</b></span>`;
 
-          const actions = document.createElement("div"); actions.className = "db-item-actions";
-          const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
-          editBtn.addEventListener("click", () => {
-            document.getElementById("custNameInput").textContent = bill.custName;
-            container.innerHTML = "";
-            bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
-            window.navToBillMode(); render(); saveLiveDraft();
-          });
+            const actions = document.createElement("div"); actions.className = "db-item-actions";
+            const editBtn = document.createElement("button"); editBtn.className = "db-action-btn"; editBtn.innerHTML = "✏️";
+            editBtn.addEventListener("click", () => {
+                document.getElementById("custNameInput").textContent = bill.custName;
+                container.innerHTML = "";
+                bill.items.forEach((itemText, rIdx) => { container.appendChild(makeRow(rIdx, itemText)); });
+                window.navToBillMode(); render(); saveLiveDraft();
+            });
 
-          const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
-          deleteBtn.addEventListener("click", () => {
-            if(confirm(`Delete bill for "${bill.custName}" (${bill.billCode})?`)) {
-              if (actualIdx !== -1) {
-                savedBillsHistory.splice(actualIdx, 1);
-                localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); 
-                renderBillsHistoryList(searchFilter);
-              }
-            }
-          });
+            const deleteBtn = document.createElement("button"); deleteBtn.className = "db-action-btn"; deleteBtn.innerHTML = "❌";
+            deleteBtn.addEventListener("click", () => {
+                if(confirm(`Delete bill for "${bill.custName}" (${bill.billCode})?`)) {
+                    if (actualIdx !== -1) {
+                        savedBillsHistory.splice(actualIdx, 1);
+                        localStorage.setItem("notebook_invoice_history", JSON.stringify(savedBillsHistory)); 
+                        renderBillsHistoryList(searchFilter);
+                    }
+                }
+            });
 
-          actions.appendChild(editBtn); actions.appendChild(deleteBtn);
-          bRow.appendChild(details); bRow.appendChild(actions);
-          dbBillsHistoryList.appendChild(bRow);
+            actions.appendChild(editBtn); actions.appendChild(deleteBtn);
+            bRow.appendChild(details); bRow.appendChild(actions);
+            dbBillsHistoryList.appendChild(bRow);
         });
-      }
+    }
 
-      window.renderBillsHistoryList = renderBillsHistoryList;
+    window.renderBillsHistoryList = renderBillsHistoryList;
 
-      clearBtn.addEventListener("click", function(){
+    clearBtn.addEventListener("click", function(){
         saveCurrentSnapshot();
         container.innerHTML = ""; document.getElementById("custNameInput").textContent = "";
         const custSearchInput = document.getElementById("custSearchInput");
@@ -2068,33 +2003,42 @@ function executeComputerBrowserPrint() {
         if (percentVal) percentVal.value = "";
         localStorage.removeItem("notebook_live_draft");
         container.appendChild(makeRow(0)); render();
-      });
+    });
 
-      // App Initialization
-      restoreLiveDraftOnLoad();
-      verifyLiveStatusWithSheet(false);
+    // ✅ FIXED: App Initialization - Proper async handling
+    async function initializeApp() {
+        restoreLiveDraftOnLoad();
+        updateSubscriptionBadge();
+        
+        // Check auth status on load
+        await verifyLiveStatusWithSheet(false);
 
-      const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
-      if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
-        const undoBtn = document.getElementById("undoBtn");
-        if (undoBtn) undoBtn.style.display = "flex";
-      }
+        const savedDraft = JSON.parse(localStorage.getItem("notebook_bill_autodraft"));
+        if (savedDraft && (savedDraft.items.length > 0 || savedDraft.custName)) {
+            const undoBtn = document.getElementById("undoBtn");
+            if (undoBtn) undoBtn.style.display = "flex";
+        }
 
-      const custInputEl = document.getElementById("custNameInput");
-      if (custInputEl) {
-        custInputEl.addEventListener("input", saveLiveDraft);
-      }
+        const custInputEl = document.getElementById("custNameInput");
+        if (custInputEl) {
+            custInputEl.addEventListener("input", saveLiveDraft);
+        }
 
-      const undoBtnEl = document.getElementById("undoBtn");
-      if (undoBtnEl) {
-        undoBtnEl.addEventListener("click", window.executeSmartUndo);
-      }
+        const undoBtnEl = document.getElementById("undoBtn");
+        if (undoBtnEl) {
+            undoBtnEl.addEventListener("click", window.executeSmartUndo);
+        }
 
-      if (container.children.length === 0) {
-        container.appendChild(makeRow(0));
-      }
-      render();
-    })();
-  </script>
+        if (container.children.length === 0) {
+            container.appendChild(makeRow(0));
+        }
+        render();
+    }
+
+    // Initialize the app
+    initializeApp();
+})();
+</script>
+  
 </body>
 </html>
