@@ -542,8 +542,8 @@
     // LocalStorage se saved paper size load karein
 let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz5JBQE1lE3BjlcA-iJkk8wJxkB-EPiFW7G8sOE6TXqbs5ppRaugYjN8GtgulD0O6b/exec";
-
+/*const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz5JBQE1lE3BjlcA-iJkk8wJxkB-EPiFW7G8sOE6TXqbs5ppRaugYjN8GtgulD0O6b/exec";*/
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyNmBzBImZX5bgZoH7_HsdalYq4AODq3nqBegHmgNBcTbr-TLmQWwtLDAicJOPM89Lasw/exec";
 let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
     isVerified: false,
     email: "",
@@ -779,7 +779,7 @@ window.closeAuthModal = function() {
     const m = document.getElementById("authLockScreen");
     if (m) m.style.display = "none";
 };
-
+/*
 // ✅ FIXED: Complete requestOTP function
 // ✅ FIXED: Optimized requestOTP function
 window.requestOTP = async function() {
@@ -881,45 +881,68 @@ window.requestOTP = async function() {
 
     if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
 };
-/*
-        // 2. POST requestOTP Call (PUBLIC Variant & Origin added)
+*/
+  window.requestOTP = async function() {
+    const trapValue = document.getElementById("website_trap") ? document.getElementById("website_trap").value : "";
+    if (trapValue !== "") return;
+
+    const authEmail = document.getElementById("authEmail");
+    let emailVal = authEmail ? authEmail.value.trim().toLowerCase() : "";
+    if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
+
+    const reqBtn = document.getElementById("btnSendRequest");
+    if(reqBtn) {
+        reqBtn.innerText = "Processing...";
+        reqBtn.disabled = true;
+    }
+    
+    try {
+        let currentToken = getDeviceToken();
+        let currentOrigin = window.location.origin;
+
+        // ⚡ Direct Fast Single POST Request (No double GET fetch)
         let res = await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'cors',
             body: JSON.stringify({ 
                 action: 'requestOTP', 
                 email: emailVal,
+                token: currentToken,
                 appVariant: 'PUBLIC',
                 clientOrigin: currentOrigin
             })
-        }).then(r => r.json());
+        }).then(r => r.json()).catch(() => null);
 
-        if(res.success) {
+        if (res && res.authorized && res.status === "Active") {
+            userLicence.isVerified = true;
+            userLicence.email = emailVal;
+            userLicence.lastSyncTime = new Date().getTime();
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            updateSubscriptionBadge();
+            alert("🎉 Status Match: Active! Pro Features Unlocked.");
+            closeAuthModal();
+            location.reload();
+            return;
+        }
+
+        if(res && res.success) {
             userLicence.email = emailVal;
             localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
             document.getElementById("emailSection").style.display = 'none';
             document.getElementById("otpSection").style.display = 'block';
             document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
         } else {
-            // Native Direct Gmail App Launch Link
-            let customMailSubject = encodeURIComponent("Notebook Bill Pro - Reactivation Request");
-            let customMailBody = encodeURIComponent(`Hello Webmy Team,\nMera email ID: ${emailVal} hai. Kripya mera subscription plan approve karein.`);
-            let directGmailAppUrl = `mailto:support@webmy.in?subject=${customMailSubject}&body=${customMailBody}`;
-
-            document.getElementById("authMessage").innerHTML = `
-                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
-                    Aapka email pending hai. Fast approval ke liye direct message karein.
-                </div>
-                <a href="${directGmailAppUrl}" style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">Open Gmail App ✉️</a>
-            `;
+            alert(res ? res.message : "Network Timeout! Please try again.");
         }
     } catch(e) { 
-        alert("Network Error! Check your internet connection."); 
+        alert("Network Error! Connection reset."); 
     }
 
-    if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+    if(reqBtn) {
+        reqBtn.innerText = "Request Pro Activation 🚀";
+        reqBtn.disabled = false;
+    }
 };
-*/
+
 // ✅ FIXED: Complete verifyOTP function
 window.verifyOTP = async function() {
     const authOTP = document.getElementById("authOTP");
