@@ -542,7 +542,7 @@
     // LocalStorage se saved paper size load karein
 let currentCompPaperSize = localStorage.getItem("notebook_comp_paper_size") || "A4_HALF";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlbNFTs6j8KyC4_LNjoCRd1tPaQbrB6Hg3Bilj7WLXpJ7W4v2nrBNcNblLfC15I1fT/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz5JBQE1lE3BjlcA-iJkk8wJxkB-EPiFW7G8sOE6TXqbs5ppRaugYjN8GtgulD0O6b/exec";
 
 let userLicence = JSON.parse(localStorage.getItem("notebook_pro_licence")) || {
     isVerified: false,
@@ -781,12 +781,13 @@ window.closeAuthModal = function() {
 };
 
 // ✅ FIXED: Complete requestOTP function
+// ✅ FIXED: Optimized requestOTP function
 window.requestOTP = async function() {
     // Honeypot Spam Bot Detection Check
     const trapValue = document.getElementById("website_trap") ? document.getElementById("website_trap").value : "";
     if (trapValue !== "") {
         console.log("Spam Bot Intercepted!");
-        return; // Silent Drop for Bots
+        return;
     }
 
     const authEmail = document.getElementById("authEmail");
@@ -794,27 +795,25 @@ window.requestOTP = async function() {
     if(!emailVal || !emailVal.includes("@")) return alert('Kripya ek valid Gmail enter karein!');
 
     const reqBtn = document.getElementById("btnSendRequest");
-    if(reqBtn) reqBtn.innerText = "Checking Status & Activating...";
+    if(reqBtn) reqBtn.innerText = "Checking Status...";
     
     try {
         let currentToken = getDeviceToken();
         let currentOrigin = window.location.origin;
 
-        // 1. GET CheckAuth Call (PUBLIC Variant & Origin added)
+        // 🔥 OPTIMIZED: First check if email exists and its status
         let authCheck = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(emailVal)}&token=${encodeURIComponent(currentToken)}&appVariant=PUBLIC&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
             method: 'GET'
         }).then(r => r.json()).catch(() => null);
 
         if (authCheck && authCheck.authorized) {
+            // User is Active - Unlock features
             userLicence.isVerified = true;
             userLicence.email = emailVal;
             userLicence.lastSyncTime = new Date().getTime();
             
-            // ✅ FIXED: Save activation date
             if (authCheck.activationDate) {
                 userLicence.activatedDate = authCheck.activationDate;
-            } else if (!userLicence.activatedDate) {
-                userLicence.activatedDate = new Date().toLocaleDateString('en-IN');
             }
             
             localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
@@ -825,6 +824,63 @@ window.requestOTP = async function() {
             location.reload();
             return;
         }
+
+        // 🔥 Check if email exists but is Denied
+        if (authCheck && authCheck.status === "Denied") {
+            document.getElementById("authMessage").innerHTML = `
+                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+                    ⏳ Aapka email pehle se registered hai aur approval pending hai.<br><br>
+                    <b>Kripya wait karein</b> ya fast approval ke liye direct message karein.
+                </div>
+                <a href="mailto:support@webmy.in?subject=${encodeURIComponent('Notebook Bill Pro - Reactivation Request')}&body=${encodeURIComponent('Hello Webmy Team,\nMera email ID: ' + emailVal + ' hai. Kripya mera subscription plan approve karein.')}" 
+                   style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">
+                    Open Gmail App ✉️
+                </a>
+            `;
+            if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+            return;
+        }
+
+        // 🔥 New user - Send OTP
+        let res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ 
+                action: 'requestOTP', 
+                email: emailVal,
+                appVariant: 'PUBLIC',
+                clientOrigin: currentOrigin
+            })
+        }).then(r => r.json());
+
+        if(res.success) {
+            userLicence.email = emailVal;
+            localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+            document.getElementById("emailSection").style.display = 'none';
+            document.getElementById("otpSection").style.display = 'block';
+            document.getElementById("authMessage").innerHTML = `6-digit access OTP sent to: <b>${emailVal}</b>`;
+        } else if (res.exists && res.status === "Denied") {
+            // Already exists and Denied
+            document.getElementById("authMessage").innerHTML = `
+                <div style="background: rgba(243, 156, 18, 0.15); border: 2px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;">
+                    ⏳ Aapka email pehle se registered hai aur approval pending hai.<br><br>
+                    <b>Kripya wait karein</b> ya fast approval ke liye direct message karein.
+                </div>
+                <a href="mailto:support@webmy.in?subject=${encodeURIComponent('Notebook Bill Pro - Reactivation Request')}&body=${encodeURIComponent('Hello Webmy Team,\nMera email ID: ' + emailVal + ' hai. Kripya mera subscription plan approve karein.')}" 
+                   style="text-decoration: none; color: white; background: #e67e22; display: flex; height: 40px; font-size: 13px; align-items: center; justify-content: center; font-weight: bold; border-radius: 6px;">
+                    Open Gmail App ✉️
+                </a>
+            `;
+        } else {
+            alert(res.message || "Error processing request");
+        }
+    } catch(e) { 
+        console.error("Request error:", e);
+        alert("Network Error! Check your internet connection."); 
+    }
+
+    if(reqBtn) reqBtn.innerText = "Request Pro Activation 🚀";
+};
 
         // 2. POST requestOTP Call (PUBLIC Variant & Origin added)
         let res = await fetch(SCRIPT_URL, {
