@@ -471,7 +471,7 @@
       localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
       return true;
     }
-
+/*
           async function verifyLiveStatusWithSheet(forceRefresh = false) {
       if (!verifyClockIntegrity()) return false;
 
@@ -527,6 +527,85 @@
           } catch (e) { return userLicence.isVerified; }
         }
       }
+*/
+                async function verifyLiveStatusWithSheet(forceRefresh = false) {
+      if (!verifyClockIntegrity()) return false;
+
+      let now = new Date().getTime();
+      let fourHours = 4 * 60 * 60 * 1000; // 4 Hours Normal Sync Interval
+      let maxOfflineLimit = 3 * 24 * 60 * 60 * 1000; // 3 Days Hard Offline Limit
+
+      if (!userLicence.email) return false;
+
+      // 🚨 CHECK 1: Agar 3 din se internet connect nahi hua hai, toh OFF LINE LOCK lagao
+      if (userLicence.lastSyncTime && (now - userLicence.lastSyncTime) > maxOfflineLimit) {
+        userLicence.isVerified = false;
+        localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+        alert("🚫 OFFLINE SECURITY LOCK!\n\nAapka device 3 din se internet se connect nahi hua hai.\nApp chalane ke liye kripya Internet/WiFi connect karke status sync karein.");
+
+        const authLockScreen = document.getElementById("authLockScreen");
+        if (authLockScreen) authLockScreen.style.display = "flex";
+        return false;
+      }
+
+      // 🌐 CHECK 2: Online Sync Logic (Har 4 ghante mein ya force refresh par)
+      if (forceRefresh || !userLicence.lastSyncTime || (now - userLicence.lastSyncTime) > fourHours) {
+        if (navigator.onLine) {
+          try {
+            let currentToken = getDeviceToken();
+            let currentOrigin = window.location.origin;
+
+            let res = await fetch(`${SCRIPT_URL}?action=checkAuth&email=${encodeURIComponent(userLicence.email)}&token=${encodeURIComponent(currentToken)}&appVariant=STAFF&clientOrigin=${encodeURIComponent(currentOrigin)}`, {
+              method: 'GET'
+            }).then(r => r.json()).catch(() => null);
+
+            // App Variant Mismatch Block
+            if (res && res.status === "VariantMismatch") {
+              userLicence.isVerified = false;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+              
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+
+            // Status Match Check
+            if (res && res.authorized) {
+              userLicence.isVerified = true;
+              userLicence.isTampered = false;
+              userLicence.lastSyncTime = now; // 👈 Live sync hone par timer reset ho gaya
+              if (res.activationDate) userLicence.activatedDate = res.activationDate;
+              
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "none";
+              return true;
+            } else {
+              userLicence.isVerified = false;
+              userLicence.lastSyncTime = now;
+              localStorage.setItem("notebook_pro_licence", JSON.stringify(userLicence));
+
+              const authLockScreen = document.getElementById("authLockScreen");
+              if (authLockScreen) authLockScreen.style.display = "flex";
+              return false;
+            }
+          } catch (e) { 
+            // Network error par offline state check hoga
+          }
+        }
+      }
+
+      // Local State & Blur Lock Enforcement
+      const authLockScreen = document.getElementById("authLockScreen");
+      if (!userLicence.isVerified) {
+        if (authLockScreen) authLockScreen.style.display = "flex";
+      } else {
+        if (authLockScreen) authLockScreen.style.display = "none";
+      }
+      return userLicence.isVerified;
+    }
 
       // Local State Check
       const authLockScreen = document.getElementById("authLockScreen");
