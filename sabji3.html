@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>अपना गांव डिजिटल डायरेक्टरी | लोकल सेवाएं और दुकानें</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="अपने गांव की सभी आवश्यक सेवाएं - ऑटो, ट्रैक्टर, डॉक्टर, इलेक्ट्रीशियन, फल-सब्जी, सीएससी केंद्र और खास ऑफर्स। सीधे कॉल और व्हाट्सएप करें।">
+    <meta name="keywords" content="गांव डायरेक्टरी, लोकल मिस्त्री, ऑटो बुकिंग, डॉक्टर संपर्क, गांव की दुकान, ऑफर्स">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="अपना गांव डिजिटल डायरेक्टरी">
+    <meta property="og:description" content="लोकल दुकानें और मिस्त्री - सीधे कॉल और व्हाट्सएप पर संपर्क करें।">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(4deg); }
+        }
+        .float-anim { animation: floatEmoji 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- 1. ANIMATED WELCOME SCREEN (SPLASH LANDING) -->
+    <div id="welcomeScreen" class="fixed inset-0 bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 z-50 flex flex-col justify-between p-6 text-white text-center transition-opacity duration-500">
+        
+        <!-- Top Lang Switcher -->
+        <div class="flex justify-end">
+            <select onchange="changeLanguage(this.value)" class="bg-white/10 text-white border border-white/20 text-xs rounded-full px-3 py-1 font-bold focus:outline-none backdrop-blur-md">
+                <option value="hi" class="text-gray-900" selected>हिंदी</option>
+                <option value="hinglish" class="text-gray-900">Hinglish</option>
+                <option value="en" class="text-gray-900">English</option>
+            </select>
+        </div>
+
+        <!-- Center Hero Content -->
+        <div class="space-y-5 my-auto">
+            <!-- 4 Floating Emojis -->
+            <div class="flex justify-center gap-3 text-4xl float-anim">
+                <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🚜</span>
+                <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🩺</span>
+                <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🥦</span>
+                <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🔌</span>
+            </div>
+
+            <div class="space-y-2">
+                <h1 class="text-2xl font-extrabold tracking-tight" data-i18n="welcomeHeading">
+                    🏪 अपना गांव डिजिटल डायरेक्टरी
+                </h1>
+                <p class="text-xs text-indigo-200 max-w-xs mx-auto leading-relaxed" data-i18n="welcomeSub">
+                    गांव और कस्बे की सभी दुकानें, मिस्त्री, डॉक्टर और वाहन - अब सब कुछ आपकी उंगलियों पर!
+                </p>
+            </div>
+
+            <!-- Features Highlights Pills -->
+            <div class="flex flex-wrap justify-center gap-2 pt-2 text-[11px] text-indigo-100 font-semibold">
+                <span class="bg-indigo-700/60 border border-indigo-400/30 px-3 py-1 rounded-full">📞 Direct Call</span>
+                <span class="bg-indigo-700/60 border border-indigo-400/30 px-3 py-1 rounded-full">💬 WhatsApp Order</span>
+                <span class="bg-indigo-700/60 border border-indigo-400/30 px-3 py-1 rounded-full">⚡ Daily Offers</span>
+            </div>
+        </div>
+
+        <!-- Bottom Start Button -->
+        <div class="space-y-3 pb-4">
+            <button onclick="startApp()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+                <span data-i18n="startNowBtn">🚀 शुरू करें (Start Now)</span>
+            </button>
+            <p class="text-[10px] text-indigo-300">100% Free & Local Village Network</p>
+        </div>
+    </div>
+
+    <!-- 2. MAIN DIRECTORY HOMEPAGE (FADES IN AFTER START NOW) -->
+    <div id="mainApp" class="hidden flex-col min-h-screen pb-20">
+
+        <!-- Sticky Header -->
+        <header class="bg-indigo-700 text-white p-3 shadow-md sticky top-0 z-40">
+            <div class="max-w-md mx-auto flex justify-between items-center">
+                <h1 class="font-bold text-base flex items-center gap-1 cursor-pointer" onclick="location.reload()">
+                    🏪 <span data-i18n="appTitle">अपना गांव डायरेक्टरी</span>
+                </h1>
+                
+                <div class="flex items-center gap-1.5">
+                    <select id="mainLangSelect" onchange="changeLanguage(this.value)" class="bg-indigo-800 text-white text-[11px] font-bold border border-indigo-400 rounded-full px-2 py-1 focus:outline-none">
+                        <option value="hi">हिंदी</option>
+                        <option value="hinglish">Hinglish</option>
+                        <option value="en">English</option>
+                    </select>
+
+                    <button onclick="shareWebsite()" class="text-xs bg-indigo-800 hover:bg-indigo-900 border border-indigo-400 px-2 py-1 rounded-full font-bold">
+                        📢 <span data-i18n="share">शेयर</span>
+                    </button>
+                    <button onclick="openVendorPortal()" class="text-xs bg-amber-400 hover:bg-amber-500 text-slate-900 border border-amber-300 px-2.5 py-1 rounded-full font-bold shadow-sm">
+                        💼 <span data-i18n="vendorBtn">दुकानदार</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Feed -->
+        <main class="max-w-md mx-auto p-3 flex-1 w-full space-y-3">
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="🔍 सेवा, नाम या दुकान खोजें..." 
+                       class="w-full bg-white border border-gray-300 pl-3 pr-8 py-2 rounded-xl text-xs font-semibold shadow-sm focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- Category Filter Bar -->
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1" data-i18n="selectCategory">श्रेणी चुनें:</p>
+                <div id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+            </div>
+
+            <!-- Location Filter Bar -->
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1" data-i18n="selectLocation">स्थान चुनें:</p>
+                <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
+            </div>
+
+            <!-- Feed -->
+            <div id="feed" class="space-y-3">
+                <p class="text-center text-gray-500 text-xs py-8" data-i18n="loading">लोड हो रहा है...</p>
+            </div>
+
+            <!-- SPECIAL OFFER ADVERTISEMENT CAROUSEL -->
+            <div class="pt-4 pb-2">
+                <div class="flex justify-between items-center mb-1.5 px-1">
+                    <span class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider flex items-center gap-1" data-i18n="offerHeading">🔥 विशेष ऑफर और विज्ञापन</span>
+                    <span class="text-[9px] text-gray-400 font-semibold" data-i18n="autoSlide">ऑटो स्लाइड ⏳</span>
+                </div>
+
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-100 via-orange-50 to-yellow-100 border-2 border-amber-300 shadow-md p-1">
+                    <div id="adSlider" class="flex transition-transform duration-700 ease-in-out"></div>
+                    <div id="sliderDots" class="flex justify-center gap-1.5 pt-2 pb-1"></div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Sticky Bottom Footer Navigation -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-slate-900 text-gray-300 text-[11px] py-2 px-3 border-t border-slate-700 z-40">
+            <div class="max-w-md mx-auto flex justify-around items-center font-semibold text-indigo-300">
+                <button onclick="toggleModal('helpModal')" class="hover:text-white" data-i18n="help">❓ मदद</button>
+                <button onclick="toggleModal('privacyModal')" class="hover:text-white" data-i18n="privacy">प्राइवेसी</button>
+                <button onclick="toggleModal('termsModal')" class="hover:text-white" data-i18n="terms">नियम</button>
+                <button onclick="toggleModal('disclaimerModal')" class="hover:text-white" data-i18n="disclaimer">डिस्क्लेमर</button>
+                <button onclick="shareWebsite()" class="bg-indigo-600 text-white px-2.5 py-0.5 rounded-full text-[10px]" data-i18n="shareApp">📢 शेयर ऐप</button>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MODAL 1: HELP -->
+    <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-700" data-i18n="helpTitle">❓ मदद और जानकारी</h3>
+                <button onclick="toggleModal('helpModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl space-y-1">
+                    <p class="font-bold text-amber-900" data-i18n="howToAdTitle">📢 विज्ञापन कैसे लगाएं?</p>
+                    <p class="text-gray-700 text-[11px]" data-i18n="howToAdDesc">नीचे ऑफर बॉक्स पर क्लिक करके ईमेल द्वारा अपना बैनर भेजें।</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: VENDOR PORTAL -->
+    <div id="vendorModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-700" data-i18n="vendorPanelTitle">💼 दुकानदार पैनल</h3>
+                <button onclick="toggleModal('vendorModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+
+            <!-- REGISTRATION & LOGIN BOX -->
+            <div id="regBox" class="space-y-2">
+                <input type="text" id="botField" class="hidden" tabindex="-1" autocomplete="off">
+
+                <p class="text-xs font-bold text-gray-700" data-i18n="regTitle">दुकान / सेवा रजिस्ट्रेशन करें:</p>
+                <input type="text" id="regName" placeholder="आपका नाम (e.g. Ramesh)" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regShop" placeholder="दुकान या सेवा का नाम" class="w-full border p-2 rounded-lg text-xs">
+                <input type="tel" id="regPhone" maxlength="10" placeholder="10 अंकों का व्हाट्सएप नंबर" class="w-full border p-2 rounded-lg text-xs">
+                <input type="text" id="regLoc" placeholder="स्थान / चौक का नाम" class="w-full border p-2 rounded-lg text-xs">
+                
+                <button onclick="registerVendor()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs" data-i18n="registerBtn">रजिस्टर करें</button>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded-lg font-bold text-xs" data-i18n="checkStatusBtn">🔄 अप्रूवल स्टेटस चेक करें</button>
+            </div>
+
+            <!-- WAITING FOR APPROVAL -->
+            <div id="waitBox" class="hidden text-center space-y-3 py-4">
+                <div class="text-3xl">⏳</div>
+                <h4 class="font-bold text-sm text-amber-600" data-i18n="pendingTitle">कृपया प्रतीक्षा करें... अप्रूवल पेंडिंग है!</h4>
+                <p class="text-[11px] text-gray-500" data-i18n="pendingDesc">आपकी डिटेल्स एडमिन को भेज दी गई हैं। एक्टिव होते ही आप सेवा जोड़ सकेंगे।</p>
+                <button onclick="checkApprovalStatus()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs" data-i18n="recheckBtn">🔄 स्टेटस पुनः चेक करें</button>
+            </div>
+
+            <!-- APPROVED DASHBOARD -->
+            <div id="dashboardBox" class="hidden space-y-3">
+                <div class="flex justify-between items-center bg-indigo-50 p-2 rounded-xl border border-indigo-200">
+                    <div>
+                        <p class="text-[10px] text-gray-500" data-i18n="welcome">नमस्ते,</p>
+                        <h4 id="vendorWelcomeName" class="font-bold text-xs text-indigo-800">Vendor</h4>
+                    </div>
+                    <button onclick="vendorLogout()" class="text-[10px] bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg" data-i18n="logout">लॉगआउट</button>
+                </div>
+
+                <div class="border p-2.5 rounded-xl space-y-2 bg-slate-50">
+                    <p id="formTitle" class="text-[11px] font-bold text-gray-600" data-i18n="addCardTitle">➕ सेवा कार्ड जोड़ें (अधिकतम 3):</p>
+                    <input type="hidden" id="editingItemId" value="">
+                    
+                    <select id="catSelect" onchange="handleCategoryChange()" class="w-full border p-2 rounded-lg text-xs bg-white font-bold text-gray-700">
+                        <option value="Auto Booking">🛺 Auto Booking</option>
+                        <option value="Marriage/Tour Vehicle">🚘 Vehicle (Tour/JCB/Tractor)</option>
+                        <option value="Medical Clinics">🩺 Medical Clinic / Ayurvedic</option>
+                        <option value="Cake / Sweets">🍰 Cake & Bakery Shops</option>
+                        <option value="Hotels / Resto">🏨 Hotels & Fast Food</option>
+                        <option value="General Shop">🛒 Grocery / Hardware Shop</option>
+                        <option value="Photocopy / CSC">🖨️ Photocopy & CSC Center</option>
+                        <option value="Vegetables & Fruits">🥦 Fruits & Vegetables</option>
+                        <option value="Room Rent / Real Estate">🏠 Room Rent & Real Estate</option>
+                        <option value="Plumber & Electrician">🔌 Electrician & Plumber</option>
+                        <option value="Repairing Services">🛠️ Repairing (AC/Fridge)</option>
+                        <option value="OTHER">✨ Other (अन्य पेशा)</option>
+                    </select>
+
+                    <input type="text" id="customCat" placeholder="अपना पेशा लिखें" class="hidden w-full border p-2 rounded-lg text-xs bg-white">
+                    <input type="text" id="serviceTitle" placeholder="सेवा का शीर्षक (e.g. 24x7 प्लंबर सेवा)" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    
+                    <input type="text" id="serviceAnnouncement" placeholder="⚡ आज का ऑफर या नोटिस (e.g. 10% छूट / दुकान खुली है)" class="w-full border border-amber-300 bg-amber-50/40 p-2 rounded-lg text-xs font-semibold text-amber-900">
+
+                    <input type="text" id="imgUrl" placeholder="Pinterest फ़ोटो लिंक" class="w-full border p-2 rounded-lg text-xs bg-white">
+                    <textarea id="serviceDetails" placeholder="सेवा की पूरी जानकारी" class="w-full border p-2 rounded-lg text-xs bg-white h-14"></textarea>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-300 text-gray-700 py-2 rounded-lg font-bold text-xs" data-i18n="cancel">रद्द करें</button>
+                        <button onclick="saveOrUpdateProduct()" id="saveBtn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-xs" data-i18n="saveCard">कार्ड सेव करें</button>
+                    </div>
+                </div>
+
+                <p class="text-[11px] font-bold text-gray-500" data-i18n="myServices">आपकी सक्रिय सेवाएं:</p>
+                <div id="myProductsList" class="space-y-2 max-h-40 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS: LEGAL PAGES -->
+    <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="privacy">प्राइवेसी पॉलिसी</h3>
+            <p class="text-gray-600" data-i18n="privacyDesc">हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं।</p>
+            <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2" data-i18n="close">बंद करें</button>
+        </div>
+    </div>
+
+    <div id="termsModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="terms">नियम और शर्तें</h3>
+            <p class="text-gray-600" data-i18n="termsDesc">लिस्टिंग स्थानीय विक्रेताओं द्वारा प्रबंधित की जाती है।</p>
+            <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2" data-i18n="close">बंद करें</button>
+        </div>
+    </div>
+
+    <div id="disclaimerModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
+            <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="disclaimer">डिस्क्लेमर</h3>
+            <p class="text-gray-600" data-i18n="disclaimerDesc">यह ऐप केवल ग्राहकों को स्थानीय विक्रेताओं से जोड़ने का माध्यम है।</p>
+            <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2" data-i18n="close">बंद करें</button>
+        </div>
+    </div>
+
+    <!-- JS Application Engine -->
+    <script>
+        const SCRIPT_URL = "YOUR_EXACT_DEPLOYED_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+        const OWNER_GMAIL = "youremail@gmail.com";
+
+        let currentLang = "hi";
+        let allData = [];
+        let selectedCategory = "ALL";
+        let selectedLocation = "ALL";
+        let activeVendorData = null;
+        let currentSlideIndex = 0;
+        let slideTimer = null;
+
+        // MULTI-LANGUAGE TRANSLATION OBJECT (HINDI, HINGLISH, ENGLISH)
+        const i18n = {
+            hi: {
+                welcomeHeading: "🏪 अपना गांव डिजिटल डायरेक्टरी",
+                welcomeSub: "गांव और कस्बे की सभी दुकानें, मिस्त्री, डॉक्टर और वाहन - अब सब कुछ आपकी उंगलियों पर!",
+                startNowBtn: "🚀 शुरू करें (Start Now)",
+                appTitle: "अपना गांव डायरेक्टरी",
+                share: "शेयर",
+                vendorBtn: "दुकानदार",
+                selectCategory: "श्रेणी चुनें:",
+                selectLocation: "स्थान चुनें:",
+                allCategories: "✨ सभी श्रेणियां",
+                allLocations: "📍 सभी स्थान",
+                loading: "लोड हो रहा है...",
+                noService: "कोई सेवा नहीं मिली।",
+                offerHeading: "🔥 विशेष ऑफर और विज्ञापन",
+                autoSlide: "ऑटो स्लाइड ⏳",
+                help: "❓ मदद",
+                privacy: "प्राइवेसी",
+                terms: "नियम",
+                disclaimer: "डिस्क्लेमर",
+                shareApp: "📢 शेयर ऐप",
+                callNow: "📞 कॉल करें",
+                whatsapp: "💬 व्हाट्सएप",
+                helpTitle: "❓ मदद और जानकारी",
+                howToAdTitle: "📢 विज्ञापन कैसे लगाएं?",
+                howToAdDesc: "नीचे ऑफर बॉक्स पर क्लिक करके ईमेल द्वारा अपना बैनर भेजें।",
+                vendorPanelTitle: "💼 दुकानदार पैनल",
+                regTitle: "दुकान / सेवा रजिस्ट्रेशन करें:",
+                registerBtn: "रजिस्टर करें",
+                checkStatusBtn: "🔄 अप्रूवल स्टेटस चेक करें",
+                pendingTitle: "कृपया प्रतीक्षा करें... अप्रूवल पेंडिंग है!",
+                pendingDesc: "आपकी डिटेल्स एडमिन को भेज दी गई हैं। एक्टिव होते ही आप सेवा जोड़ सकेंगे।",
+                recheckBtn: "🔄 स्टेटस पुनः चेक करें",
+                welcome: "नमस्ते,",
+                logout: "लॉगआउट",
+                addCardTitle: "➕ सेवा कार्ड जोड़ें (अधिकतम 3):",
+                saveCard: "कार्ड सेव करें",
+                cancel: "रद्द करें",
+                myServices: "आपकी सक्रिय सेवाएं:",
+                privacyDesc: "हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं।",
+                termsDesc: "लिस्टिंग स्थानीय विक्रेताओं द्वारा प्रबंधित की जाती है।",
+                disclaimerDesc: "यह ऐप केवल ग्राहकों को स्थानीय विक्रेताओं से जोड़ने का माध्यम है।",
+                close: "बंद करें",
+                searchPlaceholder: "🔍 सेवा, नाम या दुकान खोजें..."
+            },
+            hinglish: {
+                welcomeHeading: "🏪 Apna Gao Digital Directory",
+                welcomeSub: "Gao aur town ki sabhi dukanein, mistri, doctor aur vehicles - ab sab kuch mobile par!",
+                startNowBtn: "🚀 Start Now (Shuru Karein)",
+                appTitle: "Apna Gao Directory",
+                share: "Share",
+                vendorBtn: "Vendor",
+                selectCategory: "Category Select Karein:",
+                selectLocation: "Location Select Karein:",
+                allCategories: "✨ Sabhi Categories",
+                allLocations: "📍 Sabhi Locations",
+                loading: "Loading ho raha hai...",
+                noService: "Koi service nahi mili.",
+                offerHeading: "🔥 Special Offers & Ads",
+                autoSlide: "Auto Slide ⏳",
+                help: "❓ Help",
+                privacy: "Privacy",
+                terms: "Terms",
+                disclaimer: "Disclaimer",
+                shareApp: "📢 Share App",
+                callNow: "📞 Call Karein",
+                whatsapp: "💬 WhatsApp",
+                helpTitle: "❓ Help & Info",
+                howToAdTitle: "📢 Ad Kaise Lagayein?",
+                howToAdDesc: "Niche offer box par click karke email se banner bhejein.",
+                vendorPanelTitle: "💼 Vendor Panel",
+                regTitle: "Shop / Service Registration Karein:",
+                registerBtn: "Register Karein",
+                checkStatusBtn: "🔄 Check Approval Status",
+                pendingTitle: "Please Wait... Approval Pending Hai!",
+                pendingDesc: "Aapki details admin ko bhej di gayi hain. Active hote hi aap service add kar payenge.",
+                recheckBtn: "🔄 Re-Check Status",
+                welcome: "Welcome,",
+                logout: "Logout",
+                addCardTitle: "➕ Service Card Add Karein (Max 3):",
+                saveCard: "Save Service Card",
+                cancel: "Cancel",
+                myServices: "Aapki Active Services:",
+                privacyDesc: "Hum aapka koi personal data trace nahi karte.",
+                termsDesc: "Listings local vendors dwara manage ki jaati hain.",
+                disclaimerDesc: "Ye app direct connection ke liye ek open directory hai.",
+                close: "Close",
+                searchPlaceholder: "🔍 Service, Name ya Shop khojein..."
+            },
+            en: {
+                welcomeHeading: "🏪 Local Village Digital Directory",
+                welcomeSub: "All local village shops, mechanics, doctors & transport services - right on your mobile!",
+                startNowBtn: "🚀 Start Now",
+                appTitle: "Village Directory",
+                share: "Share",
+                vendorBtn: "Vendor",
+                selectCategory: "Select Category:",
+                selectLocation: "Select Location:",
+                allCategories: "✨ All Categories",
+                allLocations: "📍 All Locations",
+                loading: "Loading...",
+                noService: "No services found.",
+                offerHeading: "🔥 Special Offers & Ads",
+                autoSlide: "Auto Slide ⏳",
+                help: "❓ Help",
+                privacy: "Privacy",
+                terms: "Terms",
+                disclaimer: "Disclaimer",
+                shareApp: "📢 Share App",
+                callNow: "📞 Call Now",
+                whatsapp: "💬 WhatsApp",
+                helpTitle: "❓ Help & Information",
+                howToAdTitle: "📢 How to post Ads?",
+                howToAdDesc: "Click the offer box below to email your banner.",
+                vendorPanelTitle: "💼 Vendor Portal",
+                regTitle: "Shop / Service Registration:",
+                registerBtn: "Register Now",
+                checkStatusBtn: "🔄 Check Status",
+                pendingTitle: "Please Wait... Approval Pending!",
+                pendingDesc: "Your details are submitted to admin. You can add services once approved.",
+                recheckBtn: "🔄 Re-Check Status",
+                welcome: "Welcome,",
+                logout: "Logout",
+                addCardTitle: "➕ Add Service Card (Max 3):",
+                saveCard: "Save Service",
+                cancel: "Cancel",
+                myServices: "Your Active Listings:",
+                privacyDesc: "We do not track your personal data.",
+                termsDesc: "Listings are managed directly by local vendors.",
+                disclaimerDesc: "This platform is an open directory to connect customers.",
+                close: "Close",
+                searchPlaceholder: "🔍 Search services, names or shops..."
+            }
+        };
+
+        // Welcome Screen Start Button Action
+        function startApp() {
+            const welcome = document.getElementById('welcomeScreen');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('flex');
+            }, 400);
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
+            document.getElementById('searchInput').placeholder = i18n[lang].searchPlaceholder;
+            document.getElementById('mainLangSelect').value = lang;
+            renderTabs();
+            applyFilters();
+        }
+
+        // DEMO DATA
+        const demoData = [
+            {
+                itemId: "L01",
+                category: "Vegetables & Fruits",
+                title: "Ramesh Fresh Sabji Bhandar",
+                imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80",
+                details: "Taaza sabjiyan aur fal uplabdh hain. Direct WhatsApp order karein.",
+                announcement: "⚡ Aaj Sham 7 Baje Tak Sabhi Sabjiyon Par 10% Discount!",
+                vendor: { name: "Ramesh Kumar", shop: "Ramesh Veg", phone: "919876543210", location: "Main Chowk" },
+                updatedAt: "18/08/2026"
+            },
+            {
+                itemId: "L02",
+                category: "Marriage/Tour Vehicle",
+                title: "Suresh JCB & Tractor Service",
+                imageUrl: "https://images.unsplash.com/photo-1579412690850-bd41cd0af397?auto=format&fit=crop&w=600&q=80",
+                details: "Mitti bharai aur jutai ke liye Tractor aur JCB uplabdh.",
+                announcement: "📢 Kal Subah Khali Tractor Mandi Se Gaon Jayega.",
+                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
+                updatedAt: "18/08/2026"
+            }
+        ];
+
+        function getDeviceToken() {
+            let token = localStorage.getItem("dev_token");
+            if (!token) {
+                token = "dev_" + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem("dev_token", token);
+            }
+            return token;
+        }
+
+        async function loadData() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+                renderAdCarousel([]);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getData`);
+                allData = await res.json();
+                renderTabs();
+                renderCards(allData.filter(i => i.category !== "ADVERTISEMENT"));
+                renderAdCarousel(allData.filter(i => i.category === "ADVERTISEMENT"));
+            } catch(e) {
+                allData = demoData;
+                renderTabs();
+                renderCards(allData);
+                renderAdCarousel([]);
+            }
+        }
+
+        function renderTabs() {
+            const catContainer = document.getElementById('categoryTabs');
+            const categories = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.category))];
+            catContainer.innerHTML = '';
+            categories.forEach(cat => {
+                const isSelected = selectedCategory === cat;
+                const activeClasses = isSelected ? "bg-indigo-700 text-white border-indigo-700" : "bg-white text-gray-600 border-gray-200";
+                const label = cat === "ALL" ? i18n[currentLang].allCategories : cat;
+                catContainer.innerHTML += `<button onclick="selectCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${label}</button>`;
+            });
+
+            const locContainer = document.getElementById('locationTabs');
+            const locations = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.vendor.location))];
+            locContainer.innerHTML = '';
+            locations.forEach(loc => {
+                const isSelected = selectedLocation === loc;
+                const activeClasses = isSelected ? "bg-emerald-700 text-white border-emerald-700" : "bg-white text-gray-600 border-gray-200";
+                const label = loc === "ALL" ? i18n[currentLang].allLocations : `📍 ${loc}`;
+                locContainer.innerHTML += `<button onclick="selectLocation('${loc}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border ${activeClasses}">${label}</button>`;
+            });
+        }
+
+        function selectCategory(cat) { selectedCategory = cat; renderTabs(); applyFilters(); }
+        function selectLocation(loc) { selectedLocation = loc; renderTabs(); applyFilters(); }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = allData.filter(i => i.category !== "ADVERTISEMENT");
+
+            if (selectedCategory !== "ALL") filtered = filtered.filter(i => i.category === selectedCategory);
+            if (selectedLocation !== "ALL") filtered = filtered.filter(i => i.vendor.location === selectedLocation);
+            
+            if (query.trim() !== "") {
+                filtered = filtered.filter(i => 
+                    i.title.toLowerCase().includes(query) || 
+                    i.details.toLowerCase().includes(query) || 
+                    i.category.toLowerCase().includes(query) ||
+                    i.vendor.name.toLowerCase().includes(query)
+                );
+            }
+            renderCards(filtered);
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('feed');
+            container.innerHTML = '';
+
+            if(data.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 text-xs py-8">${i18n[currentLang].noService}</p>`;
+                return;
+            }
+
+            data.forEach((item) => {
+                let announcementBadge = '';
+                if(item.announcement && item.announcement.trim() !== "") {
+                    announcementBadge = `
+                        <div class="bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                            <span>⚡</span>
+                            <span class="truncate">${item.announcement}</span>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden space-y-0">
+                        <div class="p-2.5 bg-slate-50 border-b flex justify-between items-center text-xs">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${item.category}</span>
+                                <h4 class="font-bold text-gray-800 mt-1">${item.title}</h4>
+                                <p class="text-[10px] text-gray-500">📍 ${item.vendor.location} (${item.vendor.name})</p>
+                            </div>
+                            <span class="text-[9px] text-gray-400">🕒 ${item.updatedAt}</span>
+                        </div>
+
+                        <img src="${item.imageUrl}" class="w-full h-44 object-cover bg-gray-100" alt="Photo">
+
+                        <div class="p-3 space-y-2.5">
+                            ${announcementBadge}
+                            <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
+                            <div class="flex gap-2 pt-1 border-t">
+                                <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
+                                    ${i18n[currentLang].callNow}
+                                </a>
+                                <button onclick="contactWhatsApp('${item.vendor.phone}', '${item.title}', '${item.category}')" 
+                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
+                                    ${i18n[currentLang].whatsapp}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function contactWhatsApp(phone, title, category) {
+            const msg = `Namaste! Maine Apna Gao Directory par aapka *${title}* (${category}) card dekha.%0A%0AMujhe jankari chahiye.`;
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+
+        // CAROUSEL ADS
+        function renderAdCarousel(adList) {
+            const sliderContainer = document.getElementById('adSlider');
+            const dotsContainer = document.getElementById('sliderDots');
+            sliderContainer.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            let cardsToRender = adList;
+            if (!adList || adList.length === 0) {
+                cardsToRender = [
+                    { type: 'DEFAULT', text: "📢 Click Now to Display Your Special Offer Advertisement (Card 1)" },
+                    { type: 'DEFAULT', text: "🎉 Festival Offer / Discount Viral Karein Apne Gao Me (Card 2)" },
+                    { type: 'DEFAULT', text: "📞 Direct Customer Connection - Click Here to Email Us (Card 3)" }
+                ];
+            }
+
+            cardsToRender.forEach((ad, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = "w-full shrink-0 px-1";
+
+                if (ad.type === 'DEFAULT') {
+                    cardDiv.innerHTML = `
+                        <div onclick="openGmailForAd()" class="cursor-pointer bg-white/90 hover:bg-white border border-amber-200 p-3 rounded-2xl flex items-center justify-between text-left shadow-sm active:scale-95 transition">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🎁</span>
+                                <div>
+                                    <p class="font-bold text-xs text-amber-900 leading-tight">${ad.text}</p>
+                                    <p class="text-[10px] text-amber-600 mt-0.5">📩 Tap to Email Image</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-500 text-white font-bold text-[10px] px-2.5 py-1 rounded-full whitespace-nowrap">Email Ad</span>
+                        </div>
+                    `;
+                } else {
+                    cardDiv.innerHTML = `
+                        <div onclick="openAdWhatsApp('${ad.vendor.phone}', '${ad.title}')" class="cursor-pointer bg-white border border-amber-300 rounded-2xl overflow-hidden shadow-sm active:scale-95 transition">
+                            <div class="relative">
+                                <img src="${ad.imageUrl}" class="w-full h-28 object-cover" alt="Offer Ad">
+                                <span class="absolute top-1.5 left-1.5 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">OFFER</span>
+                            </div>
+                            <div class="p-2 flex justify-between items-center bg-amber-50/50">
+                                <h5 class="font-bold text-xs text-gray-800 truncate">${ad.title}</h5>
+                                <button class="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-xl">Claim</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                sliderContainer.appendChild(cardDiv);
+                dotsContainer.innerHTML += `<span class="w-2 h-2 rounded-full ${index === 0 ? 'bg-amber-500' : 'bg-amber-200'} transition-all"></span>`;
+            });
+
+            startAutoSlide(cardsToRender.length);
+        }
+
+        function startAutoSlide(totalSlides) {
+            if (slideTimer) clearInterval(slideTimer);
+            if (totalSlides <= 1) return;
+            currentSlideIndex = 0;
+            slideTimer = setInterval(() => {
+                currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+                const slider = document.getElementById('adSlider');
+                slider.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+                const dots = document.getElementById('sliderDots').children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].className = `w-2 h-2 rounded-full ${i === currentSlideIndex ? 'bg-amber-500' : 'bg-amber-200'} transition-all`;
+                }
+            }, 3500);
+        }
+
+        function openGmailForAd() {
+            const subject = encodeURIComponent("Special Offer Ad Request");
+            const body = encodeURIComponent("Namaste! Mujhe advertisement banner lagwana hai.");
+            window.location.href = `mailto:${OWNER_GMAIL}?subject=${subject}&body=${body}`;
+        }
+
+        function openAdWhatsApp(phone, offerTitle) {
+            const msg = `Namaste! Maine offer *"${offerTitle}"* dekha.`;
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+
+        function shareWebsite() {
+            const shareData = {
+                title: '🏪 Apna Gao Digital Directory',
+                text: 'Apne gao ki directory dekhein! 👇',
+                url: window.location.href
+            };
+            if (navigator.share) { navigator.share(shareData).catch(() => {}); }
+            else {
+                navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`).then(() => {
+                    alert("✅ Link Copy Ho Gaya!");
+                });
+            }
+        }
+
+        function handleCategoryChange() {
+            const val = document.getElementById('catSelect').value;
+            const customBox = document.getElementById('customCat');
+            if(val === "OTHER") customBox.classList.remove('hidden');
+            else customBox.classList.add('hidden');
+        }
+
+        function openVendorPortal() {
+            toggleModal('vendorModal');
+            if (!SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) { checkApprovalStatus(); }
+        }
+
+        async function checkApprovalStatus() {
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Script URL set karne ke baad check hoga.");
+                return;
+            }
+            const token = getDeviceToken();
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "checkStatus", 
+                    deviceToken: token, 
+                    domain: window.location.hostname 
+                })
+            });
+            const data = await res.json();
+
+            document.getElementById('regBox').classList.add('hidden');
+            document.getElementById('waitBox').classList.add('hidden');
+            document.getElementById('dashboardBox').classList.add('hidden');
+
+            if (data.status === "NOT_FOUND") document.getElementById('regBox').classList.remove('hidden');
+            else if (data.status === "Denied") document.getElementById('waitBox').classList.remove('hidden');
+            else if (data.status === "Approved") {
+                activeVendorData = data;
+                document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
+                document.getElementById('dashboardBox').classList.remove('hidden');
+                loadMyProducts();
+            }
+        }
+
+        async function registerVendor() {
+            const botVal = document.getElementById('botField').value;
+            if(botVal) return;
+
+            const name = document.getElementById('regName').value;
+            const shop = document.getElementById('regShop').value;
+            const phone = document.getElementById('regPhone').value;
+            const loc = document.getElementById('regLoc').value;
+
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if(!phoneRegex.test(phone)) return alert("Sahi 10-digit number enter karein!");
+            if(!name || !shop || !loc) return alert("Sabhi details bharein!");
+
+            if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+                alert("Demo Mode: Google Script URL paste karne ke baad save hoga!");
+                return;
+            }
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "registerVendor", name, shop, phone: "91" + phone, location: loc,
+                    deviceToken: getDeviceToken(), 
+                    domain: window.location.hostname, 
+                    honeypot: botVal
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            checkApprovalStatus();
+        }
+
+        async function loadMyProducts() {
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "getMyProducts", 
+                    vendorId: activeVendorData.vendorId, 
+                    domain: window.location.hostname 
+                })
+            });
+            const items = await res.json();
+            const container = document.getElementById('myProductsList');
+            container.innerHTML = '';
+
+            if(items.length === 0) {
+                container.innerHTML = '<p class="text-[10px] text-gray-400">Koi service card add nahi hai.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-2 rounded-xl border text-xs space-y-1">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="bg-indigo-100 text-indigo-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">${item.category}</span>
+                                <p class="font-bold text-gray-700 truncate max-w-[170px] mt-0.5">${item.title}</p>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editProduct('${item.itemId}', '${item.category}', '${item.title}', '${item.imageUrl}', '${item.details}', '${item.announcement || ''}')" class="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg font-bold">✏️</button>
+                                <button onclick="deleteProduct('${item.itemId}')" class="text-red-600 bg-red-50 px-2 py-1 rounded-lg font-bold">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function saveOrUpdateProduct() {
+            const itemId = document.getElementById('editingItemId').value;
+            let category = document.getElementById('catSelect').value;
+            if(category === "OTHER") category = document.getElementById('customCat').value;
+            
+            const title = document.getElementById('serviceTitle').value;
+            const announcement = document.getElementById('serviceAnnouncement').value;
+            const imgUrl = document.getElementById('imgUrl').value;
+            const details = document.getElementById('serviceDetails').value;
+
+            if(!category || !title || !imgUrl) return alert("Category, Title aur Image URL bharein!");
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "saveProduct",
+                    vendorId: activeVendorData.vendorId, itemId, category, title, announcement, imageUrl: imgUrl, details,
+                    domain: window.location.hostname
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            cancelEdit();
+            loadMyProducts();
+            loadData();
+        }
+
+        function editProduct(itemId, category, title, imgUrl, details, announcement) {
+            document.getElementById('editingItemId').value = itemId;
+            document.getElementById('catSelect').value = category;
+            document.getElementById('serviceTitle').value = title;
+            document.getElementById('serviceAnnouncement').value = announcement || '';
+            document.getElementById('imgUrl').value = imgUrl;
+            document.getElementById('serviceDetails').value = details;
+            document.getElementById('formTitle').innerText = "✏️ Edit Service Card:";
+            document.getElementById('saveBtn').innerText = "Update Service";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
+
+        function cancelEdit() {
+            document.getElementById('editingItemId').value = '';
+            document.getElementById('serviceTitle').value = '';
+            document.getElementById('serviceAnnouncement').value = '';
+            document.getElementById('imgUrl').value = '';
+            document.getElementById('serviceDetails').value = '';
+            document.getElementById('formTitle').innerText = i18n[currentLang].addCardTitle;
+            document.getElementById('saveBtn').innerText = i18n[currentLang].saveCard;
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        async function deleteProduct(itemId) {
+            if(!confirm("Delete karna chahte hain?")) return;
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "deleteProduct", 
+                    vendorId: activeVendorData.vendorId, 
+                    itemId, 
+                    domain: window.location.hostname 
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            loadMyProducts();
+            loadData();
+        }
+
+        function vendorLogout() { activeVendorData = null; toggleModal('vendorModal'); }
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        loadData();
+    </script>
+</body>
+</html>
