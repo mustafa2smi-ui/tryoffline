@@ -30,10 +30,9 @@
 </head>
 <body class="bg-slate-100 text-gray-800 flex flex-col min-h-screen">
 
-    <!-- 1. ANIMATED WELCOME SCREEN (SPLASH LANDING) -->
+    <!-- 1. ANIMATED WELCOME SCREEN -->
     <div id="welcomeScreen" class="fixed inset-0 bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 z-50 flex flex-col justify-between p-6 text-white text-center transition-opacity duration-500">
         
-        <!-- Top Lang Switcher -->
         <div class="flex justify-end">
             <select onchange="changeLanguage(this.value)" class="bg-white/10 text-white border border-white/20 text-xs rounded-full px-3 py-1 font-bold focus:outline-none backdrop-blur-md">
                 <option value="hi" class="text-gray-900" selected>हिंदी</option>
@@ -42,9 +41,7 @@
             </select>
         </div>
 
-        <!-- Center Hero Content -->
         <div class="space-y-5 my-auto">
-            <!-- 4 Floating Emojis -->
             <div class="flex justify-center gap-3 text-4xl float-anim">
                 <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🚜</span>
                 <span class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">🩺</span>
@@ -61,7 +58,6 @@
                 </p>
             </div>
 
-            <!-- Features Highlights Pills -->
             <div class="flex flex-wrap justify-center gap-2 pt-2 text-[11px] text-indigo-100 font-semibold">
                 <span class="bg-indigo-700/60 border border-indigo-400/30 px-3 py-1 rounded-full">📞 Direct Call</span>
                 <span class="bg-indigo-700/60 border border-indigo-400/30 px-3 py-1 rounded-full">💬 WhatsApp Order</span>
@@ -69,7 +65,6 @@
             </div>
         </div>
 
-        <!-- Bottom Start Button -->
         <div class="space-y-3 pb-4">
             <button onclick="startApp()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
                 <span data-i18n="startNowBtn">🚀 शुरू करें (Start Now)</span>
@@ -78,7 +73,7 @@
         </div>
     </div>
 
-    <!-- 2. MAIN DIRECTORY HOMEPAGE (FADES IN AFTER START NOW) -->
+    <!-- 2. MAIN APP -->
     <div id="mainApp" class="hidden flex-col min-h-screen pb-20">
 
         <!-- Sticky Header -->
@@ -105,7 +100,7 @@
             </div>
         </header>
 
-        <!-- Main Body Feed -->
+        <!-- Main Body -->
         <main class="max-w-md mx-auto p-3 flex-1 w-full space-y-3">
 
             <!-- Search Bar -->
@@ -114,19 +109,19 @@
                        class="w-full bg-white border border-gray-300 pl-3 pr-8 py-2 rounded-xl text-xs font-semibold shadow-sm focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Category Filter Bar -->
+            <!-- Category Bar -->
             <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1" data-i18n="selectCategory">श्रेणी चुनें:</p>
                 <div id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
             </div>
 
-            <!-- Location Filter Bar -->
+            <!-- Location Bar -->
             <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1" data-i18n="selectLocation">स्थान चुनें:</p>
                 <div id="locationTabs" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
             </div>
 
-            <!-- Feed -->
+            <!-- Feed Container -->
             <div id="feed" class="space-y-3">
                 <p class="text-center text-gray-500 text-xs py-8" data-i18n="loading">लोड हो रहा है...</p>
             </div>
@@ -146,7 +141,7 @@
 
         </main>
 
-        <!-- Sticky Bottom Footer Navigation -->
+        <!-- Sticky Footer Navigation -->
         <footer class="fixed bottom-0 left-0 right-0 bg-slate-900 text-gray-300 text-[11px] py-2 px-3 border-t border-slate-700 z-40">
             <div class="max-w-md mx-auto flex justify-around items-center font-semibold text-indigo-300">
                 <button onclick="toggleModal('helpModal')" class="hover:text-white" data-i18n="help">❓ मदद</button>
@@ -236,9 +231,7 @@
 
                     <input type="text" id="customCat" placeholder="अपना पेशा लिखें" class="hidden w-full border p-2 rounded-lg text-xs bg-white">
                     <input type="text" id="serviceTitle" placeholder="सेवा का शीर्षक (e.g. 24x7 प्लंबर सेवा)" class="w-full border p-2 rounded-lg text-xs bg-white">
-                    
                     <input type="text" id="serviceAnnouncement" placeholder="⚡ आज का ऑफर या नोटिस (e.g. 10% छूट / दुकान खुली है)" class="w-full border border-amber-300 bg-amber-50/40 p-2 rounded-lg text-xs font-semibold text-amber-900">
-
                     <input type="text" id="imgUrl" placeholder="Pinterest फ़ोटो लिंक" class="w-full border p-2 rounded-lg text-xs bg-white">
                     <textarea id="serviceDetails" placeholder="सेवा की पूरी जानकारी" class="w-full border p-2 rounded-lg text-xs bg-white h-14"></textarea>
                     
@@ -258,7 +251,7 @@
     <div id="privacyModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="privacy">प्राइवेसी पॉलिसी</h3>
-            <p class="text-gray-600" data-i18n="privacyDesc">हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं।</p>
+            <p class="text-gray-600" data-i18n="privacyDesc">हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं। विवरण केवल सीधे संपर्क के लिए हैं।</p>
             <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 text-gray-800 py-1.5 rounded-lg font-bold mt-2" data-i18n="close">बंद करें</button>
         </div>
     </div>
@@ -292,7 +285,7 @@
         let currentSlideIndex = 0;
         let slideTimer = null;
 
-        // MULTI-LANGUAGE TRANSLATION OBJECT (HINDI, HINGLISH, ENGLISH)
+        // MULTI-LANGUAGE ENGINE
         const i18n = {
             hi: {
                 welcomeHeading: "🏪 अपना गांव डिजिटल डायरेक्टरी",
@@ -316,6 +309,9 @@
                 shareApp: "📢 शेयर ऐप",
                 callNow: "📞 कॉल करें",
                 whatsapp: "💬 व्हाट्सएप",
+                copyCardBtn: "📋 कॉपी",
+                shareAppText: "🏪 अपने गांव की डिजिटल डायरेक्टरी! सभी दुकानें, मिस्त्री, डॉक्टर और वाहन संपर्क एक जगह देखें: 👇",
+                copiedAlert: "✅ विवरण और फ़ोटो लिंक कॉपी हो गया!",
                 helpTitle: "❓ मदद और जानकारी",
                 howToAdTitle: "📢 विज्ञापन कैसे लगाएं?",
                 howToAdDesc: "नीचे ऑफर बॉक्स पर क्लिक करके ईमेल द्वारा अपना बैनर भेजें।",
@@ -358,8 +354,11 @@
                 terms: "Terms",
                 disclaimer: "Disclaimer",
                 shareApp: "📢 Share App",
-                callNow: "📞 Call Karein",
+                callNow: "📞 Call",
                 whatsapp: "💬 WhatsApp",
+                copyCardBtn: "📋 Copy",
+                shareAppText: "🏪 Apne gao ki Digital Directory! Sabhi shops, mistri, doctor aur vehicle contacts ek jagah dekhein: 👇",
+                copiedAlert: "✅ Details aur Photo link copy ho gaya!",
                 helpTitle: "❓ Help & Info",
                 howToAdTitle: "📢 Ad Kaise Lagayein?",
                 howToAdDesc: "Niche offer box par click karke email se banner bhejein.",
@@ -402,8 +401,11 @@
                 terms: "Terms",
                 disclaimer: "Disclaimer",
                 shareApp: "📢 Share App",
-                callNow: "📞 Call Now",
+                callNow: "📞 Call",
                 whatsapp: "💬 WhatsApp",
+                copyCardBtn: "📋 Copy",
+                shareAppText: "🏪 Local Village Digital Directory! Find all local shops, services, doctors and transport contacts here: 👇",
+                copiedAlert: "✅ Details and Photo link copied to clipboard!",
                 helpTitle: "❓ Help & Information",
                 howToAdTitle: "📢 How to post Ads?",
                 howToAdDesc: "Click the offer box below to email your banner.",
@@ -428,7 +430,6 @@
             }
         };
 
-        // Welcome Screen Start Button Action
         function startApp() {
             const welcome = document.getElementById('welcomeScreen');
             welcome.style.opacity = '0';
@@ -586,6 +587,8 @@
                         <div class="p-3 space-y-2.5">
                             ${announcementBadge}
                             <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
+                            
+                            <!-- 3 Action Buttons (Call, WhatsApp, Copy Listing) -->
                             <div class="flex gap-2 pt-1 border-t">
                                 <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
                                     ${i18n[currentLang].callNow}
@@ -594,10 +597,42 @@
                                         class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1">
                                     ${i18n[currentLang].whatsapp}
                                 </button>
+                                <button onclick="copyListingCard('${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category)}', '${encodeURIComponent(item.vendor.location)}', '${encodeURIComponent(item.vendor.name)}', '${encodeURIComponent(item.details)}', '${encodeURIComponent(item.announcement || '')}', '${encodeURIComponent(item.imageUrl)}')" 
+                                        class="bg-slate-100 hover:bg-slate-200 text-gray-700 border border-gray-300 font-bold text-xs px-3 py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition">
+                                    ${i18n[currentLang].copyCardBtn}
+                                </button>
                             </div>
                         </div>
                     </div>
                 `;
+            });
+        }
+
+        // CUSTOMER CARD COPY ENGINE
+        function copyListingCard(title, category, location, name, details, announcement, imageUrl) {
+            title = decodeURIComponent(title);
+            category = decodeURIComponent(category);
+            location = decodeURIComponent(location);
+            name = decodeURIComponent(name);
+            details = decodeURIComponent(details);
+            announcement = decodeURIComponent(announcement);
+            imageUrl = decodeURIComponent(imageUrl);
+
+            let copyMsg = 
+`🏪 *${title}* (${category})
+📍 Location: ${location} (${name})
+
+📝 Details: ${details}`;
+
+            if(announcement && announcement.trim() !== "") {
+                copyMsg += `\n⚡ Notice: ${announcement}`;
+            }
+
+            copyMsg += `\n\n📸 Photo Link:\n${imageUrl}`;
+            copyMsg += `\n\n🔗 Online Directory:\n${window.location.href}`;
+
+            navigator.clipboard.writeText(copyMsg).then(() => {
+                alert(i18n[currentLang].copiedAlert);
             });
         }
 
@@ -686,16 +721,18 @@
             window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
 
+        // LANGUAGE-AWARE APP SHARE
         function shareWebsite() {
             const shareData = {
-                title: '🏪 Apna Gao Digital Directory',
-                text: 'Apne gao ki directory dekhein! 👇',
+                title: i18n[currentLang].appTitle,
+                text: i18n[currentLang].shareAppText,
                 url: window.location.href
             };
-            if (navigator.share) { navigator.share(shareData).catch(() => {}); }
-            else {
+            if (navigator.share) { 
+                navigator.share(shareData).catch(() => {}); 
+            } else {
                 navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`).then(() => {
-                    alert("✅ Link Copy Ho Gaya!");
+                    alert(i18n[currentLang].copiedAlert);
                 });
             }
         }
