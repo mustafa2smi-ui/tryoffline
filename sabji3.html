@@ -556,50 +556,92 @@
             document.getElementById(fieldId).value = text;
         }
 
-        // DIRECT IMGBB API UPLOAD ENGINE
-        async function uploadDirectToImgBB() {
-            const fileInput = document.getElementById('directImgInput');
-            const statusText = document.getElementById('uploadStatusText');
-            const uploadBtn = document.getElementById('directUploadBtn');
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                return alert("Kripya pehle photo choose karein!");
-            }
+        // Image Compression Helper Function (Browser-Side Instant Compression)
+function compressImage(file, maxWidth = 1000, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
 
-            const file = fileInput.files[0];
-            const IMGBB_KEY = "6d207e02198a847aa5a0a03322448433"; // ImgBB Public Upload Key[span_1](start_span)[span_1](end_span)
-
-            uploadBtn.disabled = true;
-            uploadBtn.innerText = "⏳ Uploading...";
-            statusText.innerText = "Uploading to Cloud...";
-
-            const formData = new FormData();
-            formData.append("image", file);
-
-            try {
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-                    method: "POST",
-                    body: formData
-                });
-                const json = await res.json();
-                
-                if (json.success) {
-                    document.getElementById('imgUrl').value = json.data.url; // Pure Direct .jpg/.png CDN Link[span_2](start_span)[span_2](end_span)
-                    statusText.innerText = "✅ Uploaded!";
-                    statusText.className = "text-[9px] font-bold text-green-600";
-                    alert("✅ Photo Upload Ho Gayi! Direct Link Auto-Fill Ho Gaya Hai.");
-                } else {
-                    alert("Upload fail hua. Kripya dubara try karein.");
-                    statusText.innerText = "❌ Upload Failed";
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
                 }
-            } catch(err) {
-                alert("Internet error. Kripya connection check karein.");
-                statusText.innerText = "❌ Network Error";
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.innerText = "🚀 Upload";
-            }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to compressed Base64 format
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(dataUrl.split(',')[1]); // Base64 data without prefix
+            };
+            img.onerror = (error) => reject(error);
+        };
+        reader.onerror = (error) => reject(error);
+    });
+}
+
+// Updated Direct Upload Function with Auto-Compress
+async function uploadDirectToImgBB() {
+    const fileInput = document.getElementById('directImgInput');
+    const statusText = document.getElementById('uploadStatusText');
+    const uploadBtn = document.getElementById('directUploadBtn');
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        return alert("Kripya pehle photo choose karein!");
+    }
+
+    // YAHAN APNI IMGBB API KEY PASTE KAREIN (FREE FROM api.imgbb.com)
+    const IMGBB_KEY = "86dba7c502239932117dd4acdfd205ae"; 
+
+    uploadBtn.disabled = true;
+    uploadBtn.innerText = "⏳ Compressing & Uploading...";
+    statusText.innerText = "Processing Image...";
+
+    try {
+        const file = fileInput.files[0];
+        
+        // 1. Instant Compression to Web-ready size (100KB)
+        const base64Image = await compressImage(file);
+
+        // 2. Upload Base64 Data directly to ImgBB
+        const formData = new FormData();
+        formData.append("image", base64Image);
+
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+            method: "POST",
+            body: formData
+        });
+        const json = await res.json();
+        
+        if (json.success && json.data && json.data.url) {
+            document.getElementById('imgUrl').value = json.data.url;
+            statusText.innerText = "✅ Uploaded Successfully!";
+            statusText.className = "text-[9px] font-bold text-green-600";
+            alert("✅ Photo Fast Upload Ho Gayi! Direct Link Auto-Fill Ho Gaya Hai.");
+        } else {
+            console.error("ImgBB Response Error:", json);
+            alert("Upload fail hua. Kripya apni free ImgBB API key check karein.");
+            statusText.innerText = "❌ Upload Failed";
         }
+    } catch(err) {
+        console.error("Upload Catch Error:", err);
+        alert("Internet ya size issue. Kripya dobara try karein.");
+        statusText.innerText = "❌ Network Error";
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerText = "🚀 Upload";
+    }
+}
+
 
         // VENDOR PROFILE SHARE ENGINE
         function shareVendorProfile() {
