@@ -193,7 +193,7 @@
                 <!-- TOP PROFILE BAR WITH EDIT MASTER DETAILS & RESET DEVICE BUTTON -->
                 <div class="bg-indigo-50 p-3 rounded-2xl border border-indigo-200 shadow-sm flex justify-between items-center">
                     <div>
-                        <p class="text-[10px] text-gray-500 font-medium" data-i18n="welcome">नमस्ते,</p>
+                        <p class="text-[10px] text-gray-500 font-medium" data-i18n="welcome">हैलो,</p>
                         <h4 id="vendorWelcomeName" class="font-bold text-xs text-indigo-900">Vendor</h4>
                         <p id="vendorWelcomeLoc" class="text-[10px] text-gray-500">📍 Location</p>
                     </div>
@@ -201,8 +201,11 @@
                         <button onclick="openEditProfileModal()" class="text-xs bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl active:scale-95 transition shadow-sm">
                             ✏️ Edit Profile
                         </button>
-                        <button onclick="disconnectDevice()" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 font-bold px-2 py-1.5 rounded-xl active:scale-95 transition">
+                      <!--  <button onclick="disconnectDevice()" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 font-bold px-2 py-1.5 rounded-xl active:scale-95 transition">
                             🚪 Reset
+                        </button>-->
+                        <button onclick="removeAccount()" class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold px-2.5 py-1.5 rounded-xl active:scale-95 transition flex items-center gap-1">
+    🗑️ Remove Account
                         </button>
                     </div>
                 </div>
@@ -396,7 +399,7 @@
 
     <!-- JS APPLICATION ENGINE -->
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKVALglThm38XvM2M8Uszfo_Ck1ZVgMZQiWgNXqaNgioIYC8rCgVPaMZPtoth40xq4/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzKVALglThm38XvM2M8Uszfo_Ck1ZVgMZQiWgNXqaNgioIYC8rCgVPaMZPtoth40xq4/exec";
         const OWNER_GMAIL = "youremail@gmail.com";
         const IMGBB_KEY = "86dba7c502239932117dd4acdfd205ae"; //[span_0](start_span)[span_0](end_span)
    
@@ -446,7 +449,7 @@
                 pendingTitle: "कृपया प्रतीक्षा करें... अप्रूवल पेंडिंग है!",
                 pendingDesc: "आपकी डिटेल्स एडमिन को भेज दी गई हैं। एक्टिव होते ही आप सेवा जोड़ सकेंगे।",
                 recheckBtn: "🔄 स्टेटस पुनः चेक करें",
-                welcome: "नमस्ते,",
+                welcome: "हैलो,",
                 addCardTitle: "➕ सेवा कार्ड जोड़ें (अधिकतम 3):",
                 saveCard: "कार्ड सेव करें",
                 cancel: "रद्द करें",
@@ -1011,12 +1014,12 @@
 
         function openGmailForAd() {
             const subject = encodeURIComponent("Special Offer Ad Request");
-            const body = encodeURIComponent("Namaste! Mujhe advertisement banner lagwana hai.");
+            const body = encodeURIComponent("Hi! Mujhe advertisement banner lagwana hai.");
             window.location.href = `mailto:${OWNER_GMAIL}?subject=${subject}&body=${body}`;
         }
 
         function openAdWhatsApp(phone, offerTitle) {
-            const msg = `Namaste! Maine offer *"${offerTitle}"* dekha.`;
+            const msg = `Hi! Maine offer *"${offerTitle}"* dekha.`;
             window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
 
@@ -1108,15 +1111,45 @@ ${link}
             }
         }
 
-        // RESET / DISCONNECT DEVICE
-        function disconnectDevice() {
-            if(!confirm("Kya aap is mobile se account disconnect karna chahte hain?")) return;
-            localStorage.removeItem("dev_token");
-            activeVendorData = null;
-            document.getElementById('dashboardBox').classList.add('hidden');
-            document.getElementById('regBox').classList.remove('hidden');
-            alert("✅ Device Reset Successful! Ab naya account register kar sakte hain.");
-        }
+        // AUTOMATIC REMOVE ACCOUNT & HIDE DATA
+async function removeAccount() {
+    const confirmDelete = confirm("⚠️ DHYAN DEIN:\n\nKya aap apna account aur sabhi cards directory se hatana chahte hain?\n\nIske baad aapki dukan public ko nahi dikhegi.");
+    if (!confirmDelete) return;
+
+    if (!activeVendorData || SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
+        localStorage.removeItem("dev_token");
+        activeVendorData = null;
+        document.getElementById('dashboardBox').classList.add('hidden');
+        document.getElementById('regBox').classList.remove('hidden');
+        alert("✅ Account Removed Successfully!");
+        return;
+    }
+
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "removeAccount",
+                vendorId: activeVendorData.vendorId,
+                deviceToken: getDeviceToken(),
+                domain: window.location.hostname
+            })
+        });
+        const data = await res.json();
+        
+        // Clear local device token
+        localStorage.removeItem("dev_token");
+        activeVendorData = null;
+        
+        alert(data.msg);
+        document.getElementById('dashboardBox').classList.add('hidden');
+        document.getElementById('regBox').classList.remove('hidden');
+        loadData(); // Public feed refresh
+    } catch(err) {
+        alert("Network error. Manual check karein.");
+    }
+}
+
 
         // EDIT VENDOR MASTER PROFILE LOGIC
         function openEditProfileModal() {
