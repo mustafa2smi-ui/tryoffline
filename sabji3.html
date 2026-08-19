@@ -5,16 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>अपना गांव डिजिटल डायरेक्टरी | लोकल सेवाएं और दुकानें</title>
 
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="अपने गांव की सभी आवश्यक सेवाएं - ऑटो, ट्रैक्टर, डॉक्टर, इलेक्ट्रीशियन, फल-सब्जी, सीएससी केंद्र और खास ऑफर्स। सीधे कॉल और व्हाट्सएप करें।">
+    <meta name="description" content="अपने गांव की सभी आवश्यक सेवाएं - ऑटो, ट्रैक्टर, डॉक्टर, इलेक्ट्रीशियन, फल-सब्जी, सीएससी केंद्र और खास ऑफर्स।">
     <meta name="keywords" content="गांव डायरेक्टरी, लोकल मिस्त्री, ऑटो बुकिंग, डॉक्टर संपर्क, गांव की दुकान, ऑफर्स">
     <meta name="robots" content="index, follow">
-
-    <!-- Open Graph Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="अपना गांव डिजिटल डायरेक्टरी">
-    <meta property="og:description" content="लोकल दुकानें और मिस्त्री - सीधे कॉल और व्हाट्सएप पर संपर्क करें।">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏪</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +25,6 @@
 
     <!-- 1. ANIMATED WELCOME SCREEN -->
     <div id="welcomeScreen" class="fixed inset-0 bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 z-50 flex flex-col justify-between p-6 text-white text-center transition-opacity duration-500">
-        
         <div class="flex justify-end">
             <select onchange="changeLanguage(this.value)" class="bg-white/10 text-white border border-white/20 text-xs rounded-full px-3 py-1 font-bold focus:outline-none backdrop-blur-md">
                 <option value="hi" class="text-gray-900" selected>हिंदी</option>
@@ -66,7 +58,7 @@
         </div>
 
         <div class="space-y-3 pb-4">
-            <button onclick="startApp()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-black py-3.5 rounded-2xl text-sm shadow-xl hover:shadow-2xl active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
+            <button onclick="startApp()" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 font-black py-3.5 rounded-2xl text-sm shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
                 <span data-i18n="startNowBtn">🚀 शुरू करें (Start Now)</span>
             </button>
             <p class="text-[10px] text-indigo-300">100% Free & Local Village Network</p>
@@ -90,10 +82,10 @@
                         <option value="en">English</option>
                     </select>
 
-                    <button onclick="shareWebsite()" class="text-xs bg-indigo-800 hover:bg-indigo-900 border border-indigo-400 px-2.5 py-1.5 rounded-full font-bold active:scale-95 transition-all">
+                    <button onclick="shareWebsite()" class="text-xs bg-indigo-800 hover:bg-indigo-900 border border-indigo-400 px-2.5 py-1.5 rounded-full font-bold active:scale-95 transition">
                         📢 <span data-i18n="share">शेयर</span>
                     </button>
-                    <button onclick="openVendorPortal()" class="text-xs bg-amber-400 hover:bg-amber-500 text-slate-900 border border-amber-300 px-3 py-1.5 rounded-full font-bold shadow-sm active:scale-95 transition-all">
+                    <button onclick="openVendorPortal()" class="text-xs bg-amber-400 hover:bg-amber-500 text-slate-900 border border-amber-300 px-3 py-1.5 rounded-full font-bold shadow-sm active:scale-95 transition">
                         💼 <span data-i18n="vendorBtn">दुकानदार</span>
                     </button>
                 </div>
@@ -107,6 +99,12 @@
             <div class="relative">
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="🔍 सेवा, नाम या दुकान खोजें..." 
                        class="w-full bg-white border border-gray-300 pl-3 pr-8 py-2 rounded-xl text-xs font-semibold shadow-sm focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- HERO AD BANNER CAROUSEL (TOP POSITION) -->
+            <div id="heroBannerSection" class="hidden overflow-hidden rounded-2xl border-2 border-indigo-200 shadow-md bg-slate-900 relative">
+                <div id="heroSlider" class="flex transition-transform duration-700 ease-in-out"></div>
+                <div id="heroDots" class="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10"></div>
             </div>
 
             <!-- Category Bar -->
@@ -126,7 +124,7 @@
                 <p class="text-center text-gray-500 text-xs py-8" data-i18n="loading">लोड हो रहा है...</p>
             </div>
 
-            <!-- SPECIAL OFFER ADVERTISEMENT CAROUSEL -->
+            <!-- SPECIAL OFFER ADVERTISEMENT CAROUSEL (FOOTER KE UPAR) -->
             <div class="pt-4 pb-2">
                 <div class="flex justify-between items-center mb-1.5 px-1">
                     <span class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider flex items-center gap-1" data-i18n="offerHeading">🔥 विशेष ऑफर और विज्ञापन</span>
@@ -144,11 +142,11 @@
         <!-- Sticky Footer Navigation -->
         <footer class="fixed bottom-0 left-0 right-0 bg-slate-900 text-gray-300 text-[11px] py-2 px-3 border-t border-slate-700 z-40">
             <div class="max-w-md mx-auto flex justify-around items-center font-semibold text-indigo-300">
-                <button onclick="toggleModal('helpModal')" class="hover:text-white active:scale-95 transition-all" data-i18n="help">❓ मदद</button>
-                <button onclick="toggleModal('privacyModal')" class="hover:text-white active:scale-95 transition-all" data-i18n="privacy">प्राइवेसी</button>
-                <button onclick="toggleModal('termsModal')" class="hover:text-white active:scale-95 transition-all" data-i18n="terms">नियम</button>
-                <button onclick="toggleModal('disclaimerModal')" class="hover:text-white active:scale-95 transition-all" data-i18n="disclaimer">डिस्क्लेमर</button>
-                <button onclick="shareWebsite()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-0.5 rounded-full text-[10px] active:scale-95 transition-all" data-i18n="shareApp">📢 शेयर ऐप</button>
+                <button onclick="toggleModal('helpModal')" class="hover:text-white" data-i18n="help">❓ मदद</button>
+                <button onclick="toggleModal('privacyModal')" class="hover:text-white" data-i18n="privacy">प्राइवेसी</button>
+                <button onclick="toggleModal('termsModal')" class="hover:text-white" data-i18n="terms">नियम</button>
+                <button onclick="toggleModal('disclaimerModal')" class="hover:text-white" data-i18n="disclaimer">डिस्क्लेमर</button>
+                <button onclick="shareWebsite()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-0.5 rounded-full text-[10px]" data-i18n="shareApp">📢 शेयर ऐप</button>
             </div>
         </footer>
 
@@ -159,7 +157,7 @@
         <!-- Header -->
         <div class="bg-indigo-700 text-white p-3.5 shadow-md flex justify-between items-center sticky top-0 z-10">
             <div class="flex items-center gap-2">
-                <button onclick="closeVendorPortal()" class="bg-indigo-800 hover:bg-indigo-900 p-1.5 rounded-full text-xs font-bold active:scale-95 transition-all">⬅ Back</button>
+                <button onclick="closeVendorPortal()" class="bg-indigo-800 hover:bg-indigo-900 p-1.5 rounded-full text-xs font-bold active:scale-95 transition">⬅ Back</button>
                 <h3 class="font-bold text-sm" data-i18n="vendorPanelTitle">💼 दुकानदार पोर्टल (Vendor Portal)</h3>
             </div>
             <button onclick="closeVendorPortal()" class="text-indigo-200 hover:text-white font-bold text-base active:scale-95">✕</button>
@@ -177,8 +175,8 @@
                 <input type="tel" id="regPhone" maxlength="10" placeholder="10 अंकों का व्हाट्सएप नंबर" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white">
                 <input type="text" id="regLoc" placeholder="स्थान / चौक का नाम (e.g. Main Chowk)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white">
                 
-                <button onclick="registerVendor()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs shadow-md active:scale-95 transition-all" data-i18n="registerBtn">रजिस्टर करें</button>
-                <button onclick="checkApprovalStatus()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-all" data-i18n="checkStatusBtn">🔄 अप्रूवल स्टेटस चेक करें</button>
+                <button onclick="registerVendor()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs shadow-md active:scale-95 transition" data-i18n="registerBtn">रजिस्टर करें</button>
+                <button onclick="checkApprovalStatus()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition" data-i18n="checkStatusBtn">🔄 अप्रूवल स्टेटस चेक करें</button>
             </div>
 
             <!-- WAITING FOR APPROVAL -->
@@ -186,17 +184,27 @@
                 <div class="text-4xl">⏳</div>
                 <h4 class="font-bold text-sm text-amber-600" data-i18n="pendingTitle">कृपया प्रतीक्षा करें... अप्रूवल पेंडिंग है!</h4>
                 <p class="text-xs text-gray-500 leading-relaxed" data-i18n="pendingDesc">आपकी डिटेल्स एडमिन को भेज दी गई हैं। एक्टिव होते ही आप सेवा जोड़ सकेंगे।</p>
-                <button onclick="checkApprovalStatus()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs shadow-md active:scale-95 transition-all" data-i18n="recheckBtn">🔄 स्टेटस पुनः चेक करें</button>
+                <button onclick="checkApprovalStatus()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs shadow-md active:scale-95 transition" data-i18n="recheckBtn">🔄 स्टेटस पुनः चेक करें</button>
             </div>
 
             <!-- APPROVED DASHBOARD -->
             <div id="dashboardBox" class="hidden space-y-4">
-                <div class="flex justify-between items-center bg-indigo-50 p-3 rounded-2xl border border-indigo-200 shadow-sm">
+                
+                <!-- TOP PROFILE BAR WITH EDIT MASTER DETAILS & RESET DEVICE BUTTON -->
+                <div class="bg-indigo-50 p-3 rounded-2xl border border-indigo-200 shadow-sm flex justify-between items-center">
                     <div>
                         <p class="text-[10px] text-gray-500 font-medium" data-i18n="welcome">नमस्ते,</p>
                         <h4 id="vendorWelcomeName" class="font-bold text-xs text-indigo-900">Vendor</h4>
+                        <p id="vendorWelcomeLoc" class="text-[10px] text-gray-500">📍 Location</p>
                     </div>
-                    <button onclick="vendorLogout()" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all" data-i18n="logout">लॉगआउट</button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="openEditProfileModal()" class="text-xs bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-xl active:scale-95 transition shadow-sm">
+                            ✏️ Edit Profile
+                        </button>
+                        <button onclick="disconnectDevice()" class="text-xs bg-red-100 hover:bg-red-200 text-red-600 font-bold px-2 py-1.5 rounded-xl active:scale-95 transition">
+                            🚪 Reset
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ADD/EDIT FORM -->
@@ -249,6 +257,17 @@
 
                     <input type="text" id="serviceAnnouncement" placeholder="⚡ आज का ऑफर या नोटिस (e.g. 10% छूट / दुकान खुली है)" class="w-full border border-amber-300 bg-amber-50/40 p-2.5 rounded-xl text-xs font-semibold text-amber-900">
 
+                    <!-- COLLAGE SMART TIP -->
+                    <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-[11px] text-amber-900 space-y-1">
+                        <div class="flex items-center gap-1 font-bold">
+                            <span>💡</span>
+                            <span data-i18n="collageTipHeading">स्मार्ट फोटो टिप (Photo Tip):</span>
+                        </div>
+                        <p class="text-[10px] text-amber-800 leading-tight" data-i18n="collageTipText">
+                            अपनी दुकान के 2-3 सामान, मेनू या रेट-कार्ड को <b>Collage (एक साथ जोड़कर)</b> अपलोड करें, ताकि ग्राहक को एक ही फोटो में पूरी जानकारी मिल सके!
+                        </p>
+                    </div>
+
                     <!-- DIRECT IMGBB IMAGE UPLOAD WIDGET -->
                     <div class="space-y-2 border border-dashed border-indigo-300 p-2.5 rounded-xl bg-indigo-50/50">
                         <div class="flex justify-between items-center">
@@ -266,8 +285,8 @@
                     <input type="text" id="imgUrl" placeholder="Direct Photo Link (Auto-fill ya CDN Link)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white font-mono text-[11px]">
                     
                     <div class="flex gap-2 pt-1">
-                        <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-all" data-i18n="cancel">रद्द करें</button>
-                        <button onclick="saveOrUpdateProduct()" id="saveBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md active:scale-95 transition-all" data-i18n="saveCard">कार्ड सेव करें</button>
+                        <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition" data-i18n="cancel">रद्द करें</button>
+                        <button onclick="saveOrUpdateProduct()" id="saveBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs shadow-md active:scale-95 transition" data-i18n="saveCard">कार्ड सेव करें</button>
                     </div>
                 </div>
 
@@ -276,7 +295,7 @@
 
                 <!-- VENDOR OWN PROFILE SHARE BUTTON -->
                 <div class="pt-2">
-                    <button type="button" onclick="shareVendorProfile()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="shareVendorProfile()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
                         📢 <span data-i18n="shareMyProfile">अपना प्रोफाइल व्हाट्सएप पर शेयर करें</span>
                     </button>
                 </div>
@@ -308,6 +327,33 @@
         </div>
     </div>
 
+    <!-- 4. EDIT VENDOR MASTER PROFILE MODAL -->
+    <div id="editProfileModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-indigo-700">✏️ Edit Business Profile</h3>
+                <button onclick="toggleModal('editProfileModal')" class="text-gray-400 font-bold text-sm">✕</button>
+            </div>
+            <div class="space-y-2 text-xs">
+                <label class="font-bold text-gray-700">Aapka Naam:</label>
+                <input type="text" id="editProfName" class="w-full border p-2 rounded-lg bg-slate-50">
+
+                <label class="font-bold text-gray-700">Dukan / Business Title:</label>
+                <input type="text" id="editProfShop" class="w-full border p-2 rounded-lg bg-slate-50">
+
+                <label class="font-bold text-gray-700">WhatsApp Contact Number:</label>
+                <input type="tel" id="editProfPhone" maxlength="10" class="w-full border p-2 rounded-lg bg-slate-50">
+
+                <label class="font-bold text-gray-700">Location / Chowk:</label>
+                <input type="text" id="editProfLoc" class="w-full border p-2 rounded-lg bg-slate-50">
+
+                <button onclick="saveVendorMasterProfile()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow-md active:scale-95 transition">
+                    Save Profile Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALS: HELP & LEGAL PAGES -->
     <div id="helpModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-3 max-h-[85vh] overflow-y-auto">
@@ -328,7 +374,7 @@
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="privacy">प्राइवेसी पॉलिसी</h3>
             <p class="text-gray-600" data-i18n="privacyDesc">हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं। विवरण केवल सीधे संपर्क के लिए हैं।</p>
-            <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition-all" data-i18n="close">बंद करें</button>
+            <button onclick="toggleModal('privacyModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition" data-i18n="close">बंद करें</button>
         </div>
     </div>
 
@@ -336,7 +382,7 @@
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="terms">नियम और शर्तें</h3>
             <p class="text-gray-600" data-i18n="termsDesc">लिस्टिंग स्थानीय विक्रेताओं द्वारा प्रबंधित की जाती है।</p>
-            <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition-all" data-i18n="close">बंद करें</button>
+            <button onclick="toggleModal('termsModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition" data-i18n="close">बंद करें</button>
         </div>
     </div>
 
@@ -344,7 +390,7 @@
         <div class="bg-white rounded-2xl p-4 w-full max-w-sm space-y-2 text-xs">
             <h3 class="font-bold text-sm text-gray-800 border-b pb-1" data-i18n="disclaimer">डिस्क्लेमर</h3>
             <p class="text-gray-600" data-i18n="disclaimerDesc">यह ऐप केवल ग्राहकों को स्थानीय विक्रेताओं से जोड़ने का माध्यम है।</p>
-            <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition-all" data-i18n="close">बंद करें</button>
+            <button onclick="toggleModal('disclaimerModal')" class="w-full bg-slate-200 hover:bg-slate-300 text-gray-800 py-1.5 rounded-lg font-bold mt-2 active:scale-95 transition" data-i18n="close">बंद करें</button>
         </div>
     </div>
 
@@ -352,16 +398,18 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKVALglThm38XvM2M8Uszfo_Ck1ZVgMZQiWgNXqaNgioIYC8rCgVPaMZPtoth40xq4/exec";
         const OWNER_GMAIL = "youremail@gmail.com";
-
+        const IMGBB_KEY = "86dba7c502239932117dd4acdfd205ae"; //[span_0](start_span)[span_0](end_span)
+   
         let currentLang = "hi";
         let allData = [];
         let selectedCategory = "ALL";
         let selectedLocation = "ALL";
         let activeVendorData = null;
         let currentSlideIndex = 0;
+        let currentHeroIndex = 0;
         let slideTimer = null;
+        let heroTimer = null;
 
-        // MULTI-LANGUAGE DICTIONARY
         const i18n = {
             hi: {
                 welcomeHeading: "🏪 अपना गांव डिजिटल डायरेक्टरी",
@@ -399,7 +447,6 @@
                 pendingDesc: "आपकी डिटेल्स एडमिन को भेज दी गई हैं। एक्टिव होते ही आप सेवा जोड़ सकेंगे।",
                 recheckBtn: "🔄 स्टेटस पुनः चेक करें",
                 welcome: "नमस्ते,",
-                logout: "लॉगआउट",
                 addCardTitle: "➕ सेवा कार्ड जोड़ें (अधिकतम 3):",
                 saveCard: "कार्ड सेव करें",
                 cancel: "रद्द करें",
@@ -412,6 +459,8 @@
                 guideEditDesc: "सक्रिय सेवाओं में ✏️ से विवरण बदलें और 🗑️ से कार्ड हटाएं।",
                 guideOfferTitle: "ऑफर और नोटिस का फायदा (24h Expiry)",
                 guideOfferDesc: "दैनिक छूट या जरूरी सूचना दर्ज करें। पुराने ऑफर 24 घंटे में स्वतः हट जाते हैं।",
+                collageTipHeading: "स्मार्ट फोटो टिप (Photo Tip):",
+                collageTipText: "अपनी दुकान के 2-3 सामान, मेनू या रेट-कार्ड को <b>Collage (एक साथ जोड़कर)</b> अपलोड करें, ताकि ग्राहक को एक ही फोटो में पूरी जानकारी मिल सके!",
                 privacyDesc: "हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं।",
                 termsDesc: "लिस्टिंग स्थानीय विक्रेताओं द्वारा प्रबंधित की जाती है।",
                 disclaimerDesc: "यह ऐप केवल ग्राहकों को स्थानीय विक्रेताओं से जोड़ने का माध्यम है।",
@@ -454,7 +503,6 @@
                 pendingDesc: "Aapki details admin ko bhej di gayi hain. Active hote hi aap service add kar payenge.",
                 recheckBtn: "🔄 Re-Check Status",
                 welcome: "Welcome,",
-                logout: "Logout",
                 addCardTitle: "➕ Service Card Add Karein (Max 3):",
                 saveCard: "Save Service Card",
                 cancel: "Cancel",
@@ -467,6 +515,8 @@
                 guideEditDesc: "Active services me ✏️ se update karein aur 🗑️ se card delete karein.",
                 guideOfferTitle: "Offers & Notice Ka Fayda (24h Expiry)",
                 guideOfferDesc: "Daily discount ya emergency notice dalein. Purane offers 24h me auto-expire ho jate hain.",
+                collageTipHeading: "Smart Photo Tip:",
+                collageTipText: "Apni dukan ke 2-3 items ya rate list ko <b>Collage bana kar</b> upload karein, taaki customer ko ek hi photo me poori dukan dikhe!",
                 privacyDesc: "Hum aapka koi personal data trace nahi karte.",
                 termsDesc: "Listings local vendors dwara manage ki jaati hain.",
                 disclaimerDesc: "Ye app direct connection ke liye ek open directory hai.",
@@ -509,7 +559,6 @@
                 pendingDesc: "Your details are submitted to admin. You can add services once approved.",
                 recheckBtn: "🔄 Re-Check Status",
                 welcome: "Welcome,",
-                logout: "Logout",
                 addCardTitle: "➕ Add Service Card (Max 3):",
                 saveCard: "Save Service",
                 cancel: "Cancel",
@@ -522,6 +571,8 @@
                 guideEditDesc: "Use ✏️ to modify details and 🗑️ to delete your listings anytime.",
                 guideOfferTitle: "Offers & Flash Notice (24h Expiry)",
                 guideOfferDesc: "Post daily discounts or alerts. Announcements auto-expire after 24 hours.",
+                collageTipHeading: "Smart Photo Tip:",
+                collageTipText: "Upload a <b>Collage photo</b> combining 2-3 items or price-list so customers can view your business in a single photo!",
                 privacyDesc: "We do not track your personal data.",
                 termsDesc: "Listings are managed directly by local vendors.",
                 disclaimerDesc: "This platform is an open directory to connect customers.",
@@ -544,7 +595,7 @@
             currentLang = lang;
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (i18n[lang][key]) el.innerText = i18n[lang][key];
+                if (i18n[lang][key]) el.innerHTML = i18n[lang][key];
             });
             document.getElementById('searchInput').placeholder = i18n[lang].searchPlaceholder;
             document.getElementById('mainLangSelect').value = lang;
@@ -556,122 +607,88 @@
             document.getElementById(fieldId).value = text;
         }
 
-        // Image Compression Helper Function (Browser-Side Instant Compression)
-function compressImage(file, maxWidth = 1000, quality = 0.7) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                // Convert to compressed Base64 format
-                const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                resolve(dataUrl.split(',')[1]); // Base64 data without prefix
-            };
-            img.onerror = (error) => reject(error);
-        };
-        reader.onerror = (error) => reject(error);
-    });
-}
-
-// Updated Direct Upload Function with Auto-Compress
-async function uploadDirectToImgBB() {
-    const fileInput = document.getElementById('directImgInput');
-    const statusText = document.getElementById('uploadStatusText');
-    const uploadBtn = document.getElementById('directUploadBtn');
-    
-    if (!fileInput.files || fileInput.files.length === 0) {
-        return alert("Kripya pehle photo choose karein!");
-    }
-
-    // YAHAN APNI IMGBB API KEY PASTE KAREIN (FREE FROM api.imgbb.com)
-    const IMGBB_KEY = "86dba7c502239932117dd4acdfd205ae"; 
-
-    uploadBtn.disabled = true;
-    uploadBtn.innerText = "⏳ Compressing & Uploading...";
-    statusText.innerText = "Processing Image...";
-
-    try {
-        const file = fileInput.files[0];
-        
-        // 1. Instant Compression to Web-ready size (100KB)
-        const base64Image = await compressImage(file);
-
-        // 2. Upload Base64 Data directly to ImgBB
-        const formData = new FormData();
-        formData.append("image", base64Image);
-
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-            method: "POST",
-            body: formData
-        });
-        const json = await res.json();
-        
-        if (json.success && json.data && json.data.url) {
-            document.getElementById('imgUrl').value = json.data.url;
-            statusText.innerText = "✅ Uploaded Successfully!";
-            statusText.className = "text-[9px] font-bold text-green-600";
-            alert("✅ Photo Fast Upload Ho Gayi! Direct Link Auto-Fill Ho Gaya Hai.");
-        } else {
-            console.error("ImgBB Response Error:", json);
-            alert("Upload fail hua. Kripya apni free ImgBB API key check karein.");
-            statusText.innerText = "❌ Upload Failed";
+        // AUTO-COMPRESS & UPLOAD TO IMGBB
+        function compressImage(file, maxWidth = 1000, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(dataUrl.split(',')[1]);
+                    };
+                    img.onerror = (error) => reject(error);
+                };
+                reader.onerror = (error) => reject(error);
+            });
         }
-    } catch(err) {
-        console.error("Upload Catch Error:", err);
-        alert("Internet ya size issue. Kripya dobara try karein.");
-        statusText.innerText = "❌ Network Error";
-    } finally {
-        uploadBtn.disabled = false;
-        uploadBtn.innerText = "🚀 Upload";
-    }
-}
 
+        async function uploadDirectToImgBB() {
+            const fileInput = document.getElementById('directImgInput');
+            const statusText = document.getElementById('uploadStatusText');
+            const uploadBtn = document.getElementById('directUploadBtn');
+            
+            if (!fileInput.files || fileInput.files.length === 0) return alert("Kripya pehle photo choose karein!");
 
-        // VENDOR PROFILE SHARE ENGINE
-        function shareVendorProfile() {
-            if(!activeVendorData) return;
-            const shop = activeVendorData.shop || "My Business";
-            const name = activeVendorData.name || "Vendor";
-            const loc = activeVendorData.location || "Mandi Area";
-            const link = window.location.href;
+            uploadBtn.disabled = true;
+            uploadBtn.innerText = "⏳ Uploading...";
+            statusText.innerText = "Processing Image...";
 
-            const shareMsg = 
-`🏪 *${shop}* (${name})
-📍 Location: ${loc}
+            try {
+                const file = fileInput.files[0];
+                const base64Image = await compressImage(file);
 
-✨ *Hamari sabhi dukan/seva ki details aur daily offers dekhne ke liye niche link kholein:*
-👇
-${link}
+                const formData = new FormData();
+                formData.append("image", base64Image);
 
-📲 Direct Call & WhatsApp Contact Karein!`;
-
-            if (navigator.share) {
-                navigator.share({ title: shop, text: shareMsg, url: link }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(shareMsg).then(() => {
-                    alert("✅ Profile Share Text Copy Ho Gaya!\n\nAb WhatsApp Status ya Chat me Paste kar dein.");
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                    method: "POST",
+                    body: formData
                 });
+                const json = await res.json();
+                
+                if (json.success && json.data && json.data.url) { //[span_1](start_span)[span_1](end_span)
+                    document.getElementById('imgUrl').value = json.data.url; //[span_2](start_span)[span_2](end_span)
+                    statusText.innerText = "✅ Uploaded!";
+                    statusText.className = "text-[9px] font-bold text-green-600";
+                    alert("✅ Photo Fast Upload Ho Gayi! Direct Link Auto-Fill Ho Gaya Hai.");
+                } else {
+                    alert("Upload fail hua. Kripya ImgBB key check karein.");
+                    statusText.innerText = "❌ Upload Failed";
+                }
+            } catch(err) {
+                alert("Network issue. Kripya connection check karein.");
+                statusText.innerText = "❌ Error";
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerText = "🚀 Upload";
             }
         }
 
-        // DEMO DATA
+        // DEMO DATA (Includes Hero Banner & Regular Listings)
         const demoData = [
+            {
+                itemId: "H01",
+                category: "HERO_BANNER",
+                title: "Grand Festival 20% Discount Sale",
+                imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80",
+                details: "Mandi Chowk Mega Offer! Sabhi saman par bhari chhoot.",
+                vendor: { name: "Ramesh Kumar", shop: "Ramesh Mega Store", phone: "919876543210", location: "Main Chowk" },
+                updatedAt: "19/08/2026"
+            },
             {
                 itemId: "L01",
                 category: "Vegetables & Fruits",
@@ -680,16 +697,6 @@ ${link}
                 details: "Taaza sabjiyan aur fal uplabdh hain. Direct WhatsApp order karein.",
                 announcement: "⚡ Aaj Sham 7 Baje Tak Sabhi Sabjiyon Par 10% Discount!",
                 vendor: { name: "Ramesh Kumar", shop: "Ramesh Veg", phone: "919876543210", location: "Main Chowk" },
-                updatedAt: "19/08/2026"
-            },
-            {
-                itemId: "L02",
-                category: "Marriage/Tour Vehicle",
-                title: "Suresh JCB & Tractor Service",
-                imageUrl: "", // Fallback test
-                details: "Mitti bharai aur jutai ke liye Tractor aur JCB uplabdh.",
-                announcement: "📢 Kal Subah Khali Tractor Mandi Se Gaon Jayega.",
-                vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
                 updatedAt: "19/08/2026"
             }
         ];
@@ -706,8 +713,9 @@ ${link}
         async function loadData() {
             if (SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) {
                 allData = demoData;
+                renderHeroBanner(allData.filter(i => i.category === "HERO_BANNER"));
                 renderTabs();
-                renderCards(allData);
+                renderCards(allData.filter(i => i.category !== "ADVERTISEMENT" && i.category !== "HERO_BANNER"));
                 renderAdCarousel([]);
                 return;
             }
@@ -715,36 +723,89 @@ ${link}
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getData`);
                 allData = await res.json();
+                
+                renderHeroBanner(allData.filter(i => i.category === "HERO_BANNER"));
                 renderTabs();
-                renderCards(allData.filter(i => i.category !== "ADVERTISEMENT"));
+                renderCards(allData.filter(i => i.category !== "ADVERTISEMENT" && i.category !== "HERO_BANNER"));
                 renderAdCarousel(allData.filter(i => i.category === "ADVERTISEMENT"));
             } catch(e) {
                 allData = demoData;
+                renderHeroBanner([]);
                 renderTabs();
                 renderCards(allData);
                 renderAdCarousel([]);
             }
         }
 
+        // HERO BANNER CAROUSEL ENGINE (TOP POSITION)
+        function renderHeroBanner(heroList) {
+            const section = document.getElementById('heroBannerSection');
+            const slider = document.getElementById('heroSlider');
+            const dots = document.getElementById('heroDots');
+            
+            if(!heroList || heroList.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            section.classList.remove('hidden');
+            slider.innerHTML = '';
+            dots.innerHTML = '';
+
+            heroList.forEach((item, index) => {
+                const slide = document.createElement('div');
+                slide.className = "w-full shrink-0 relative cursor-pointer";
+                slide.onclick = () => openAdWhatsApp(item.vendor.phone, item.title);
+                slide.innerHTML = `
+                    <img src="${item.imageUrl}" class="w-full h-36 sm:h-44 object-cover" alt="Hero Ad">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
+                        <div class="text-white">
+                            <span class="bg-amber-500 text-slate-900 text-[9px] font-black px-2 py-0.5 rounded-full uppercase">FEATURED SPONSOR</span>
+                            <h4 class="font-extrabold text-xs mt-1 truncate max-w-[280px]">${item.title}</h4>
+                            <p class="text-[10px] text-gray-200 truncate max-w-[280px]">${item.details}</p>
+                        </div>
+                    </div>
+                `;
+                slider.appendChild(slide);
+                dots.innerHTML += `<span class="w-2 h-2 rounded-full ${index === 0 ? 'bg-amber-400' : 'bg-white/50'} transition-all"></span>`;
+            });
+
+            startHeroSlide(heroList.length);
+        }
+
+        function startHeroSlide(total) {
+            if (heroTimer) clearInterval(heroTimer);
+            if (total <= 1) return;
+            currentHeroIndex = 0;
+            heroTimer = setInterval(() => {
+                currentHeroIndex = (currentHeroIndex + 1) % total;
+                document.getElementById('heroSlider').style.transform = `translateX(-${currentHeroIndex * 100}%)`;
+                const dots = document.getElementById('heroDots').children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].className = `w-2 h-2 rounded-full ${i === currentHeroIndex ? 'bg-amber-400' : 'bg-white/50'} transition-all`;
+                }
+            }, 4000);
+        }
+
         function renderTabs() {
             const catContainer = document.getElementById('categoryTabs');
-            const categories = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.category))];
+            const categories = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT" && i.category !== "HERO_BANNER").map(item => item.category))];
             catContainer.innerHTML = '';
             categories.forEach(cat => {
                 const isSelected = selectedCategory === cat;
                 const activeClasses = isSelected ? "bg-indigo-700 text-white border-indigo-700" : "bg-white text-gray-600 border-gray-200";
                 const label = cat === "ALL" ? i18n[currentLang].allCategories : cat;
-                catContainer.innerHTML += `<button onclick="selectCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border active:scale-95 transition-all ${activeClasses}">${label}</button>`;
+                catContainer.innerHTML += `<button onclick="selectCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border active:scale-95 transition ${activeClasses}">${label}</button>`;
             });
 
             const locContainer = document.getElementById('locationTabs');
-            const locations = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT").map(item => item.vendor.location))];
+            const locations = ["ALL", ...new Set(allData.filter(i => i.category !== "ADVERTISEMENT" && i.category !== "HERO_BANNER").map(item => item.vendor.location))];
             locContainer.innerHTML = '';
             locations.forEach(loc => {
                 const isSelected = selectedLocation === loc;
                 const activeClasses = isSelected ? "bg-emerald-700 text-white border-emerald-700" : "bg-white text-gray-600 border-gray-200";
                 const label = loc === "ALL" ? i18n[currentLang].allLocations : `📍 ${loc}`;
-                locContainer.innerHTML += `<button onclick="selectLocation('${loc}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border active:scale-95 transition-all ${activeClasses}">${label}</button>`;
+                locContainer.innerHTML += `<button onclick="selectLocation('${loc}')" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap border active:scale-95 transition ${activeClasses}">${label}</button>`;
             });
         }
 
@@ -753,7 +814,7 @@ ${link}
 
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = allData.filter(i => i.category !== "ADVERTISEMENT");
+            let filtered = allData.filter(i => i.category !== "ADVERTISEMENT" && i.category !== "HERO_BANNER");
 
             if (selectedCategory !== "ALL") filtered = filtered.filter(i => i.category === selectedCategory);
             if (selectedLocation !== "ALL") filtered = filtered.filter(i => i.vendor.location === selectedLocation);
@@ -833,15 +894,15 @@ ${link}
                             <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
                             
                             <div class="flex gap-2 pt-1 border-t">
-                                <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm">
+                                <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition shadow-sm">
                                     ${i18n[currentLang].callNow}
                                 </a>
                                 <button onclick="contactWhatsApp('${item.vendor.phone}', '${item.title}', '${item.category}')" 
-                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm">
+                                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition shadow-sm">
                                     ${i18n[currentLang].whatsapp}
                                 </button>
                                 <button onclick="copyListingCard('${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category)}', '${encodeURIComponent(item.vendor.location)}', '${encodeURIComponent(item.vendor.name)}', '${encodeURIComponent(item.details)}', '${encodeURIComponent(item.announcement || '')}', '${encodeURIComponent(item.imageUrl || '')}')" 
-                                        class="bg-slate-100 hover:bg-slate-200 text-gray-700 border border-gray-300 font-bold text-xs px-3 py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-all">
+                                        class="bg-slate-100 hover:bg-slate-200 text-gray-700 border border-gray-300 font-bold text-xs px-3 py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition">
                                     ${i18n[currentLang].copyCardBtn}
                                 </button>
                             </div>
@@ -866,14 +927,8 @@ ${link}
 
 📝 Details: ${details}`;
 
-            if(announcement && announcement.trim() !== "") {
-                copyMsg += `\n⚡ Notice: ${announcement}`;
-            }
-
-            if(imageUrl && imageUrl.trim() !== "") {
-                copyMsg += `\n\n📸 Photo Link:\n${imageUrl}`;
-            }
-
+            if(announcement && announcement.trim() !== "") copyMsg += `\n⚡ Notice: ${announcement}`;
+            if(imageUrl && imageUrl.trim() !== "") copyMsg += `\n\n📸 Photo Link:\n${imageUrl}`;
             copyMsg += `\n\n🔗 Online Directory:\n${window.location.href}`;
 
             navigator.clipboard.writeText(copyMsg).then(() => {
@@ -886,7 +941,7 @@ ${link}
             window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
 
-        // CAROUSEL ADS
+        // CAROUSEL ADS (FOOTER KE UPAR)
         function renderAdCarousel(adList) {
             const sliderContainer = document.getElementById('adSlider');
             const dotsContainer = document.getElementById('sliderDots');
@@ -908,7 +963,7 @@ ${link}
 
                 if (ad.type === 'DEFAULT') {
                     cardDiv.innerHTML = `
-                        <div onclick="openGmailForAd()" class="cursor-pointer bg-white/90 hover:bg-white border border-amber-200 p-3 rounded-2xl flex items-center justify-between text-left shadow-sm active:scale-95 transition-all">
+                        <div onclick="openGmailForAd()" class="cursor-pointer bg-white/90 hover:bg-white border border-amber-200 p-3 rounded-2xl flex items-center justify-between text-left shadow-sm active:scale-95 transition">
                             <div class="flex items-center gap-2">
                                 <span class="text-2xl">🎁</span>
                                 <div>
@@ -921,7 +976,7 @@ ${link}
                     `;
                 } else {
                     cardDiv.innerHTML = `
-                        <div onclick="openAdWhatsApp('${ad.vendor.phone}', '${ad.title}')" class="cursor-pointer bg-white border border-amber-300 rounded-2xl overflow-hidden shadow-sm active:scale-95 transition-all">
+                        <div onclick="openAdWhatsApp('${ad.vendor.phone}', '${ad.title}')" class="cursor-pointer bg-white border border-amber-300 rounded-2xl overflow-hidden shadow-sm active:scale-95 transition">
                             <div class="relative">
                                 <img src="${ad.imageUrl}" class="w-full h-28 object-cover" alt="Offer Ad">
                                 <span class="absolute top-1.5 left-1.5 bg-amber-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">OFFER</span>
@@ -946,8 +1001,7 @@ ${link}
             currentSlideIndex = 0;
             slideTimer = setInterval(() => {
                 currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
-                const slider = document.getElementById('adSlider');
-                slider.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+                document.getElementById('adSlider').style.transform = `translateX(-${currentSlideIndex * 100}%)`;
                 const dots = document.getElementById('sliderDots').children;
                 for (let i = 0; i < dots.length; i++) {
                     dots[i].className = `w-2 h-2 rounded-full ${i === currentSlideIndex ? 'bg-amber-500' : 'bg-amber-200'} transition-all`;
@@ -977,6 +1031,32 @@ ${link}
             } else {
                 navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`).then(() => {
                     alert(i18n[currentLang].copiedAlert);
+                });
+            }
+        }
+
+        function shareVendorProfile() {
+            if(!activeVendorData) return;
+            const shop = activeVendorData.shop || "My Business";
+            const name = activeVendorData.name || "Vendor";
+            const loc = activeVendorData.location || "Mandi Area";
+            const link = window.location.href;
+
+            const shareMsg = 
+`🏪 *${shop}* (${name})
+📍 Location: ${loc}
+
+✨ *Hamari sabhi dukan/seva ki details aur daily offers dekhne ke liye niche link kholein:*
+👇
+${link}
+
+📲 Direct Call & WhatsApp Contact Karein!`;
+
+            if (navigator.share) {
+                navigator.share({ title: shop, text: shareMsg, url: link }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareMsg).then(() => {
+                    alert("✅ Profile Share Text Copy Ho Gaya!\n\nAb WhatsApp Status ya Chat me Paste kar dein.");
                 });
             }
         }
@@ -1022,9 +1102,57 @@ ${link}
             else if (data.status === "Approved") {
                 activeVendorData = data;
                 document.getElementById('vendorWelcomeName').innerText = `${data.shop} (${data.name})`;
+                document.getElementById('vendorWelcomeLoc').innerText = `📍 ${data.location || ''}`;
                 document.getElementById('dashboardBox').classList.remove('hidden');
                 loadMyProducts();
             }
+        }
+
+        // RESET / DISCONNECT DEVICE
+        function disconnectDevice() {
+            if(!confirm("Kya aap is mobile se account disconnect karna chahte hain?")) return;
+            localStorage.removeItem("dev_token");
+            activeVendorData = null;
+            document.getElementById('dashboardBox').classList.add('hidden');
+            document.getElementById('regBox').classList.remove('hidden');
+            alert("✅ Device Reset Successful! Ab naya account register kar sakte hain.");
+        }
+
+        // EDIT VENDOR MASTER PROFILE LOGIC
+        function openEditProfileModal() {
+            if(!activeVendorData) return;
+            document.getElementById('editProfName').value = activeVendorData.name || '';
+            document.getElementById('editProfShop').value = activeVendorData.shop || '';
+            document.getElementById('editProfPhone').value = (activeVendorData.phone || '').replace(/^91/, '');
+            document.getElementById('editProfLoc').value = activeVendorData.location || '';
+            toggleModal('editProfileModal');
+        }
+
+        async function saveVendorMasterProfile() {
+            const name = document.getElementById('editProfName').value;
+            const shop = document.getElementById('editProfShop').value;
+            const phone = document.getElementById('editProfPhone').value;
+            const loc = document.getElementById('editProfLoc').value;
+
+            const phoneRegex = /^[6-9]\d{9}$/;
+            if(!phoneRegex.test(phone)) return alert("Sahi 10-digit mobile number bharein!");
+            if(!name || !shop || !loc) return alert("Sabhi details bharein!");
+
+            const res = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "updateVendorProfile",
+                    vendorId: activeVendorData.vendorId,
+                    name, shop, phone: "91" + phone, location: loc,
+                    deviceToken: getDeviceToken(),
+                    domain: window.location.hostname
+                })
+            });
+            const data = await res.json();
+            alert(data.msg);
+            toggleModal('editProfileModal');
+            checkApprovalStatus();
+            loadData();
         }
 
         async function registerVendor() {
@@ -1162,11 +1290,6 @@ ${link}
             loadData();
         }
 
-        function vendorLogout() { 
-            activeVendorData = null; 
-            closeVendorPortal(); 
-        }
-        
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         
         loadData();
