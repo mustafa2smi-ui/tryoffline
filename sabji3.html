@@ -154,7 +154,7 @@
 
     </div>
 
-    <!-- 3. FULL-PAGE VENDOR PORTAL VIEW (MODAL KE BADLE COMPLETE PAGE) -->
+    <!-- 3. FULL-PAGE VENDOR PORTAL VIEW -->
     <div id="vendorPortalPage" class="hidden fixed inset-0 bg-slate-100 z-50 flex flex-col overflow-y-auto">
         <!-- Header -->
         <div class="bg-indigo-700 text-white p-3.5 shadow-md flex justify-between items-center sticky top-0 z-10">
@@ -223,20 +223,47 @@
                     
                     <!-- Quick Pre-defined Service Title Suggestions -->
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">⚡ Quick Suggestion (Touch to Paste):</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">⚡ Quick Title (Touch to Fill):</p>
                         <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                            <button type="button" onclick="setServiceTitle('24x7 Emergency Plumber')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Plumber</button>
-                            <button type="button" onclick="setServiceTitle('Fresh Fruits & Vegetables')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Fresh Sabji</button>
-                            <button type="button" onclick="setServiceTitle('Auto / Taxi Booking')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Auto Booking</button>
-                            <button type="button" onclick="setServiceTitle('JCB & Tractor Service')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ JCB Service</button>
-                            <button type="button" onclick="setServiceTitle('Home Delivery Available')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Delivery</button>
+                            <button type="button" onclick="setField('serviceTitle', '24x7 Emergency Plumber')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Plumber</button>
+                            <button type="button" onclick="setField('serviceTitle', 'Fresh Fruits & Vegetables Daily')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Fresh Sabji</button>
+                            <button type="button" onclick="setField('serviceTitle', 'Fast Auto & Taxi Booking')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Auto Booking</button>
+                            <button type="button" onclick="setField('serviceTitle', 'JCB & Heavy Tractor Service')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ JCB Service</button>
+                            <button type="button" onclick="setField('serviceTitle', 'All Grocery & Home Delivery')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Grocery</button>
                         </div>
                     </div>
 
                     <input type="text" id="serviceTitle" placeholder="सेवा का शीर्षक (Service Title)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white font-medium">
-                    <input type="text" id="serviceAnnouncement" placeholder="⚡ आज का ऑफर या नोटिस (e.g. 10% छूट / दुकान खुली है)" class="w-full border border-amber-300 bg-amber-50/40 p-2.5 rounded-xl text-xs font-semibold text-amber-900">
-                    <input type="text" id="imgUrl" placeholder="Direct Photo Link (CDN / ImgBB URL)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white">
+
+                    <!-- Quick Pre-defined Details Suggestions -->
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">⚡ Quick Details (Touch to Fill):</p>
+                        <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                            <button type="button" onclick="setField('serviceDetails', 'Hamare yahan sabhi saman uchit daam par milte hain. Ghar baithe direct WhatsApp order karein.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ General Shop</button>
+                            <button type="button" onclick="setField('serviceDetails', 'Har prakaar ke pipe fitting, motor repair aur bathroom fitting ke anubhavi mistri.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Plumber/Mestri</button>
+                            <button type="button" onclick="setField('serviceDetails', 'Gao aur aas-paas ke sabhi shahar jane ke liye 24 ghante emergency booking uplabdh.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg border whitespace-nowrap active:scale-95">+ Transport</button>
+                        </div>
+                    </div>
+
                     <textarea id="serviceDetails" placeholder="सेवा की पूरी जानकारी (Details)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white h-16"></textarea>
+
+                    <input type="text" id="serviceAnnouncement" placeholder="⚡ आज का ऑफर या नोटिस (e.g. 10% छूट / दुकान खुली है)" class="w-full border border-amber-300 bg-amber-50/40 p-2.5 rounded-xl text-xs font-semibold text-amber-900">
+
+                    <!-- DIRECT IMGBB IMAGE UPLOAD WIDGET -->
+                    <div class="space-y-2 border border-dashed border-indigo-300 p-2.5 rounded-xl bg-indigo-50/50">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[11px] font-bold text-indigo-900">📸 Photo Upload Karein (Gallery Se):</label>
+                            <span id="uploadStatusText" class="text-[9px] font-bold text-gray-500">ImgBB Direct CDN</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="file" id="directImgInput" accept="image/*" class="w-full text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 bg-white p-1 rounded-lg border">
+                            <button type="button" onclick="uploadDirectToImgBB()" id="directUploadBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition whitespace-nowrap shadow-sm">
+                                🚀 Upload
+                            </button>
+                        </div>
+                    </div>
+
+                    <input type="text" id="imgUrl" placeholder="Direct Photo Link (Auto-fill ya CDN Link)" class="w-full border p-2.5 rounded-xl text-xs bg-slate-50 focus:bg-white font-mono text-[11px]">
                     
                     <div class="flex gap-2 pt-1">
                         <button onclick="cancelEdit()" id="cancelBtn" class="hidden w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-all" data-i18n="cancel">रद्द करें</button>
@@ -245,7 +272,37 @@
                 </div>
 
                 <p class="text-xs font-bold text-gray-600" data-i18n="myServices">आपकी सक्रिय सेवाएं:</p>
-                <div id="myProductsList" class="space-y-2 pb-10"></div>
+                <div id="myProductsList" class="space-y-2"></div>
+
+                <!-- VENDOR OWN PROFILE SHARE BUTTON -->
+                <div class="pt-2">
+                    <button type="button" onclick="shareVendorProfile()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5">
+                        📢 <span data-i18n="shareMyProfile">अपना प्रोफाइल व्हाट्सएप पर शेयर करें</span>
+                    </button>
+                </div>
+
+                <!-- MULTI-LANGUAGE VENDOR HELP GUIDE SECTION -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-3.5 space-y-3 mt-4 text-xs shadow-sm pb-10">
+                    <h4 class="font-bold text-indigo-900 border-b pb-1.5 flex items-center gap-1">
+                        📖 <span data-i18n="guideHeading">दुकानदार सहायता और नियम (Vendor Guide)</span>
+                    </h4>
+
+                    <div class="space-y-0.5">
+                        <p class="font-bold text-gray-800 flex items-center gap-1">1. ➕ <span data-i18n="guideCardTitle">नया कार्ड कैसे बनाएं?</span></p>
+                        <p class="text-gray-600 text-[11px] leading-relaxed" data-i18n="guideCardDesc">अपनी श्रेणी चुनें, फ़ोटो अपलोड करें और टाइटल भरकर 'कार्ड सेव करें' दबाएं।</p>
+                    </div>
+
+                    <div class="space-y-0.5 border-t pt-1.5">
+                        <p class="font-bold text-gray-800 flex items-center gap-1">2. ✏️ <span data-i18n="guideEditTitle">एडिट और डिलीट कैसे करें?</span></p>
+                        <p class="text-gray-600 text-[11px] leading-relaxed" data-i18n="guideEditDesc">सक्रिय सेवाओं में ✏️ से विवरण बदलें और 🗑️ से कार्ड हटाएं।</p>
+                    </div>
+
+                    <div class="space-y-0.5 border-t pt-1.5">
+                        <p class="font-bold text-amber-900 flex items-center gap-1">3. ⚡ <span data-i18n="guideOfferTitle">ऑफर और नोटिस का फायदा (24h Expiry)</span></p>
+                        <p class="text-gray-600 text-[11px] leading-relaxed" data-i18n="guideOfferDesc">दैनिक छूट या जरूरी सूचना दर्ज करें। पुराने ऑफर 24 घंटे में स्वतः हट जाते हैं।</p>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -304,6 +361,7 @@
         let currentSlideIndex = 0;
         let slideTimer = null;
 
+        // MULTI-LANGUAGE DICTIONARY
         const i18n = {
             hi: {
                 welcomeHeading: "🏪 अपना गांव डिजिटल डायरेक्टरी",
@@ -346,6 +404,14 @@
                 saveCard: "कार्ड सेव करें",
                 cancel: "रद्द करें",
                 myServices: "आपकी सक्रिय सेवाएं:",
+                shareMyProfile: "अपना प्रोफाइल व्हाट्सएप पर शेयर करें",
+                guideHeading: "दुकानदार सहायता और नियम (Vendor Guide)",
+                guideCardTitle: "नया कार्ड कैसे बनाएं?",
+                guideCardDesc: "अपनी श्रेणी चुनें, फ़ोटो अपलोड करें और टाइटल भरकर 'कार्ड सेव करें' दबाएं।",
+                guideEditTitle: "एडिट और डिलीट कैसे करें?",
+                guideEditDesc: "सक्रिय सेवाओं में ✏️ से विवरण बदलें और 🗑️ से कार्ड हटाएं।",
+                guideOfferTitle: "ऑफर और नोटिस का फायदा (24h Expiry)",
+                guideOfferDesc: "दैनिक छूट या जरूरी सूचना दर्ज करें। पुराने ऑफर 24 घंटे में स्वतः हट जाते हैं।",
                 privacyDesc: "हम आपका कोई निजी डेटा ट्रैक नहीं करते हैं।",
                 termsDesc: "लिस्टिंग स्थानीय विक्रेताओं द्वारा प्रबंधित की जाती है।",
                 disclaimerDesc: "यह ऐप केवल ग्राहकों को स्थानीय विक्रेताओं से जोड़ने का माध्यम है।",
@@ -393,6 +459,14 @@
                 saveCard: "Save Service Card",
                 cancel: "Cancel",
                 myServices: "Aapki Active Services:",
+                shareMyProfile: "Apna Profile WhatsApp Par Share Karein",
+                guideHeading: "Dukandar Guide & Help",
+                guideCardTitle: "Naya Card Kaise Banayein?",
+                guideCardDesc: "Category chunein, photo upload karein aur Title bhar kar 'Save' dabayein.",
+                guideEditTitle: "Edit aur Delete Kaise Karein?",
+                guideEditDesc: "Active services me ✏️ se update karein aur 🗑️ se card delete karein.",
+                guideOfferTitle: "Offers & Notice Ka Fayda (24h Expiry)",
+                guideOfferDesc: "Daily discount ya emergency notice dalein. Purane offers 24h me auto-expire ho jate hain.",
                 privacyDesc: "Hum aapka koi personal data trace nahi karte.",
                 termsDesc: "Listings local vendors dwara manage ki jaati hain.",
                 disclaimerDesc: "Ye app direct connection ke liye ek open directory hai.",
@@ -440,6 +514,14 @@
                 saveCard: "Save Service",
                 cancel: "Cancel",
                 myServices: "Your Active Listings:",
+                shareMyProfile: "Share My Profile on WhatsApp",
+                guideHeading: "Vendor Help & Guide",
+                guideCardTitle: "How to Create a Listing?",
+                guideCardDesc: "Select category, upload photo, fill title and press 'Save Service Card'.",
+                guideEditTitle: "How to Edit & Delete?",
+                guideEditDesc: "Use ✏️ to modify details and 🗑️ to delete your listings anytime.",
+                guideOfferTitle: "Offers & Flash Notice (24h Expiry)",
+                guideOfferDesc: "Post daily discounts or alerts. Announcements auto-expire after 24 hours.",
                 privacyDesc: "We do not track your personal data.",
                 termsDesc: "Listings are managed directly by local vendors.",
                 disclaimerDesc: "This platform is an open directory to connect customers.",
@@ -470,8 +552,80 @@
             applyFilters();
         }
 
-        function setServiceTitle(val) {
-            document.getElementById('serviceTitle').value = val;
+        function setField(fieldId, text) {
+            document.getElementById(fieldId).value = text;
+        }
+
+        // DIRECT IMGBB API UPLOAD ENGINE
+        async function uploadDirectToImgBB() {
+            const fileInput = document.getElementById('directImgInput');
+            const statusText = document.getElementById('uploadStatusText');
+            const uploadBtn = document.getElementById('directUploadBtn');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                return alert("Kripya pehle photo choose karein!");
+            }
+
+            const file = fileInput.files[0];
+            const IMGBB_KEY = "6d207e02198a847aa5a0a03322448433"; // ImgBB Public Upload Key[span_1](start_span)[span_1](end_span)
+
+            uploadBtn.disabled = true;
+            uploadBtn.innerText = "⏳ Uploading...";
+            statusText.innerText = "Uploading to Cloud...";
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const json = await res.json();
+                
+                if (json.success) {
+                    document.getElementById('imgUrl').value = json.data.url; // Pure Direct .jpg/.png CDN Link[span_2](start_span)[span_2](end_span)
+                    statusText.innerText = "✅ Uploaded!";
+                    statusText.className = "text-[9px] font-bold text-green-600";
+                    alert("✅ Photo Upload Ho Gayi! Direct Link Auto-Fill Ho Gaya Hai.");
+                } else {
+                    alert("Upload fail hua. Kripya dubara try karein.");
+                    statusText.innerText = "❌ Upload Failed";
+                }
+            } catch(err) {
+                alert("Internet error. Kripya connection check karein.");
+                statusText.innerText = "❌ Network Error";
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerText = "🚀 Upload";
+            }
+        }
+
+        // VENDOR PROFILE SHARE ENGINE
+        function shareVendorProfile() {
+            if(!activeVendorData) return;
+            const shop = activeVendorData.shop || "My Business";
+            const name = activeVendorData.name || "Vendor";
+            const loc = activeVendorData.location || "Mandi Area";
+            const link = window.location.href;
+
+            const shareMsg = 
+`🏪 *${shop}* (${name})
+📍 Location: ${loc}
+
+✨ *Hamari sabhi dukan/seva ki details aur daily offers dekhne ke liye niche link kholein:*
+👇
+${link}
+
+📲 Direct Call & WhatsApp Contact Karein!`;
+
+            if (navigator.share) {
+                navigator.share({ title: shop, text: shareMsg, url: link }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(shareMsg).then(() => {
+                    alert("✅ Profile Share Text Copy Ho Gaya!\n\nAb WhatsApp Status ya Chat me Paste kar dein.");
+                });
+            }
         }
 
         // DEMO DATA
@@ -490,7 +644,7 @@
                 itemId: "L02",
                 category: "Marriage/Tour Vehicle",
                 title: "Suresh JCB & Tractor Service",
-                imageUrl: "", // Blank link testing fallback
+                imageUrl: "", // Fallback test
                 details: "Mitti bharai aur jutai ke liye Tractor aur JCB uplabdh.",
                 announcement: "📢 Kal Subah Khali Tractor Mandi Se Gaon Jayega.",
                 vendor: { name: "Suresh Sahu", shop: "Suresh Enterprises", phone: "919876543211", location: "Station Road" },
@@ -603,7 +757,6 @@
                     `;
                 }
 
-                // Image Block with Profile Icon & Bold Font Fallback
                 let imageBlock = '';
                 if(item.imageUrl && item.imageUrl.trim() !== '') {
                     imageBlock = `
@@ -637,7 +790,6 @@
                             ${announcementBadge}
                             <p class="text-xs text-gray-600 leading-relaxed">${item.details}</p>
                             
-                            <!-- 3 Action Buttons -->
                             <div class="flex gap-2 pt-1 border-t">
                                 <a href="tel:${item.vendor.phone}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-all shadow-sm">
                                     ${i18n[currentLang].callNow}
@@ -657,7 +809,6 @@
             });
         }
 
-        // CUSTOMER CARD COPY ENGINE
         function copyListingCard(title, category, location, name, details, announcement, imageUrl) {
             title = decodeURIComponent(title);
             category = decodeURIComponent(category);
@@ -795,7 +946,6 @@
             else customBox.classList.add('hidden');
         }
 
-        // FULL PAGE VENDOR PORTAL CONTROLLER
         function openVendorPortal() {
             document.getElementById('vendorPortalPage').classList.remove('hidden');
             if (!SCRIPT_URL.includes("YOUR_EXACT_DEPLOYED")) { checkApprovalStatus(); }
