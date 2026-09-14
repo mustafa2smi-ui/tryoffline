@@ -7,18 +7,19 @@
   <meta name="theme-color" content="#1a252f">
   
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Free offline counter billing app with Bluetooth thermal receipt generator, digital ledger, barcode scanner, and A4/5x8 print support.">
-  <meta name="keywords" content="notebook bill, offline billing tool, thermal printer billing, bluetooth receipt generator, retail ledger, digital khata">
-  <meta name="author" content="Webmy Solutions">
+  <meta name="description" content="Free offline counter billing app with Bluetooth thermal receipt generator, digital ledger, barcode scanner, and A4/5x8 print support by imadigitalgo.">
+  <meta name="keywords" content="notebook bill, imadigitalgo billing, offline billing tool, thermal printer billing, bluetooth receipt generator, retail ledger, digital khata">
+  <meta name="author" content="imadigitalgo">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://www.webmy.in/tools/notebook-bill">
+  <link rel="canonical" href="https://imadigitalgo.netlify.app/NotebookBill/">
 
   <!-- Open Graph / Social Media Sharing -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Notebook Bill - Free Offline Counter Billing Tool">
-  <meta property="og:description" content="Fast, offline-first thermal receipt generator and daily sales ledger for retail shops.">
-  <meta property="og:url" content="https://www.webmy.in/tools/notebook-bill">
-  <meta property="og:image" content="https://www.webmy.in/assets/images/notebook-bill-og.png">
+  <meta property="og:site_name" content="imadigitalgo">
+  <meta property="og:title" content="Notebook Bill - Free Offline Counter Billing Tool | imadigitalgo">
+  <meta property="og:description" content="Fast, offline-first thermal receipt generator and daily sales ledger for retail shops by imadigitalgo.">
+  <meta property="og:url" content="https://imadigitalgo.netlify.app/NotebookBill/">
+  <meta property="og:image" content="https://imadigitalgo.netlify.app/assets/images/notebook-bill-og.png">
 
   <!-- Favicon Icons -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -30,10 +31,15 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Notebook Bill",
-    "url": "https://www.webmy.in/tools/notebook-bill",
+    "url": "https://imadigitalgo.netlify.app/NotebookBill/",
     "description": "Offline mobile billing tool with bluetooth thermal printing, barcode scanning, and daily ledger tracking.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "All",
+    "author": {
+      "@type": "Organization",
+      "name": "imadigitalgo",
+      "url": "https://imadigitalgo.netlify.app"
+    },
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -231,8 +237,8 @@
         </div>
 
         <!-- 🏠 DIRECT HUB HOME LINK -->
-        <a href="https://www.webmy.in" target="_self" class="settings-item-btn" style="background: #27ae60; border-color: #2ecc71;">
-          <span style="color: #fff; font-weight: bold;">🏠 Back to Webmy Home</span> ➔
+        <a href="https://imadigitalgo.netlify.app" target="_self" class="settings-item-btn" style="background: #27ae60; border-color: #2ecc71;">
+          <span style="color: #fff; font-weight: bold;">🏠 Back to imadigitalgo Home</span> ➔
         </a>
 
         <button class="settings-item-btn" onclick="location.reload();">
@@ -295,7 +301,7 @@
 
         <div style="margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 11px; text-align: center; font-weight: bold; background: rgba(39, 174, 96, 0.15); border: 1px solid #27ae60; color: #2ecc71;">
           🟢 Complete Free Edition Active<br>
-          <span style="font-size:10px; color:#bdc3c7;">All Pro Features Fully Unlocked</span>
+          <span style="font-size:10px; color:#bdc3c7;">All Pro Features Fully Unlocked | imadigitalgo</span>
         </div>
       </div>
     </div>
@@ -318,7 +324,7 @@
     <div class="brand-header">
       <div class="controls">
         <div style="display: flex; gap: 4px; align-items: center;">
-          <a href="https://www.webmy.in" class="settings-trigger-btn" title="Back to Home Hub">🏠</a>
+          <a href="https://imadigitalgo.netlify.app" class="settings-trigger-btn" title="Back to imadigitalgo Home">🏠</a>
           <button id="btnSettingsOpen" onclick="openSettingsModal()" class="settings-trigger-btn" title="Open Settings">⚙️</button>
           <button id="btnBackToBill" onclick="navToBillMode()" class="back-to-bill-btn">← Back</button>
         </div>
@@ -451,19 +457,19 @@
 
   <script>
     /* ==========================================================================
-       🌐 1. MULTI-LANGUAGE (HINGLISH / HINDI / ENGLISH) DICTIONARY ENGINE
+       🌐 1. MULTI-LANGUAGE DICTIONARY ENGINE (imadigitalgo)
        ========================================================================== */
     let currentAppLang = localStorage.getItem("notebook_app_lang") || "hinglish";
 
     const I18N_LANG = {
       hinglish: {
-        privacyTitle: "🔒 Privacy Policy (प्राइवेसी पॉलिसी)",
+        privacyTitle: "🔒 Privacy Policy (imadigitalgo)",
         privacyBody: `
-          <p><b>Notebook Bill</b> aapki privacy ko 100% respect karta hai.</p><br>
-          <p><b>Data Storage:</b> Aapka saara billing records, customer details, aur database items aapke apne mobile/device ke <i>LocalStorage</i> mein privately store rehta hai.</p><br>
-          <p><b>Zero Server Tracking:</b> Koi bhi data hamare server par nahi jata. Yeh application 100% offline safe hai.</p>
+          <p><b>Notebook Bill by imadigitalgo</b> aapki privacy ko 100% respect karta hai.</p><br>
+          <p><b>Data Storage:</b> Aapka saara billing records, customer details, aur database items aapke apne mobile ke <i>LocalStorage</i> mein privately store rehta hai.</p><br>
+          <p><b>Zero Server Tracking:</b> Koi bhi data hamare external server par send nahi hota. Yeh application 100% offline safe hai.</p>
         `,
-        disclaimerTitle: "⚠️ Disclaimer & Data Warning",
+        disclaimerTitle: "⚠️ Disclaimer & Loss Alert",
         disclaimerBody: `
           <p><b>Local Data Dependency:</b> Yeh app device browser storage par depend karti hai.</p><br>
           <p><b>Data Loss Warning:</b> Agar aap browser ka "Clear Cache / Clear Data" karenge, toh bina backup ke aapka purana records delete ho sakta hai.</p><br>
@@ -476,7 +482,7 @@
             <li><b>Item Add:</b> Name aur Price likhein (e.g. <i>Rice 50</i> ya <i>चीनी 40</i>) aur Enter dabayein.</li>
             <li><b>Math Calculation:</b> Expression math likhein (e.g. <i>Sugar 40*2.5</i>).</li>
             <li><b>Barcode Scan:</b> 📷 Camera icon daba kar scan karein.</li>
-            <li><b>Smart Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
+            <li><b>Undo:</b> Galti se clear hone par ↩️ Undo dabayein.</li>
           </ul>
         `,
         backupWarning: "🚨 Backup restore karne se current data replace ho jayega. Continue?",
@@ -485,10 +491,10 @@
         custNameReq: "Data save karne ke liye 'Cust Name' zaroor enter karein!"
       },
       hindi: {
-        privacyTitle: "🔒 गोपनीयता नीति (Privacy Policy)",
+        privacyTitle: "🔒 गोपनीयता नीति (imadigitalgo)",
         privacyBody: `
-          <p><b>नोटबुक बिल</b> आपकी डेटा गोपनीयता का पूर्ण सम्मान करता है।</p><br>
-          <p><b>डेटा संग्रहण:</b> आपका सारा बिलिंग विवरण, ग्राहक सूची और उत्पाद डेटा आपके अपने मोबाइल के <i>स्थानीय भंडारण (LocalStorage)</i> में सुरक्षित रहता है।</p><br>
+          <p><b>नोटबुक बिल (imadigitalgo)</b> आपकी डेटा गोपनीयता का पूर्ण सम्मान करता है।</p><br>
+          <p><b>डेटा संग्रहण:</b> आपका सारा बिलिंग विवरण और उत्पाद डेटा आपके अपने मोबाइल के <i>स्थानीय भंडारण (LocalStorage)</i> में सुरक्षित रहता है।</p><br>
           <p><b>कोई बाहरी ट्रैकिंग नहीं:</b> कोई भी डेटा किसी बाहरी सर्वर पर नहीं भेजा जाता। यह ऐप पूर्णतः ऑफलाइन सुरक्षित है।</p>
         `,
         disclaimerTitle: "⚠️ अस्वीकरण एवं डेटा चेतावनी",
@@ -513,9 +519,9 @@
         custNameReq: "बिल सेव करने के लिए ग्राहक का नाम दर्ज करें!"
       },
       english: {
-        privacyTitle: "🔒 Privacy Policy",
+        privacyTitle: "🔒 Privacy Policy (imadigitalgo)",
         privacyBody: `
-          <p><b>Notebook Bill</b> respects your privacy completely.</p><br>
+          <p><b>Notebook Bill by imadigitalgo</b> respects your privacy completely.</p><br>
           <p><b>Data Storage:</b> All invoices, customer details, and database records are saved privately inside your device's <i>LocalStorage</i>.</p><br>
           <p><b>Zero Server Tracking:</b> No personal ledger details are sent to external servers. It is 100% offline secure.</p>
         `,
@@ -686,7 +692,7 @@
 
     window.shareAppText = function() {
       closeSettingsModal();
-      const shareData = { title: "Notebook Bill", text: "Smart Digital Ledger & Thermal Billing App", url: window.location.href };
+      const shareData = { title: "Notebook Bill by imadigitalgo", text: "Free Smart Digital Ledger & Thermal Billing App", url: window.location.href };
       if (navigator.share) navigator.share(shareData);
       else alert("App Link: " + window.location.href);
     };
@@ -696,8 +702,8 @@
       const dict = I18N_LANG[currentAppLang] || I18N_LANG.hinglish;
       try {
         const backupData = {
-          app: "NotebookBillFree",
-          version: "1.0",
+          app: "NotebookBill-imadigitalgo",
+          version: "2.0",
           exportDate: new Date().toLocaleString('en-IN'),
           ledger_db_v3: JSON.parse(localStorage.getItem("ledger_db_v3")) || [],
           notebook_invoice_history: JSON.parse(localStorage.getItem("notebook_invoice_history")) || [],
@@ -712,7 +718,7 @@
         const downloadAnchor = document.createElement("a");
         const today = new Date().toISOString().slice(0, 10);
         downloadAnchor.setAttribute("href", jsonString);
-        downloadAnchor.setAttribute("download", `notebook_bill_backup_${today}.json`);
+        downloadAnchor.setAttribute("download", `notebook_bill_${today}.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -1047,7 +1053,7 @@
         const tokens = cleaned.split(/\s+/);
         let priceVal = 0;
         for (let i = tokens.length - 1; i >= 0; i--) {
-          if (/^[0-9.]+$/.test(token)) { priceVal = parseFloat(token); break; }
+          if (/^[0-9.]+$/.test(tokens[i])) { priceVal = parseFloat(tokens[i]); break; }
           if (/[+\-*/^]/.test(tokens[i])) break;
         }
         if (itemName && priceVal > 0) {
@@ -1361,11 +1367,11 @@
         alert(`Bill data saved! Code: ${generatedBillCode}`);
       });
 
-      // 📤 SHARE CURRENT BILL TEXT VIA WHATSAPP / SYSTEM
+      // 📤 SHARE CURRENT BILL TEXT VIA WHATSAPP / SYSTEM SHARE
       if (shareBtn) {
         shareBtn.addEventListener("click", function() {
           const shopTitle = document.getElementById("shopNameInput").value || 'Notebook Bill';
-          const cName = document.getElementById('custNameInput').textContent.trim() || "Customer";
+          const cName = document.getElementById('custNameInput').textContent.trim() || "Valued Customer";
           
           let validRows = [];
           [...container.children].forEach(row => {
@@ -1374,18 +1380,19 @@
             if(itemText) validRows.push(`${itemText} = ₹${itemTotal || 0}`);
           });
 
-          if (validRows.length === 0) return alert("Pehle items add karein!");
+          if (validRows.length === 0) return alert("Pehle bill mein items add karein!");
 
           let shareMsg = `🧾 *${shopTitle.toUpperCase()}*\n`;
           shareMsg += `📅 Date: ${dateEl.textContent} ${timeEl.textContent}\n`;
-          shareMsg += `👤 Cust: ${cName}\n`;
+          shareMsg += `👤 Customer: ${cName}\n`;
           shareMsg += `-------------------------\n`;
           validRows.forEach((it, idx) => {
             shareMsg += `${idx + 1}. ${it}\n`;
           });
           shareMsg += `-------------------------\n`;
           shareMsg += `💰 *Grand Total: ${totalBox.textContent}*\n`;
-          shareMsg += `🙏 Thank You! Visit Again.`;
+          shareMsg += `🙏 Thank You! Visit Again.\n`;
+          shareMsg += `⚡ Billed via imadigitalgo Notebook`;
 
           if (navigator.share) {
             navigator.share({ title: `${shopTitle} Bill`, text: shareMsg }).catch(() => {});
@@ -1403,9 +1410,8 @@
           if(itemText) csvContent += `${idx + 1},"${itemText}",${itemTotal || 0}\n`;
         });
         csvContent += `,,Total: ${totalBox.textContent.replace(/₹|,/g, "")}\n`;
-        const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri); link.setAttribute("download", `ledger_report.csv`);
+        link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `ledger_report.csv`);
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
       };
 
